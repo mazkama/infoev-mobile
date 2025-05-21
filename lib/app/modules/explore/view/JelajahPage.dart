@@ -1,0 +1,1200 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:infoev/app/modules/explore/controllers/MerekController.dart';
+import 'package:infoev/app/modules/explore/model/MerekModel.dart';
+import 'package:shimmer/shimmer.dart';
+
+class JelajahPage extends StatefulWidget {
+  const JelajahPage({super.key});
+
+  @override
+  State<JelajahPage> createState() => _JelajahPageState();
+}
+
+class _JelajahPageState extends State<JelajahPage> {
+  final TextEditingController _searchController = TextEditingController();
+  final MerekController controller = Get.find<MerekController>();
+  final FocusNode _searchFocusNode = FocusNode();
+  Timer? _debounceTimer;
+  String _lastSearchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Load initial data
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Ensure type counts are loaded first
+      await controller.loadTypeData();
+
+      if (controller.merekList.isEmpty && !controller.isLoading.value) {
+        await controller.refreshData();
+      }
+    });
+
+    // Add debounced listener for real-time search
+    _searchController.addListener(() {
+      final newQuery = _searchController.text;
+      // Only trigger search if the text actually changed
+      if (newQuery != _lastSearchQuery) {
+        _lastSearchQuery = newQuery;
+        if (_debounceTimer?.isActive ?? false) _debounceTimer?.cancel();
+        _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+          if (mounted && _searchFocusNode.hasFocus) {
+            controller.performSearch(newQuery);
+          }
+        });
+      }
+    });
+
+    _searchFocusNode.addListener(_onFocusChange);
+  }
+
+  void _onFocusChange() {
+    if (!_searchFocusNode.hasFocus) {
+      _debounceTimer?.cancel();
+    }
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    _searchController.dispose();
+    _searchFocusNode.removeListener(_onFocusChange);
+    _searchFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        if (_searchFocusNode.hasFocus) {
+          _debounceTimer?.cancel();
+          FocusScope.of(context).unfocus();
+          return false;
+        }
+        if (controller.isSearching.value) {
+          controller.resetSearch();
+          controller.resetFilters(); // Reset filter saat kembali
+          _searchController.clear();
+          _lastSearchQuery = '';
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFF121212),
+        body: SafeArea(
+          child: Column(
+            children: [
+              Obx(
+                () =>
+                    controller.isSearching.value
+                        ? _buildSearchAppBar()
+                        : Column(
+                          children: [
+                            _buildNormalAppBar(),
+                            _buildTypeFilterChips(),
+                          ],
+                        ),
+              ),
+              Expanded(
+                child: Obx(() {
+                  if (controller.isSearching.value) {
+                    return _buildSearchResults();
+                  }
+                  return _buildMainContent();
+                }),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchAppBar() {
+    return Container(
+      color: const Color(0xFF1A1A1A),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              controller.resetSearch();
+              controller.resetFilters(); // Reset filter saat tombol back diklik
+              _searchController.clear();
+            },
+          ),
+          Expanded(
+            child: TextField(
+              controller: _searchController,
+              focusNode: _searchFocusNode,
+              style: GoogleFonts.poppins(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: 'Cari kendaraan listrik...',
+                hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                suffixIcon: ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: _searchController,
+                  builder: (context, value, child) {
+                    return value.text.isNotEmpty
+                        ? IconButton(
+                          icon: const Icon(Icons.close, color: Colors.grey),
+                          onPressed: () {
+                            _searchController.clear();
+                            controller.searchBrands('');
+                            controller.performSearch('');
+                          },
+                        )
+                        : const SizedBox.shrink();
+                  },
+                ),
+              ),
+              onChanged: (value) {
+                if (_debounceTimer?.isActive ?? false) _debounceTimer?.cancel();
+                _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+                  if (mounted) {
+                    controller.searchBrands(value);
+                    controller.performSearch(value);
+                  }
+                });
+              },
+              autofocus: true,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNormalAppBar() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Jelajah',
+                style: GoogleFonts.poppins(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.search, color: Colors.white),
+                    onPressed: () {
+                      controller.toggleSearch();
+                      Future.delayed(const Duration(milliseconds: 100), () {
+                        _searchFocusNode.requestFocus();
+                      });
+                    },
+                  ),
+                  Stack(
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.filter_list,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          _showFilterDialog(context, controller);
+                        },
+                      ),
+                      if (controller.filterOptions['minProductCount'] != null &&
+                          controller.filterOptions['minProductCount'] > 0)
+                        Positioned(
+                          right: 8,
+                          top: 8,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Temukan berbagai kendaraan listrik favorit Anda',
+            style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[400]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTypeFilterChips() {
+    return Column(
+      children: [
+        Container(
+          height: 40,
+          margin: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A1A1A),
+            border: Border(
+              bottom: BorderSide(color: Colors.grey.withOpacity(0.1), width: 1),
+            ),
+          ),
+          child: Obx(() {
+            // Fixed order for vehicle types with their respective names
+            final List<Map<String, dynamic>> fixedTypeOrder = [
+              {'id': 0, 'name': 'Semua', 'count': controller.merekList.length},
+              {'id': 1, 'name': 'Mobil', 'count': 0},
+              {'id': 2, 'name': 'Sepeda Motor', 'count': 0},
+              {'id': 3, 'name': 'Sepeda', 'count': 0},
+              {'id': 5, 'name': 'Skuter', 'count': 0},
+            ];
+
+            // Update counts from brandCounts if available
+            final brandCounts = controller.filterOptions['brandCounts'];
+            if (brandCounts != null) {
+              for (var type in fixedTypeOrder) {
+                if (type['id'] != 0) {
+                  type['count'] = brandCounts[type['id']] ?? 0;
+                }
+              }
+            }
+
+            return ListView(
+              scrollDirection: Axis.horizontal,
+              children:
+                  fixedTypeOrder.map((type) {
+                    final id = type['id'] as int;
+                    final name = type['name'] as String;
+                    final count =
+                        id == 0
+                            ? controller.merekList.length
+                            : type['count'] as int;
+                    final isSelected =
+                        id == 0
+                            ? controller.filterOptions['typeId'] == null ||
+                                controller.filterOptions['typeId'] == 0
+                            : controller.filterOptions['typeId'] == id;
+
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (id == 0) {
+                            controller.resetFilters();
+                          } else {
+                            controller.filterBrandsByType(id);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              isSelected
+                                  ? Colors.white
+                                  : const Color(0xFF303030),
+                          foregroundColor:
+                              isSelected ? Colors.black : Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text(
+                          id == 0 ? name : '$name ($count)',
+                          style: GoogleFonts.poppins(
+                            fontWeight:
+                                isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+            );
+          }),
+        ),
+        const SizedBox(height: 12), // Adds spacing below the filter
+      ],
+    );
+  }
+
+  Widget _buildSearchResults() {
+    return Obx(() {
+      if (controller.isSearchLoading.value) {
+        return const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          ),
+        );
+      }
+
+      if (_searchController.text.isEmpty) {
+        return _buildSearchHistory();
+      }
+
+      if (controller.searchResults.isEmpty) {
+        return Center(
+          child: Text(
+            'Tidak ditemukan hasil',
+            style: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 16),
+          ),
+        );
+      }
+
+      return ListView.builder(
+        itemCount: controller.searchResults.length,
+        itemBuilder: (context, index) {
+          final entry = controller.searchResults.entries.elementAt(index);
+          final sectionTitle = entry.key;
+          final items = entry.value;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Text(
+                  sectionTitle,
+                  style: GoogleFonts.poppins(
+                    color: Colors.grey[400],
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              ...items.map((item) {
+                if (sectionTitle == 'MEREK') {
+                  final brand = item as MerekModel;
+                  return _buildBrandSearchItem(brand);
+                } else {
+                  return _buildVehicleSearchItem(item);
+                }
+              }).toList(),
+              if (index < controller.searchResults.length - 1)
+                const Divider(color: Colors.grey),
+            ],
+          );
+        },
+      );
+    });
+  }
+
+  Widget _buildSearchHistory() {
+    return Obx(() {
+      if (controller.searchHistory.isEmpty) {
+        return Center(
+          child: Text(
+            'Belum ada riwayat pencarian',
+            style: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 16),
+          ),
+        );
+      }
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Riwayat Pencarian',
+                  style: GoogleFonts.poppins(
+                    color: Colors.grey[400],
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => controller.clearSearchHistory(),
+                  child: Text(
+                    'Hapus Semua',
+                    style: GoogleFonts.poppins(
+                      color: Colors.blue,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: controller.searchHistory.length,
+              itemBuilder: (context, index) {
+                final query = controller.searchHistory[index];
+                return ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  leading: const Icon(Icons.history, color: Colors.grey),
+                  title: Text(
+                    query,
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 14,
+                    ),
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.close, color: Colors.grey, size: 20),
+                    onPressed: () => controller.removeFromSearchHistory(query),
+                  ),
+                  onTap: () {
+                    _searchController.text = query;
+                    _searchController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: query.length),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      );
+    });
+  }
+
+  Widget _buildBrandSearchItem(MerekModel brand) {
+    // Get background color from controller configuration
+    final backgroundColor = controller.getBrandBackgroundColor(brand.name);
+
+    return InkWell(
+      onTap: () {
+        Get.toNamed(
+          '/brand/${brand.id}',
+          parameters: {'brandId': brand.id.toString()},
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            if (brand.banner != null)
+              Container(
+                width: 48,
+                height: 48,
+                margin: const EdgeInsets.only(right: 12),
+                decoration: BoxDecoration(
+                  color: backgroundColor,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: CachedNetworkImage(
+                    imageUrl: brand.banner!,
+                    fit: BoxFit.contain,
+                    placeholder:
+                        (context, url) => Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(color: backgroundColor),
+                        ),
+                    errorWidget:
+                        (context, url, error) =>
+                            const Icon(Icons.error_outline, color: Colors.grey),
+                  ),
+                ),
+              )
+            else
+              Container(
+                width: 48,
+                height: 48,
+                margin: const EdgeInsets.only(right: 12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[800],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.electric_car, color: Colors.white),
+              ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    brand.name,
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    '${brand.vehiclesCount} kendaraan',
+                    style: GoogleFonts.poppins(
+                      color: Colors.grey[400],
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: Colors.grey),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVehicleSearchItem(Map<String, dynamic> vehicle) {
+    return InkWell(
+      onTap: () {
+        Get.toNamed('/kendaraan/${vehicle['slug']}');
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 48, // Square ratio 48x48
+              height: 48,
+              margin: const EdgeInsets.only(right: 12),
+              decoration: BoxDecoration(
+                color: Colors.white, // White background for transparent images
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: CachedNetworkImage(
+                  imageUrl: vehicle['thumbnail_url'] ?? '',
+                  fit: BoxFit.contain,
+                  placeholder:
+                      (context, url) => Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(color: Colors.white),
+                      ),
+                  errorWidget:
+                      (context, url, error) =>
+                          const Icon(Icons.error_outline, color: Colors.grey),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    vehicle['name'] ?? '',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (vehicle['brand'] != null)
+                    Text(
+                      vehicle['brand']['name'] ?? '',
+                      style: GoogleFonts.poppins(
+                        color: Colors.grey[400],
+                        fontSize: 12,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: Colors.grey),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMainContent() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return RefreshIndicator(
+      color: Colors.white,
+      backgroundColor: const Color(0xFF303030),
+      onRefresh: () => controller.refreshData(),
+      child: Obx(() {
+        if (controller.isLoading.value && controller.merekList.isEmpty) {
+          return _buildShimmer(screenWidth);
+        }
+
+        if (!controller.isLoading.value && controller.merekList.isEmpty) {
+          return _buildErrorState(controller);
+        }
+
+        final displayList =
+            controller.filteredMerekList.isEmpty
+                ? controller.merekList
+                : controller.filteredMerekList;
+
+        if (displayList.isEmpty) {
+          return _buildEmptyFilterResults(controller);
+        }
+
+        return _buildBrandGrid(controller, screenWidth, displayList);
+      }),
+    );
+  }
+
+  Widget _buildBrandGrid(
+    MerekController controller,
+    double screenWidth,
+    List<MerekModel> displayList,
+  ) {
+    return GridView.builder(
+      padding: const EdgeInsets.all(16),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: screenWidth > 600 ? 3 : 2,
+        childAspectRatio: 1.2,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+      ),
+      itemCount: displayList.length,
+      itemBuilder: (context, index) {
+        final merek = displayList[index];
+        return InkWell(
+          onTap: () {
+            debugPrint("Merek ID: ${merek.id}, Banner: ${merek.banner}");
+            Get.toNamed(
+              '/brand/${merek.id}',
+              parameters: {'brandId': merek.id.toString()},
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF212121),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child:
+                  merek.banner != null
+                      ? CachedNetworkImage(
+                        imageUrl: merek.banner!,
+                        imageBuilder: (context, imageProvider) {
+                          return _buildCardWithContentLoaded(
+                            merek,
+                            imageProvider,
+                          );
+                        },
+                        placeholder: (context, url) => _buildFullCardShimmer(),
+                        errorWidget:
+                            (context, url, error) =>
+                                _buildFullCardShimmer(isError: true),
+                      )
+                      : _buildFullCardShimmer(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Card dengan content sudah terload
+  Widget _buildCardWithContentLoaded(
+    MerekModel merek,
+    ImageProvider imageProvider,
+  ) {
+    return Stack(
+      children: [
+        // Background color
+        Positioned.fill(
+          child: Container(
+            color: controller.getBrandBackgroundColor(merek.name),
+          ),
+        ),
+        // Brand content with shimmer while loading
+        Center(
+          child: Hero(
+            tag: 'brand-${merek.id}',
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Image(
+                image: imageProvider,
+                fit: BoxFit.contain,
+                errorBuilder:
+                    (context, error, stackTrace) => _buildShimmerPlaceholder(),
+                frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                  if (wasSynchronouslyLoaded) return child;
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: frame != null ? child : _buildShimmerPlaceholder(),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+        // Bottom gradient overlay
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                stops: const [0.5, 1.0],
+              ),
+            ),
+          ),
+        ),
+        // Brand info
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  merek.name,
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  '${merek.vehiclesCount} kendaraan',
+                  style: GoogleFonts.poppins(
+                    color: Colors.grey[300],
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildShimmerPlaceholder() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[800]!,
+      highlightColor: Colors.grey[700]!,
+      child: Container(color: Colors.white),
+    );
+  }
+
+  Widget _buildFullCardShimmer({bool isError = false}) {
+    return SizedBox(
+      width: double.infinity,
+      height: double.infinity,
+      child: Stack(
+        children: [
+          Shimmer.fromColors(
+            baseColor: Colors.grey.shade800,
+            highlightColor: Colors.grey.shade700,
+            child: Container(color: Colors.white),
+          ),
+          if (isError)
+            Center(
+              child: Icon(
+                Icons.broken_image,
+                size: 40,
+                color: Colors.grey[600],
+              ),
+            ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                ),
+              ),
+              child: Shimmer.fromColors(
+                baseColor: Colors.grey.shade800,
+                highlightColor: Colors.grey.shade700,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 120,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      width: 80,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmer(double screenWidth) {
+    return GridView.builder(
+      padding: const EdgeInsets.all(12),
+      itemCount: 6,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: screenWidth > 600 ? 3 : 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 0.9,
+      ),
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey.shade800,
+          highlightColor: Colors.grey.shade700,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildEmptyFilterResults(MerekController controller) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.filter_alt_off, size: 64, color: Colors.grey),
+          const SizedBox(height: 16),
+          Text(
+            'Tidak ada merek yang sesuai',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Coba ubah kriteria pencarian atau filter Anda',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 14),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () {
+              controller.resetFilters();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'Reset Filter',
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(MerekController controller) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.signal_wifi_off, size: 64, color: Colors.grey),
+          const SizedBox(height: 16),
+          Text(
+            'Gagal memuat data merek',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Periksa koneksi internet Anda\ndan coba lagi',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 14),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () => controller.refreshData(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'Coba Lagi',
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showFilterDialog(BuildContext context, MerekController controller) {
+    int minProductCount = controller.filterOptions['minProductCount'] ?? 0;
+    String sortBy = controller.sortBy.value;
+    String sortOrder = controller.sortOrder.value;
+    // Default type is 0 (All)
+    int selectedTypeId = controller.filterOptions['typeId'] ?? 0;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: const Color(0xFF252525),
+              title: Text(
+                'Filter Merek',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16),
+                  Text(
+                    'Jumlah Kendaraan Minimal',
+                    style: GoogleFonts.poppins(color: Colors.white),
+                  ),
+                  const SizedBox(height: 8),
+                  SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: Colors.white,
+                      inactiveTrackColor: Colors.white.withOpacity(0.3),
+                      thumbColor: Colors.white,
+                      overlayColor: Colors.white.withOpacity(0.1),
+                      valueIndicatorColor: Colors.white,
+                      valueIndicatorTextStyle: const TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
+                    child: Slider(
+                      value: minProductCount.toDouble(),
+                      min: 0,
+                      max: 10,
+                      divisions: 10,
+                      label: minProductCount.toString(),
+                      onChanged: (value) {
+                        setState(() {
+                          minProductCount = value.round();
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Urutkan Berdasarkan',
+                    style: GoogleFonts.poppins(color: Colors.white),
+                  ),
+                  const SizedBox(height: 8),
+                  Theme(
+                    data: Theme.of(context).copyWith(
+                      unselectedWidgetColor: Colors.white.withOpacity(0.5),
+                      radioTheme: RadioThemeData(
+                        fillColor: MaterialStateProperty.all(Colors.white),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(
+                            'Nama',
+                            style: GoogleFonts.poppins(color: Colors.white),
+                          ),
+                          leading: Radio<String>(
+                            value: 'name',
+                            groupValue: sortBy,
+                            onChanged: (value) {
+                              setState(() {
+                                sortBy = value!;
+                              });
+                            },
+                          ),
+                        ),
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(
+                            'Jumlah Kendaraan',
+                            style: GoogleFonts.poppins(color: Colors.white),
+                          ),
+                          leading: Radio<String>(
+                            value: 'vehicles_count',
+                            groupValue: sortBy,
+                            onChanged: (value) {
+                              setState(() {
+                                sortBy = value!;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Urutan',
+                    style: GoogleFonts.poppins(color: Colors.white),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                sortOrder == 'asc'
+                                    ? Colors.white
+                                    : Colors.grey[800],
+                            foregroundColor:
+                                sortOrder == 'asc'
+                                    ? Colors.black
+                                    : Colors.white,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              sortOrder = 'asc';
+                            });
+                          },
+                          child: Text('A-Z ↑', style: GoogleFonts.poppins()),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                sortOrder == 'desc'
+                                    ? Colors.white
+                                    : Colors.grey[800],
+                            foregroundColor:
+                                sortOrder == 'desc'
+                                    ? Colors.black
+                                    : Colors.white,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              sortOrder = 'desc';
+                            });
+                          },
+                          child: Text('Z-A ↓', style: GoogleFonts.poppins()),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  child: Text(
+                    'Reset',
+                    style: GoogleFonts.poppins(color: Colors.grey),
+                  ),
+                  onPressed: () {
+                    // Reset hanya nilai pada dialog, bukan nilai filter sebenarnya
+                    setState(() {
+                      minProductCount = 0;
+                      sortBy = 'name';
+                      sortOrder = 'asc';
+                      selectedTypeId = 0;
+                    });
+                  },
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                  ),
+                  child: Text(
+                    'Terapkan',
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+                  ),
+                  onPressed: () {
+                    // Apply type filter if not 'All'
+                    if (selectedTypeId > 0) {
+                      controller.filterBrandsByType(selectedTypeId);
+                    } else {
+                      // Tidak perlu reset full filter, cukup terapkan filter lainnya
+                      // controller.resetFilters();
+                      // Reapply other filters below
+                      controller.filterBrands({
+                        'minProductCount': minProductCount,
+                      });
+                      controller.sortBrands(sortBy, sortOrder);
+                    }
+                    // Close dialog
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+}
