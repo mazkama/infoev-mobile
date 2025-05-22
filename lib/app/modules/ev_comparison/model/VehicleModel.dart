@@ -168,8 +168,8 @@ class SpecVehicleValue {
   factory SpecVehicleValue.fromJson(Map<String, dynamic> json) {
     final pivot = json['pivot'];
     final rawValue = pivot['value'];
-    final rawDesc = pivot['value_desc'];
-    final rawBool = pivot['value_bool'];
+    // final rawDesc = pivot['value_desc'];
+    // final rawBool = pivot['value_bool'];
 
     // Use cast for vehicle_id as int
     final vehicleId = cast<int>(pivot['vehicle_id'], 'vehicle_id');  // cast to int

@@ -29,7 +29,7 @@ class NewsTitle extends StatelessWidget {
         padding: const EdgeInsets.all(10),
         margin: const EdgeInsets.only(bottom: 12), // Margin konsisten dengan TrandingCard
         decoration: BoxDecoration(
-          color: AppColors.cardBackgroundColor, // Abu-abu terang dari palet
+          color: AppColors.backgroundColor, // Abu-abu terang dari palet
           borderRadius: BorderRadius.circular(12), // Sudut lebih halus, konsisten dengan TrandingCard
           boxShadow: [
             BoxShadow(

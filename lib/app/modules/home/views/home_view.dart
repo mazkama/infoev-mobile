@@ -1,10 +1,11 @@
+import 'package:infoev/app/modules/home/views/Widgets/new_vehicle_card.dart';
+import 'package:infoev/app/modules/home/views/Widgets/vehicle_populer_card.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infoev/app/modules/news/controllers/news_controller.dart';
 import 'package:infoev/app/modules/home/views/Widgets/news_title.dart';
-import 'package:infoev/app/modules/home/views/Widgets/tranding_card.dart';
 import 'package:infoev/app/modules/news/views/news_detail_view.dart';
 import 'package:infoev/app/modules/home/views/Widgets/shimmer_loading.dart';
 import 'package:infoev/app/modules/home/views/Widgets/shimmer_loading_horizontal.dart';
@@ -13,9 +14,14 @@ import 'package:infoev/app/styles/app_colors.dart'; // Import palet warna
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
+  static final NewsController newsController = Get.put(NewsController());
+
+  Future<void> _onRefresh() async {
+    await newsController.loadAllData();
+  }
+
   @override
   Widget build(BuildContext context) {
-    NewsController newsController = Get.put(NewsController());
     WidgetsFlutterBinding.ensureInitialized();
     initializeDateFormatting('id_ID', null);
     return Scaffold(
@@ -49,76 +55,170 @@ class HomePage extends StatelessWidget {
           const SizedBox(width: 8), // Padding di sebelah kanan ikon
         ],
       ),
-      backgroundColor: AppColors.backgroundColor, // Latar belakang putih
+      backgroundColor: const Color(0xFFF5F5F5), // Latar belakang putih
       body: Padding(
         padding: const EdgeInsets.only(top: 15, left: 16, right: 16),
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(), // Efek smooth scroll
-          child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start, // Rata kiri untuk teks
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Berita Pilihan",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: AppColors.textColor, // Warna teks hitam
+        child: RefreshIndicator(
+          onRefresh: _onRefresh,
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Kendaaran Terbaru",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: AppColors.textColor, // Warna teks hitam
+                      ),
                     ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/news');
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 5,
+                  ],
+                ),
+                const SizedBox(height: 15),
+
+                // Shimmer untuk "Hottest News"
+                Obx(() {
+                  if (newsController.isLoading.value) {
+                    return const ShimmerLoadingHorizontal();
+                  } else {
+                    return SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children:
+                            newsController.newVehiclesList
+                                .map(
+                                  (e) => VehicleNewCard(
+                                    onTap: () {
+                                      Get.toNamed('/kendaraan/${e.slug}');
+                                    },
+                                    bannerUrl:
+                                        e.thumbnailUrl ??
+                                        '', // Gunakan nilai default jika null
+                                    name: e.name ?? 'Kendaraan',
+                                    brand: e.brand?.name ?? 'InfoEV.id',
+                                  ),
+                                )
+                                .toList(),
                       ),
-                      decoration: BoxDecoration(
-                        color: AppColors.accentColor.withOpacity(
-                          0.1,
-                        ), // Background oranye tipis
-                        borderRadius: BorderRadius.circular(
-                          8,
-                        ), // Rounded corner
+                    );
+                  }
+                }),
+
+                const SizedBox(
+                  height: 20,
+                ), // Spacing lebih besar untuk pemisahan
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Kendaaran Populer",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: AppColors.textColor, // Warna teks hitam
                       ),
-                      child: Text(
-                        "Lihat Semua",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: AppColors.accentColor,
-                          fontWeight: FontWeight.w600,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
+
+                // Shimmer untuk "Hottest News"
+                Obx(() {
+                  if (newsController.isLoading.value) {
+                    return const ShimmerLoadingHorizontal();
+                  } else {
+                    return SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children:
+                            newsController.popularVehiclesList
+                                .map(
+                                  (e) => VehiclePopulerCard(
+                                    onTap: () {
+                                      Get.toNamed('/kendaraan/${e.slug}');
+                                    },
+                                    bannerUrl:
+                                        e.thumbnailUrl ??
+                                        '', // Gunakan nilai default jika null
+                                    name: e.name ?? 'Kendaraan',
+                                    brand: e.brand?.name ?? 'InfoEV.id',
+                                  ),
+                                )
+                                .toList(),
+                      ),
+                    );
+                  }
+                }),
+
+                const SizedBox(
+                  height: 20,
+                ), // Spacing lebih besar untuk pemisahan
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Berita Terbaru",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: AppColors.textColor,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/news');
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor.withOpacity(
+                            0.1,
+                          ), // Background oranye tipis
+                          borderRadius: BorderRadius.circular(
+                            8,
+                          ), // Rounded corner
+                        ),
+                        child: Text(
+                          "Lihat Semua",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: AppColors.primaryColor,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
+                  ],
+                ),
+                const SizedBox(height: 15),
 
-              // Shimmer untuk "Hottest News"
-              Obx(() {
-                if (newsController.isLoading.value) {
-                  return const ShimmerLoadingHorizontal();
-                } else {
-                  return SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
+                // Shimmer untuk "News For You"
+                Obx(() {
+                  if (newsController.isLoading.value) {
+                    return const ShimmerLoading();
+                  } else {
+                    return Column(
                       children:
-                          newsController.newsForYouList
+                          newsController.newNewsList
                               .map(
-                                (e) => TrandingCard(
+                                (e) => NewsTitle(
                                   ontap: () {
                                     FocusScope.of(context).unfocus();
                                     Get.to(NewsDetailsPage(news: e));
                                   },
                                   imageUrl: e.thumbnailUrl,
-                                  tag: "Infoev.id",
+                                  tag: "EV",
                                   time: DateFormat(
                                     "dd MMM yyyy",
                                     'id_ID',
@@ -128,84 +228,11 @@ class HomePage extends StatelessWidget {
                                 ),
                               )
                               .toList(),
-                    ),
-                  );
-                }
-              }),
-
-              const SizedBox(height: 30), // Spacing lebih besar untuk pemisahan
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Berita Terbaru",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: AppColors.textColor,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/news');
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.accentColor.withOpacity(
-                          0.1,
-                        ), // Background oranye tipis
-                        borderRadius: BorderRadius.circular(
-                          8,
-                        ), // Rounded corner
-                      ),
-                      child: Text(
-                        "Lihat Semua",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: AppColors.accentColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              // Shimmer untuk "News For You"
-              Obx(() {
-                if (newsController.isLoading.value) {
-                  return const ShimmerLoading();
-                } else {
-                  return Column(
-                    children:
-                        newsController.newNewsList
-                            .map(
-                              (e) => NewsTitle(
-                                ontap: () {
-                                  FocusScope.of(context).unfocus();
-                                  Get.to(NewsDetailsPage(news: e));
-                                },
-                                imageUrl: e.thumbnailUrl,
-                                tag: "EV",
-                                time: DateFormat(
-                                  "dd MMM yyyy",
-                                  'id_ID',
-                                ).format(e.createdAt),
-                                title: e.title,
-                                author: "InfoEV.id",
-                              ),
-                            )
-                            .toList(),
-                  );
-                }
-              }),
-            ],
+                    );
+                  }
+                }),
+              ],
+            ),
           ),
         ),
       ),

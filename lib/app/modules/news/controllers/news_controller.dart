@@ -1,13 +1,16 @@
 import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:infoev/app/modules/explore/model/VehicleModel.dart';
 import 'package:infoev/app/modules/news/model/NewsModel.dart';
 import 'package:infoev/core/halper.dart';
 
 class NewsController extends GetxController {
   RxList<NewsModel> newNewsList = <NewsModel>[].obs;
   RxList<NewsModel> newsForYouList = <NewsModel>[].obs;
-  RxList<NewsModel> allNewsList = <NewsModel>[].obs; // pastikan ada
+  RxList<NewsModel> allNewsList = <NewsModel>[].obs;
+  RxList<VehicleModel> popularVehiclesList = <VehicleModel>[].obs;
+  RxList<VehicleModel> newVehiclesList = <VehicleModel>[].obs;
   RxBool isLoading = true.obs;
   RxBool isLoadingMore = false.obs;
   RxBool hasMoreNews = true.obs;
@@ -17,10 +20,19 @@ class NewsController extends GetxController {
   int currentPage = 1;
 
   @override
-  void onInit() async {
+  void onInit() {
     super.onInit();
+    loadAllData();
+  }
+
+  Future<void> loadAllData() async {
     isLoading.value = true;
-    await Future.wait([getNewNews(), getNewsForYou(), getAllNews(reset: true)]);
+    await Future.wait([
+      getNewNews(),
+      getNewVehicles(),
+      getPopularVehicles(),
+      getAllNews(reset: true),
+    ]);
     isLoading.value = false;
   }
 
@@ -38,7 +50,7 @@ class NewsController extends GetxController {
 
   Future<void> getNewNews() async {
     var baseURL = "${baseUrlDev}";
-    final response = await http.get(Uri.parse(baseURL));  
+    final response = await http.get(Uri.parse(baseURL));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final List<dynamic> newsData = data['posts'];
@@ -98,6 +110,34 @@ class NewsController extends GetxController {
       isError.value = true;
     } finally {
       isLoadingMore.value = false;
+    }
+  }
+
+  Future<void> getPopularVehicles() async {
+    var baseURL = "${baseUrlDev}";
+    final response = await http.get(Uri.parse(baseURL));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final List<dynamic> vehicleData = data['popularVehicles'];
+      popularVehiclesList.assignAll(
+        vehicleData.map((json) => VehicleModel.fromJson(json)).toList(),
+      );
+    } else {
+      isError.value = true;
+    }
+  }
+
+  Future<void> getNewVehicles() async {
+    var baseURL = "${baseUrlDev}";
+    final response = await http.get(Uri.parse(baseURL));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final List<dynamic> vehicleData = data['latestVehicles'];
+      newVehiclesList.assignAll(
+        vehicleData.map((json) => VehicleModel.fromJson(json)).toList(),
+      );
+    } else {
+      isError.value = true;
     }
   }
 

@@ -4,8 +4,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http; 
 import 'package:infoev/app/modules/explore/model/BrandDetailModel.dart';
 import 'package:infoev/app/modules/explore/model/VehicleModel.dart';
-import 'package:infoev/app/modules/explore/model/VehicleTipeModel.dart';
-import 'package:infoev/core/halper.dart';
+import 'package:infoev/app/modules/explore/model/VehicleTipeModel.dart'; 
 import 'package:shared_preferences/shared_preferences.dart';  
 
 class BrandDetailController extends GetxController {
