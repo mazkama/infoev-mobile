@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:infoev/app/modules/explore/controllers/VehicleDetailController.dart'; 
+import 'package:infoev/app/modules/explore/controllers/VehicleDetailController.dart';
 import 'package:flutter/services.dart';
+import 'package:infoev/app/modules/favorite_vehicles/controllers/FavoriteVehiclesController.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -14,8 +15,10 @@ class VehicleDetailPage extends StatefulWidget {
   State<VehicleDetailPage> createState() => _VehicleDetailPageState();
 }
 
-class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTickerProviderStateMixin {
+class _VehicleDetailPageState extends State<VehicleDetailPage>
+    with SingleTickerProviderStateMixin {
   final VehicleDetailController controller = Get.put(VehicleDetailController());
+  final FavoriteVehicleController favoriteController = Get.find();
   late final AnimationController _fadeController;
   late final Animation<double> _fadeAnimation;
 
@@ -89,19 +92,55 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
                   ),
                 ),
                 actions: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.favorite_border_rounded,
-                      color: Colors.white,
+                  Obx(
+                    () => IconButton(
+                      icon: Icon(
+                        controller.vehicleLoved.value
+                            ? Icons.favorite_rounded
+                            : Icons.favorite_border_rounded,
+                        color:
+                            controller.vehicleLoved.value
+                                ? Colors.red
+                                : Colors.white,
+                      ),
+                      onPressed: () async {
+                        HapticFeedback.lightImpact();
+                        final vehicleId = controller.vehicleId.value;
+
+                        try {
+                          if (controller.vehicleLoved.value) {
+                            await favoriteController.removeFavorite(vehicleId);
+                            controller.vehicleLoved.value = false;
+                            showCustomSnackbar(
+                              title: 'Berhasil',
+                              message: 'Kendaraan dihapus dari favorit',
+                              backgroundColor: Colors.red.shade400,
+                              icon: Icons.favorite,
+                            );
+                          } else {
+                            await favoriteController.addFavorite(vehicleId);
+                            controller.vehicleLoved.value = true;
+                            showCustomSnackbar(
+                              title: 'Berhasil',
+                              message: 'Kendaraan ditambahkan ke favorit',
+                              backgroundColor: Colors.green.shade600,
+                              icon: Icons.favorite,
+                            );
+                          }
+                        } catch (e) {
+                          showCustomSnackbar(
+                            title: 'Error',
+                            message: 'Terjadi kesalahan: $e',
+                            backgroundColor: Colors.orange.shade700,
+                            icon: Icons.error_outline,
+                          );
+                        }
+                      },
                     ),
-                    onPressed: () {
-                      HapticFeedback.lightImpact();
-                      // TODO: Implement favorite functionality
-                    },
                   ),
                 ],
               ),
-              
+
               // Content
               SliverToBoxAdapter(
                 child: FadeTransition(
@@ -152,13 +191,20 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
                                     child: CachedNetworkImage(
                                       imageUrl: controller.vehicleImages[0],
                                       fit: BoxFit.contain,
-                                      placeholder: (context, url) => _buildImageShimmer(),
-                                      errorWidget: (context, url, error) => Container(
-                                        color: const Color(0xFF212121),
-                                        child: const Center(
-                                          child: Icon(Icons.broken_image, color: Colors.white54, size: 48),
-                                        ),
-                                      ),
+                                      placeholder:
+                                          (context, url) =>
+                                              _buildImageShimmer(),
+                                      errorWidget:
+                                          (context, url, error) => Container(
+                                            color: const Color(0xFF212121),
+                                            child: const Center(
+                                              child: Icon(
+                                                Icons.broken_image,
+                                                color: Colors.white54,
+                                                size: 48,
+                                              ),
+                                            ),
+                                          ),
                                     ),
                                   ),
                                 ],
@@ -198,7 +244,9 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
                               icon: Icons.speed_rounded,
                               title: 'Kecepatan',
                               value: controller.getHighlightValue('maxSpeed'),
-                              unit: controller.getHighlightUnit('maxSpeed') ?? 'km/h',
+                              unit:
+                                  controller.getHighlightUnit('maxSpeed') ??
+                                  'km/h',
                               gradient: const LinearGradient(
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -209,7 +257,9 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
                               icon: Icons.battery_charging_full_rounded,
                               title: 'Kapasitas',
                               value: controller.getHighlightValue('capacity'),
-                              unit: controller.getHighlightUnit('capacity') ?? 'kWh',
+                              unit:
+                                  controller.getHighlightUnit('capacity') ??
+                                  'kWh',
                               gradient: const LinearGradient(
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -220,7 +270,8 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
                               icon: Icons.map_rounded,
                               title: 'Jarak Tempuh',
                               value: controller.getHighlightValue('range'),
-                              unit: controller.getHighlightUnit('range') ?? 'km',
+                              unit:
+                                  controller.getHighlightUnit('range') ?? 'km',
                               gradient: const LinearGradient(
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -231,7 +282,9 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
                               icon: Icons.electrical_services_rounded,
                               title: 'Pengisian AC',
                               value: controller.getHighlightValue('charge'),
-                              unit: controller.getHighlightUnit('charge') ?? 'jam',
+                              unit:
+                                  controller.getHighlightUnit('charge') ??
+                                  'jam',
                               gradient: const LinearGradient(
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -249,103 +302,135 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: controller.specCategories.map((category) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 20),
-                                Row(
+                          children:
+                              controller.specCategories.map((category) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Icon(
-                                      _getCategoryIcon(category.name),
-                                      color: Colors.white70,
-                                      size: 24,
+                                    const SizedBox(height: 20),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          _getCategoryIcon(category.name),
+                                          color: Colors.white70,
+                                          size: 24,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          category.name,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      category.name,
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white,
+                                    const SizedBox(height: 12),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF212121),
+                                        borderRadius: BorderRadius.circular(16),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(
+                                              0.2,
+                                            ),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        children:
+                                            category.specs
+                                                .map((spec) {
+                                                  final value = spec.getValue();
+                                                  if (value == null)
+                                                    return const SizedBox.shrink();
+
+                                                  final formattedValue =
+                                                      controller
+                                                          .formatSpecValue(
+                                                            value,
+                                                          );
+                                                  if (formattedValue.isEmpty)
+                                                    return const SizedBox.shrink();
+
+                                                  return Container(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          vertical: 14,
+                                                          horizontal: 16,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      border: Border(
+                                                        top: BorderSide(
+                                                          color:
+                                                              Colors.grey[850]!,
+                                                          width: 0.5,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    child: Row(
+                                                      children: [
+                                                        Expanded(
+                                                          flex: 2,
+                                                          child: Text(
+                                                            spec.name,
+                                                            style: GoogleFonts.poppins(
+                                                              color:
+                                                                  Colors
+                                                                      .grey[400],
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Expanded(
+                                                          flex: 3,
+                                                          child: Text(
+                                                            formattedValue,
+                                                            style:
+                                                                GoogleFonts.poppins(
+                                                                  color:
+                                                                      Colors
+                                                                          .white,
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                ),
+                                                            textAlign:
+                                                                TextAlign.right,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                })
+                                                .where(
+                                                  (widget) =>
+                                                      widget !=
+                                                      const SizedBox.shrink(),
+                                                )
+                                                .toList(),
                                       ),
                                     ),
                                   ],
-                                ),
-                                const SizedBox(height: 12),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF212121),
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    children: category.specs.map((spec) {
-                                      final value = spec.getValue();
-                                      if (value == null) return const SizedBox.shrink();
-                                      
-                                      final formattedValue = controller.formatSpecValue(value);
-                                      if (formattedValue.isEmpty) return const SizedBox.shrink();
-                                      
-                                      return Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 14,
-                                          horizontal: 16,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          border: Border(
-                                            top: BorderSide(
-                                              color: Colors.grey[850]!,
-                                              width: 0.5,
-                                            ),
-                                          ),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              flex: 2,
-                                              child: Text(
-                                                spec.name,
-                                                style: GoogleFonts.poppins(
-                                                  color: Colors.grey[400],
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              flex: 3,
-                                              child: Text(
-                                                formattedValue,
-                                                style: GoogleFonts.poppins(
-                                                  color: Colors.white,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                                textAlign: TextAlign.right,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }).where((widget) => widget != const SizedBox.shrink()).toList(),
-                                  ),
-                                ),
-                              ],
-                            );
-                          }).toList(),
+                                );
+                              }).toList(),
                         ),
                       ),
 
                       // Disclaimer
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                         child: Text(
                           "InfoEV tidak menjamin informasi yang ada di halaman ini akurat 100%.",
                           style: GoogleFonts.poppins(
@@ -359,10 +444,14 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
 
                       // Affiliate Links - beli sekarang section
                       Obx(() {
-                        if (controller.affiliateLinks.isEmpty) return const SizedBox.shrink();
-                        
+                        if (controller.affiliateLinks.isEmpty)
+                          return const SizedBox.shrink();
+
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -375,55 +464,81 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
                                 ),
                               ),
                               const SizedBox(height: 12),
-                              
+
                               // Marketplace logo and links
                               Wrap(
                                 spacing: 12,
                                 runSpacing: 12,
-                                children: controller.affiliateLinks.map<Widget>((link) {
-                                  return InkWell(
-                                    onTap: () {
-                                      // Open link in browser
-                                      final url = link['link'];
-                                      if (url != null) {
-                                        try {
-                                          launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-                                        } catch (e) {
-                                          debugPrint('Error launching URL: $e');
-                                        }
-                                      }
-                                      HapticFeedback.lightImpact();
-                                    },
-                                    child: Container(
-                                      height: 48,
-                                      width: 140,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(8),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withOpacity(0.1),
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 2),
+                                children:
+                                    controller.affiliateLinks.map<Widget>((
+                                      link,
+                                    ) {
+                                      return InkWell(
+                                        onTap: () {
+                                          // Open link in browser
+                                          final url = link['link'];
+                                          if (url != null) {
+                                            try {
+                                              launchUrl(
+                                                Uri.parse(url),
+                                                mode:
+                                                    LaunchMode
+                                                        .externalApplication,
+                                              );
+                                            } catch (e) {
+                                              debugPrint(
+                                                'Error launching URL: $e',
+                                              );
+                                            }
+                                          }
+                                          HapticFeedback.lightImpact();
+                                        },
+                                        child: Container(
+                                          height: 48,
+                                          width: 140,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(
+                                                  0.1,
+                                                ),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                      child: Center(
-                                        child: CachedNetworkImage(
-                                          imageUrl: link['marketplace_logo'] ?? '',
-                                          fit: BoxFit.scaleDown,
-                                          placeholder: (context, url) => Container(
-                                            color: Colors.grey[200],
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 8,
                                           ),
-                                          errorWidget: (context, url, error) => Center(
-                                            child: Icon(Icons.shopping_bag, color: Colors.grey[400]),
+                                          child: Center(
+                                            child: CachedNetworkImage(
+                                              imageUrl:
+                                                  link['marketplace_logo'] ??
+                                                  '',
+                                              fit: BoxFit.scaleDown,
+                                              placeholder:
+                                                  (context, url) => Container(
+                                                    color: Colors.grey[200],
+                                                  ),
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      Center(
+                                                        child: Icon(
+                                                          Icons.shopping_bag,
+                                                          color:
+                                                              Colors.grey[400],
+                                                        ),
+                                                      ),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
+                                      );
+                                    }).toList(),
                               ),
                             ],
                           ),
@@ -455,7 +570,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
                                 ),
                                 const Spacer(),
                                 Text(
-                                  '24 komentar',  // This will be dynamic later
+                                  '24 komentar', // This will be dynamic later
                                   style: GoogleFonts.poppins(
                                     fontSize: 14,
                                     color: Colors.grey[400],
@@ -464,7 +579,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
                               ],
                             ),
                             const SizedBox(height: 16),
-                            
+
                             // Comment Input
                             Container(
                               padding: const EdgeInsets.all(16),
@@ -521,7 +636,9 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
                                           vertical: 12,
                                         ),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                       ),
                                       child: Text(
@@ -536,10 +653,10 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
                               ),
                             ),
                             const SizedBox(height: 16),
-                            
+
                             // Sample Comments
                             ...List.generate(3, (index) => _buildCommentCard()),
-                            
+
                             // Show More Button
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 16),
@@ -573,7 +690,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
       ),
     );
   }
-  
+
   Widget _buildCommentCard() {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -735,11 +852,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  icon,
-                  color: Colors.white,
-                  size: 32,
-                ),
+                Icon(icon, color: Colors.white, size: 32),
                 const Spacer(),
                 Text(
                   title,
@@ -759,7 +872,8 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
                   ),
                 ),
                 // Tambahkan deskripsi jika ada
-                if (title == 'Pengisian AC' && controller.getHighlightDesc('charge') != null)
+                if (title == 'Pengisian AC' &&
+                    controller.getHighlightDesc('charge') != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
@@ -808,19 +922,14 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
             width: 50,
             height: 50,
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(
-                Colors.blue[400]!,
-              ),
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue[400]!),
               strokeWidth: 3,
             ),
           ),
           const SizedBox(height: 16),
           Text(
             'Loading...',
-            style: GoogleFonts.poppins(
-              color: Colors.white70,
-              fontSize: 16,
-            ),
+            style: GoogleFonts.poppins(color: Colors.white70, fontSize: 16),
           ),
         ],
       ),
@@ -832,11 +941,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.error_outline_rounded,
-            size: 64,
-            color: Colors.red,
-          ),
+          const Icon(Icons.error_outline_rounded, size: 64, color: Colors.red),
           const SizedBox(height: 16),
           Text(
             'Terjadi Kesalahan',
@@ -852,10 +957,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
             child: Text(
               controller.errorMessage.value,
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: Colors.grey[400],
-              ),
+              style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[400]),
             ),
           ),
           const SizedBox(height: 24),
@@ -871,9 +973,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
             ),
             label: Text(
               'Coba Lagi',
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w600,
-              ),
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -885,9 +985,28 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
     return Shimmer.fromColors(
       baseColor: const Color(0xFF262626),
       highlightColor: const Color(0xFF303030),
-      child: Container(
-        color: Colors.white,
-      ),
+      child: Container(color: Colors.white),
+    );
+  }
+
+  void showCustomSnackbar({
+    required String title,
+    required String message,
+    required Color backgroundColor,
+    IconData? icon,
+  }) {
+    Get.rawSnackbar(
+      title: title,
+      message: message,
+      icon: icon != null ? Icon(icon, color: Colors.white) : null,
+      duration: const Duration(seconds: 3),
+      backgroundColor: backgroundColor,
+      margin: const EdgeInsets.all(16),
+      borderRadius: 12,
+      snackStyle: SnackStyle.FLOATING,
+      isDismissible: true,
+      forwardAnimationCurve: Curves.easeOutBack,
+      snackPosition: SnackPosition.TOP,
     );
   }
 }

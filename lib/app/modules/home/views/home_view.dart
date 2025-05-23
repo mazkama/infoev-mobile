@@ -1,4 +1,7 @@
+import 'package:infoev/app/modules/favorite_vehicles/views/FavoriteVehiclesPage.dart';
 import 'package:infoev/app/modules/home/views/Widgets/new_vehicle_card.dart';
+import 'package:infoev/app/modules/home/views/Widgets/shimmer_vehicle_new.dart';
+import 'package:infoev/app/modules/home/views/Widgets/shimmer_vehicle_populer.dart';
 import 'package:infoev/app/modules/home/views/Widgets/vehicle_populer_card.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
@@ -8,7 +11,6 @@ import 'package:infoev/app/modules/news/controllers/news_controller.dart';
 import 'package:infoev/app/modules/home/views/Widgets/news_title.dart';
 import 'package:infoev/app/modules/news/views/news_detail_view.dart';
 import 'package:infoev/app/modules/home/views/Widgets/shimmer_loading.dart';
-import 'package:infoev/app/modules/home/views/Widgets/shimmer_loading_horizontal.dart';
 import 'package:infoev/app/styles/app_colors.dart'; // Import palet warna
 
 class HomePage extends StatelessWidget {
@@ -44,11 +46,16 @@ class HomePage extends StatelessWidget {
           IconButton(
             onPressed: () {
               // Aksi saat ikon love ditekan (opsional)
-              // Misalnya, toggle status favorit
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const FavoritVehiclesPage(),
+                ),
+              );
             },
             icon: const Icon(
               Icons.favorite_border, // Ikon hati (kosong)
-              color: AppColors.primaryColor, // Warna putih untuk kontras
+              color: AppColors.accentColor, // Warna putih untuk kontras
               size: 25, // Ukuran ikon
             ),
           ),
@@ -60,6 +67,7 @@ class HomePage extends StatelessWidget {
         padding: const EdgeInsets.only(top: 15, left: 16, right: 16),
         child: RefreshIndicator(
           onRefresh: _onRefresh,
+          color: AppColors.accentColor,
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Column(
@@ -83,7 +91,7 @@ class HomePage extends StatelessWidget {
                 // Shimmer untuk "Hottest News"
                 Obx(() {
                   if (newsController.isLoading.value) {
-                    return const ShimmerLoadingHorizontal();
+                    return const ShimmerVehicleNew();
                   } else {
                     return SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
@@ -110,7 +118,7 @@ class HomePage extends StatelessWidget {
                 }),
 
                 const SizedBox(
-                  height: 20,
+                  height: 30,
                 ), // Spacing lebih besar untuk pemisahan
 
                 Row(
@@ -131,7 +139,7 @@ class HomePage extends StatelessWidget {
                 // Shimmer untuk "Hottest News"
                 Obx(() {
                   if (newsController.isLoading.value) {
-                    return const ShimmerLoadingHorizontal();
+                    return const ShimmerVehiclePopuler();
                   } else {
                     return SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
@@ -158,7 +166,7 @@ class HomePage extends StatelessWidget {
                 }),
 
                 const SizedBox(
-                  height: 20,
+                  height: 30,
                 ), // Spacing lebih besar untuk pemisahan
 
                 Row(

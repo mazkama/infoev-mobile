@@ -31,7 +31,7 @@ class CalculatorController extends GetxController {
   final monthlyRunningCost = 0.0.obs;
   
   // Constants for calculation
-  final maintenanceCostPerKm = 100.0; // Rp100 per km for maintenance
+  double maintenanceCostPerKm = 100.0; // Maintenance cost per km, will be updated based on vehicle type
   
   // For calculation
   double? consumption; // kWh/km
@@ -104,6 +104,27 @@ class CalculatorController extends GetxController {
     costPer100Km.value = 0.0;
     costPerMonth.value = 0.0;
     
+    // Set maintenance cost based on vehicle type_id if available in search results
+    if (vehicle['type_id'] != null) {
+      int typeId = vehicle['type_id'];
+      String vehicleType = "";
+      
+      // Set maintenance cost based on type_id
+      switch(typeId) {
+        case 1:
+          vehicleType = "mobil";
+          maintenanceCostPerKm = 108.0;
+          break;
+        default:
+          vehicleType = "lainnya";
+          maintenanceCostPerKm = 42.0;
+      }
+      
+      // DEBUG: These print statements should be commented out for release builds
+      print('DEBUG: Vehicle type_id from search: $typeId - Vehicle type: $vehicleType');
+      print('DEBUG: Maintenance cost set to: Rp $maintenanceCostPerKm per km');
+    }
+    
     // Fetch vehicle details to get consumption and battery data
     fetchVehicleDetails(vehicle['slug']);
   }
@@ -120,6 +141,35 @@ class CalculatorController extends GetxController {
       
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        
+        // Set maintenance cost based on vehicle type_id if not already set in selectVehicle
+        if (data['type_id'] != null) {
+          int typeId = data['type_id'];
+          String vehicleType = "";
+          
+          // Set maintenance cost based on vehicle type
+          switch(typeId) {
+            case 1: 
+              vehicleType = "mobil";
+              maintenanceCostPerKm = 108.0;
+              break;
+            case 2:
+              vehicleType = "sepeda motor";
+              maintenanceCostPerKm = 42.0;
+              break;
+            case 3:
+              vehicleType = "sepeda";
+              maintenanceCostPerKm = 42.0;
+              break;
+            default:
+              vehicleType = "lainnya";
+              maintenanceCostPerKm = 42.0;
+          }
+          
+          // DEBUG: These print statements should be commented out for release builds
+          print('DEBUG: Vehicle type_id from detail: $typeId - Vehicle type: $vehicleType');
+          print('DEBUG: Maintenance cost set to: Rp $maintenanceCostPerKm per km');
+        }
         
         // Extract battery details from new API structure
         extractBatteryDetails(data);
@@ -246,6 +296,7 @@ class CalculatorController extends GetxController {
     print('- Konsumsi energi: ${consumption} kWh/km');
     print('- Jarak tempuh: ${maxRange} km');
     print('- Harga listrik: ${electricityPrice.value} Rp/kWh');
+    print('- Biaya perawatan: Rp $maintenanceCostPerKm per km');
     
     // Pastikan konsumsi dalam kWh/km
     double consumptionToUse = consumption!;

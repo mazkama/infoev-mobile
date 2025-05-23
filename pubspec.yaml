@@ -46,7 +46,7 @@ dependencies:
   google_fonts: ^6.1.0
   font_awesome_flutter: ^10.5.0
   google_sign_in: ^6.1.4
-  google_maps_flutter: ^2.12.1
+  google_maps_flutter: ^2.12.1 
 
 dev_dependencies:
   flutter_test:

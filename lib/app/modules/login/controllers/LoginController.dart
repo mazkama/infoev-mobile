@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart'; 
+import 'package:get/get.dart';
 import 'package:infoev/app/modules/login/model/UserModel.dart';
 import 'package:infoev/app/services/AuthService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,7 +10,7 @@ class LoginController extends GetxController {
   // Text controllers for form fields
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  
+
   // Observable states
   final isLoading = false.obs;
   final isGoogleLoading = false.obs;
@@ -77,17 +77,17 @@ class LoginController extends GetxController {
   void handleAuthResponse(Map<String, dynamic> response) {
     if (response['success']) {
       saveUserSession(response);
-      
+
       // Get user info for welcome message
       final user = UserModel.fromJson(response['user']);
-      
+
       Get.snackbar(
         "Success",
         "Hi ${user.name}!",
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
-      
+
       // Navigate to home screen
       Get.offAllNamed(Routes.NAVBAR);
     } else {
@@ -102,9 +102,13 @@ class LoginController extends GetxController {
 
   // Save user session data
   Future<void> saveUserSession(Map<String, dynamic> data) async {
+    print('[DEBUG] Full login response data: $data');
+    print('[DEBUG] data[token]: ${data['token']}');
+    print('[DEBUG] Length: ${data['token'].toString().length}');
+
     final user = UserModel.fromJson(data['user']);
     final prefs = await SharedPreferences.getInstance();
-    
+
     await prefs.setBool('isLoggedIn', true);
     await prefs.setString('token', data['token']);
     await prefs.setString('user', jsonEncode(user.toJson()));
