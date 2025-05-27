@@ -28,7 +28,7 @@ class LoginPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(16), // Sudut membulat
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05), // Bayangan halus
+                  color: AppColors.shadowLight, // Bayangan halus
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -54,7 +54,7 @@ class LoginPage extends StatelessWidget {
                     "Silakan masuk untuk melanjutkan",
                     style: GoogleFonts.poppins(
                       fontSize: 16,
-                      color: AppColors.secondaryTextColor, // Abu-abu gelap
+                      color: AppColors.textSecondary, // Abu-abu gelap
                     ),
                   ),
                   const SizedBox(height: 40),
@@ -69,7 +69,7 @@ class LoginPage extends StatelessWidget {
                     decoration: InputDecoration(
                       labelText: 'Email',
                       labelStyle: TextStyle(
-                        color: AppColors.secondaryTextColor,
+                        color: AppColors.textSecondary,
                         fontSize: 14,
                       ),
                       prefixIcon: Icon(
@@ -86,7 +86,7 @@ class LoginPage extends StatelessWidget {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: AppColors.accentColor),
+                        borderSide: BorderSide(color: AppColors.primaryColor),
                       ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                     ),
@@ -107,7 +107,7 @@ class LoginPage extends StatelessWidget {
                       decoration: InputDecoration(
                         labelText: 'Password',
                         labelStyle: TextStyle(
-                          color: AppColors.secondaryTextColor,
+                          color: AppColors.textSecondary,
                           fontSize: 14,
                         ),
                         prefixIcon: Icon(
