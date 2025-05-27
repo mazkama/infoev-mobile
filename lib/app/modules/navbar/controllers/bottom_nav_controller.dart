@@ -1,34 +1,35 @@
 // bottom_nav_controller.dart
-import 'package:get/get.dart';
-import 'package:infoev/app/modules/login/views/Logout.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart'; 
+import 'package:infoev/core/local_db.dart';
+import 'package:infoev/app/routes/app_pages.dart';
 
 class BottomNavController extends GetxController {
   // Current selected tab index
   final RxInt selectedmenu = 0.obs;
 
+  // Simulasi cek login, sebaiknya ambil dari service atau storage token
+  bool get isLoggedIn => LocalDB.getToken() != null;
+
   // Method to change the selected menu
   void changemenuselection(int index) {
-    // If the logout button is clicked (assuming it's the last tab)
-    if (index == 3) {
-      // Handle logout logic here if needed
-      // For example: AuthService.logout();
-      // return;
-      LogoutPage(key: null);
+    if (index == 2) { // ChargerStationPage
+      if (!isLoggedIn) {
+        // Jika belum login, tampilkan pesan dan arahkan ke halaman login
+        Get.snackbar(
+          'Akses Ditolak',
+          'Anda harus login terlebih dahulu untuk mengakses Charger Station',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+        );
+        // Navigasi ke halaman login
+        Get.toNamed(Path.LOGIN);
+        return; // jangan lanjut ganti tab
+      }
     }
+
+    // Ganti tab jika tidak ada kondisi khusus
     selectedmenu.value = index;
   }
-
-  // // List of routes corresponding to each tab
-  // final List<String> routes = [
-  //   '/home',
-  //   '/explore',
-  //   '/charge',
-  //   '/compare',
-  // ];
-
-  // // Change tab and navigate to corresponding route if using named routes
-  // void navigateToTab(int index) {
-  //   selectedmenu.value = index;
-  //   Get.offAllNamed(routes[index]);
-  // }
-}
+} 

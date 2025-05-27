@@ -10,7 +10,7 @@ class RegisterPage extends StatelessWidget {
   RegisterPage({super.key});
 
   final controller = Get.put(RegisterController());
-  final controllerLogin = Get.put(LoginController());
+  final controllerLogin = Get.find<LoginController>();
 
   @override
   Widget build(BuildContext context) {

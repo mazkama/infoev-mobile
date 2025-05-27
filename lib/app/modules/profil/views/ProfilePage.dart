@@ -12,13 +12,17 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  Future<String> loadUserName() async {
+  Future<String?> loadUserName() async {
+    final token = LocalDB.getToken();
+    if (token == null) return null;
     final name = LocalDB.getName();
     return name ?? 'User Noname';
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool isLoggedIn = LocalDB.getToken() != null;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -37,94 +41,141 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             const SizedBox(height: 50),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 children: [
-                  // Gunakan FutureBuilder untuk menunggu nama pengguna
-                  FutureBuilder<String>(
-                    future: loadUserName(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        // Jika sedang menunggu, tampilkan 'Loading...'
-                        return _buildMenuItem(
-                          icon: Icons.person,
-                          title: 'Loading...',
-                          subtitle: 'Pengaturan Profil Pengguna',
-                          onTap: () {},
-                          backgroundColor: Colors.grey.shade100,
-                          iconColor: Colors.black,
-                          textColor: Colors.black,
-                        );
-                      } else if (snapshot.hasError) {
-                        // Jika ada error, tampilkan pesan error
-                        return _buildMenuItem(
-                          icon: Icons.person,
-                          title: 'Error loading name',
-                          subtitle: 'Pengaturan Profil Pengguna',
-                          onTap: () {},
-                          backgroundColor: Colors.grey.shade100,
-                          iconColor: Colors.black,
-                          textColor: Colors.black,
-                        );
-                      } else if (snapshot.hasData) {
-                        final name = snapshot.data ?? 'User Noname';
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildMenuItem(
-                              icon: Icons.person,
-                              title: name,
-                              subtitle: 'Pengaturan Profil Pengguna',
-                              onTap: () {},
-                              backgroundColor: Colors.grey.shade100,
-                              iconColor: Colors.black,
-                              textColor: Colors.black,
-                            ),
-                            SizedBox(height: 12),
-                            _buildMenuItem(
-                              icon: Icons.calculate_outlined,
-                              title: 'Kalkulator Kendaraan',
-                              subtitle: 'Aplikasi kalkulator kendaraan listrik',
-                              onTap: () {
-                                Get.toNamed('/calculator');
-                              },
-                              backgroundColor: Colors.grey.shade100,
-                              iconColor: Colors.black,
-                              textColor: Colors.black,
-                            ),
-                            SizedBox(height: 12),
-                            _buildMenuItem(
-                              icon: Icons.security,
-                              title: 'Privasi & Keamanan',
-                              subtitle: 'Kelola kata sandi dan autentikasi',
-                              onTap: () {
-                                // Arahkan ke halaman pengaturan keamanan
-                              },
-                              backgroundColor: Colors.grey.shade100,
-                              iconColor: Colors.black,
-                              textColor: Colors.black,
-                            ),
-                          ],
-                        );
+                  if (isLoggedIn) 
+                    FutureBuilder<String?>(
+                      future: loadUserName(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return _buildMenuItem(
+                            icon: Icons.person,
+                            title: 'Loading...',
+                            subtitle: 'Pengaturan Profil Pengguna',
+                            onTap: () {},
+                            backgroundColor: Colors.grey.shade100,
+                            iconColor: Colors.black,
+                            textColor: Colors.black,
+                            showArrow: false, 
+                          );
+                        } else if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
+                          return _buildMenuItem(
+                            icon: Icons.person,
+                            title: 'User Noname',
+                            subtitle: 'Pengaturan Profil Pengguna',
+                            onTap: () {},
+                            backgroundColor: Colors.grey.shade100,
+                            iconColor: Colors.black,
+                            textColor: Colors.black,
+                            showArrow: false, 
+                          );
+                        } else {
+                          final name = snapshot.data!;
+                          return _buildMenuItem(
+                            icon: Icons.person,
+                            title: name,
+                            subtitle: 'Pengaturan Profil Pengguna',
+                            onTap: () {},
+                            backgroundColor: Colors.grey.shade100,
+                            iconColor: Colors.black,
+                            textColor: Colors.black,
+                            showArrow: false, 
+                          );
+                        }
+                      },
+                    )
+                  else
+Container(
+  padding: const EdgeInsets.all(12),
+  decoration: BoxDecoration(
+    color: Colors.orange.withOpacity(0.15), // background sedikit lebih terang
+    borderRadius: BorderRadius.circular(8),
+    border: Border.all(
+      color: Colors.orange.withOpacity(0.4), // border lebih tegas
+    ),
+  ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          Icon(Icons.info_outline_rounded, color: Colors.orange.shade700, size: 20),
+          const SizedBox(width: 8),
+          Text(
+            'Info',
+            style: GoogleFonts.poppins(
+              color: Colors.orange.shade700,
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 4),
+      Text(
+        'Anda belum login. Silakan login untuk mengakses fitur lebih lengkap.',
+        style: GoogleFonts.poppins(
+          color: Colors.orange.shade900,
+          fontSize: 12,
+        ),
+      ),
+    ],
+  ),
+),
+
+
+
+                  const SizedBox(height: 12),
+
+                  // Tampilkan fitur lain hanya jika sudah login
+                  if (isLoggedIn) ...[
+                    _buildMenuItem(
+                      icon: Icons.calculate_outlined,
+                      title: 'Kalkulator Kendaraan',
+                      subtitle: 'Aplikasi kalkulator kendaraan listrik',
+                      onTap: () {
+                        Get.toNamed('/calculator');
+                      },
+                      backgroundColor: Colors.grey.shade100,
+                      iconColor: Colors.black,
+                      textColor: Colors.black,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildMenuItem(
+                      icon: Icons.security,
+                      title: 'Privasi & Keamanan',
+                      subtitle: 'Kelola kata sandi dan autentikasi',
+                      onTap: () {
+                        // Arahkan ke halaman pengaturan keamanan
+                      },
+                      backgroundColor: Colors.grey.shade100,
+                      iconColor: Colors.black,
+                      textColor: Colors.black,
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Tombol logout jika login, login jika belum
+                  _buildMenuItem(
+                    icon: isLoggedIn ? Icons.logout_rounded : Icons.login_rounded,
+                    title: isLoggedIn ? 'Log Out' : 'Log In',
+                    subtitle: isLoggedIn
+                        ? 'Keluar dari Aplikasi Infoev'
+                        : 'Masuk untuk akses fitur lengkap aplikasi',
+                    onTap: () {
+                      if (isLoggedIn) {
+                        Get.offAll(() => LogoutPage());
                       } else {
-                        return Container();
+                        Get.toNamed('/login');
                       }
                     },
-                  ),
-
-                  const SizedBox(height: 24),
-                  const SizedBox(height: 16),
-
-                  _buildMenuItem(
-                    icon: Icons.logout_rounded,
-                    title: 'Log Out',
-                    subtitle: 'Keluar dari Aplikasi Infoev',
-                    onTap: () => Get.offAll(() => LogoutPage()),
-                    backgroundColor: Colors.red.withOpacity(0.1),
-                    iconColor: Colors.red,
-                    textColor: Colors.red.shade700,
+                    backgroundColor: isLoggedIn
+                        ? Colors.red.withOpacity(0.1)
+                        : Colors.blue.withOpacity(0.1),
+                    iconColor: isLoggedIn ? Colors.red : Colors.blue,
+                    textColor: isLoggedIn ? Colors.red.shade700 : Colors.blue.shade700,
                   ),
                 ],
               ),
@@ -142,7 +193,8 @@ class _ProfilePageState extends State<ProfilePage> {
     required VoidCallback onTap,
     Color backgroundColor = Colors.white,
     Color iconColor = Colors.black,
-    Color textColor = Colors.black,
+    Color textColor = Colors.black, 
+    bool showArrow = true,
   }) {
     return InkWell(
       onTap: onTap,
@@ -180,11 +232,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 ],
               ),
             ),
-            const Icon(
-              Icons.arrow_forward_ios_rounded,
-              size: 14,
-              color: Colors.grey,
-            ),
+            if (showArrow)
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 14,
+                color: Colors.grey,
+              ),
           ],
         ),
       ),

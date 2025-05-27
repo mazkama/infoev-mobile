@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infoev/app/modules/explore/controllers/MerekController.dart';
+import 'package:infoev/app/modules/login/controllers/LoginController.dart';
 import 'package:infoev/app/routes/app_pages.dart';
 import 'package:infoev/app/styles/app_colors.dart';
 import 'package:infoev/core/local_db.dart';
@@ -8,8 +9,9 @@ import 'package:infoev/core/local_db.dart';
 void main() async { 
   WidgetsFlutterBinding.ensureInitialized();
   await LocalDB.init();
-  runApp(MyApp());
   Get.lazyPut(() => MerekController(), fenix: true);
+  Get.lazyPut(() => LoginController(), fenix: true);
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {

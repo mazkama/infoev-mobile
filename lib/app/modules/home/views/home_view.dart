@@ -105,9 +105,8 @@ class HomePage extends StatelessWidget {
                                       Get.toNamed('/kendaraan/${e.slug}');
                                     },
                                     bannerUrl:
-                                        e.thumbnailUrl ??
-                                        '', // Gunakan nilai default jika null
-                                    name: e.name ?? 'Kendaraan',
+                                        e.thumbnailUrl,
+                                    name: e.name,
                                     brand: e.brand?.name ?? 'InfoEV.id',
                                   ),
                                 )
@@ -153,9 +152,8 @@ class HomePage extends StatelessWidget {
                                       Get.toNamed('/kendaraan/${e.slug}');
                                     },
                                     bannerUrl:
-                                        e.thumbnailUrl ??
-                                        '', // Gunakan nilai default jika null
-                                    name: e.name ?? 'Kendaraan',
+                                        e.thumbnailUrl,
+                                    name: e.name ,
                                     brand: e.brand?.name ?? 'InfoEV.id',
                                   ),
                                 )

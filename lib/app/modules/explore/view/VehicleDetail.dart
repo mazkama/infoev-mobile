@@ -18,7 +18,7 @@ class VehicleDetailPage extends StatefulWidget {
 class _VehicleDetailPageState extends State<VehicleDetailPage>
     with SingleTickerProviderStateMixin {
   final VehicleDetailController controller = Get.put(VehicleDetailController());
-  final FavoriteVehicleController favoriteController = Get.put(FavoriteVehicleController());
+  FavoriteVehicleController? favoriteController;
   late final AnimationController _fadeController;
   late final Animation<double> _fadeAnimation;
 
@@ -34,6 +34,10 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
       curve: Curves.easeOut,
     );
     _fadeController.forward();
+
+    if (controller.isLoggedIn.value) {
+      favoriteController = Get.put(FavoriteVehicleController());
+    }
   }
 
   @override
@@ -92,8 +96,11 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                   ),
                 ),
                 actions: [
-                  Obx(
-                    () => IconButton(
+                  Obx(() {
+                    if (!controller.isLoggedIn.value) {
+                      return SizedBox.shrink(); // Tidak tampil sama sekali
+                    }
+                    return IconButton(
                       icon: Icon(
                         controller.vehicleLoved.value
                             ? Icons.favorite_rounded
@@ -109,7 +116,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
 
                         try {
                           if (controller.vehicleLoved.value) {
-                            await favoriteController.removeFavorite(vehicleId);
+                            await favoriteController!.removeFavorite(vehicleId);
                             controller.vehicleLoved.value = false;
                             showCustomSnackbar(
                               title: 'Berhasil',
@@ -118,7 +125,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                               icon: Icons.favorite,
                             );
                           } else {
-                            await favoriteController.addFavorite(vehicleId);
+                            await favoriteController!.addFavorite(vehicleId);
                             controller.vehicleLoved.value = true;
                             showCustomSnackbar(
                               title: 'Berhasil',
@@ -136,8 +143,8 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                           );
                         }
                       },
-                    ),
-                  ),
+                    );
+                  }),
                 ],
               ),
 
@@ -297,7 +304,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
 
                       // Affiliate Links - beli sekarang section
                       Obx(() {
-                        if (controller.affiliateLinks.isEmpty || 
+                        if (controller.affiliateLinks.isEmpty ||
                             controller.affiliateLinks.length > 2) {
                           return const SizedBox.shrink();
                         }
@@ -322,22 +329,22 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                               // Center layout for 1 or 2 items
                               controller.affiliateLinks.length == 1
                                   ? Center(
-                                      child: _buildAffiliateButton(
-                                        controller.affiliateLinks[0]
-                                      ),
-                                    )
-                                  : Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        _buildAffiliateButton(
-                                          controller.affiliateLinks[0]
-                                        ),
-                                        const SizedBox(width: 16),
-                                        _buildAffiliateButton(
-                                          controller.affiliateLinks[1]
-                                        ),
-                                      ],
+                                    child: _buildAffiliateButton(
+                                      controller.affiliateLinks[0],
                                     ),
+                                  )
+                                  : Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      _buildAffiliateButton(
+                                        controller.affiliateLinks[0],
+                                      ),
+                                      const SizedBox(width: 16),
+                                      _buildAffiliateButton(
+                                        controller.affiliateLinks[1],
+                                      ),
+                                    ],
+                                  ),
                             ],
                           ),
                         );
@@ -671,14 +678,10 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
           child: CachedNetworkImage(
             imageUrl: link['marketplace_logo'] ?? '',
             fit: BoxFit.contain,
-            placeholder: (context, url) => Container(
-              color: Colors.white,
-            ),
-            errorWidget: (context, url, error) => Icon(
-              Icons.shopping_bag,
-              color: Colors.grey[400],
-              size: 32,
-            ),
+            placeholder: (context, url) => Container(color: Colors.white),
+            errorWidget:
+                (context, url, error) =>
+                    Icon(Icons.shopping_bag, color: Colors.grey[400], size: 32),
           ),
         ),
       ),

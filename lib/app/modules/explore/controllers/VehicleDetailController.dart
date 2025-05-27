@@ -7,6 +7,7 @@ import 'package:infoev/core/halper.dart';
 import 'package:infoev/core/local_db.dart';
 
 class VehicleDetailController extends GetxController {
+ 
   // Data state
   var isLoading = true.obs;
   var hasError = false.obs;
@@ -22,9 +23,13 @@ class VehicleDetailController extends GetxController {
   var highlightSpecs = [].obs;
   var affiliateLinks = [].obs;
 
+  var isLoggedIn = false.obs;
+
   @override
   void onInit() {
     super.onInit();
+    // Cek token saat inisialisasi dan update isLoggedIn
+    isLoggedIn.value = LocalDB.getToken() != null;
     final slug = Get.parameters['slug'];
     if (slug != null) {
       fetchVehicleDetails(slug);
@@ -37,12 +42,7 @@ class VehicleDetailController extends GetxController {
 
     try {
       final token = LocalDB.getToken();
-
-      if (token == null || token.isEmpty) {
-        errorMessage.value = 'Token tidak tersedia. Silakan login kembali.';
-        return;
-      }
-
+      
       final response = await http.get(
         Uri.parse('${baseUrlDev}/$slug'),
         headers: {

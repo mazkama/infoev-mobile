@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:infoev/app/modules/home/views/home_view.dart';
 import 'package:infoev/app/modules/login/controllers/LoginController.dart';
+import 'package:infoev/app/modules/navbar/views/bottom_nav_view.dart';
 import 'package:infoev/app/modules/register/views/RegisterPage.dart';
 import 'package:infoev/app/styles/app_colors.dart'; // Import palet warna
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
-  final controller = Get.put(LoginController());
+  final controller = Get.find<LoginController>();
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -62,10 +64,7 @@ class LoginPage extends StatelessWidget {
                   // Email Field
                   TextFormField(
                     controller: controller.emailController,
-                    style: TextStyle(
-                      color: AppColors.textColor,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(color: AppColors.textColor, fontSize: 16),
                     decoration: InputDecoration(
                       labelText: 'Email',
                       labelStyle: TextStyle(
@@ -88,10 +87,16 @@ class LoginPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: AppColors.primaryColor),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 16,
+                      ),
                     ),
-                    validator: (value) =>
-                        value == null || value.isEmpty ? "Email is required" : null,
+                    validator:
+                        (value) =>
+                            value == null || value.isEmpty
+                                ? "Email is required"
+                                : null,
                   ),
                   const SizedBox(height: 20),
 
@@ -135,10 +140,16 @@ class LoginPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(color: AppColors.primaryColor),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 16,
+                        ),
                       ),
-                      validator: (value) =>
-                          value == null || value.isEmpty ? "Password is required" : null,
+                      validator:
+                          (value) =>
+                              value == null || value.isEmpty
+                                  ? "Password is required"
+                                  : null,
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -161,45 +172,100 @@ class LoginPage extends StatelessWidget {
                           ),
                           elevation: 2,
                         ),
-                        child: controller.isLoading.value
-                            ? CircularProgressIndicator(
-                                color: AppColors.accentColor, // Oranye untuk loading
-                              )
-                            : Text(
-                                'Login',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.backgroundColor, // Putih untuk kontras
+                        child:
+                            controller.isLoading.value
+                                ? CircularProgressIndicator(
+                                  color:
+                                      AppColors
+                                          .accentColor, // Oranye untuk loading
+                                )
+                                : Text(
+                                  'Login',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color:
+                                        AppColors
+                                            .backgroundColor, // Putih untuk kontras
+                                  ),
                                 ),
-                              ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Teks atau sebagai pemisah
+                  Center(
+                    child: Text(
+                      'atau',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
                   const SizedBox(height: 20),
+
+                  // Tombol Lanjutkan tanpa login dengan desain outline
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        // Arahkan ke halaman yang diinginkan tanpa login
+                        Get.offAll(
+                          () => BottomNavView(),
+                          transition: Transition.downToUp,
+                          duration: const Duration(milliseconds: 500),
+                        );
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: AppColors.accentColor,
+                          width: 1.5,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: Colors.transparent,
+                        foregroundColor: AppColors.accentColor,
+                        textStyle: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      child: const Text('Lanjutkan tanpa login'),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
 
                   // Login with Google Button
                   SizedBox(
                     width: double.infinity,
                     child: Obx(
                       () => ElevatedButton.icon(
-                        onPressed: controller.isGoogleLoading.value
-                            ? null
-                            : () => controller.loginWithGoogle(),
-                        icon: controller.isGoogleLoading.value
-                            ? SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: AppColors.accentColor,
+                        onPressed:
+                            controller.isGoogleLoading.value
+                                ? null
+                                : () => controller.loginWithGoogle(),
+                        icon:
+                            controller.isGoogleLoading.value
+                                ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: AppColors.accentColor,
+                                  ),
+                                )
+                                : Image.asset(
+                                  'assets/images/icon_google.png',
+                                  height: 24,
+                                  width: 24,
                                 ),
-                              )
-                            : Image.asset(
-                                'assets/images/icon_google.png',
-                                height: 24,
-                                width: 24,
-                              ),
                         label: Text(
                           controller.isGoogleLoading.value
                               ? 'Signing in...'
@@ -227,11 +293,12 @@ class LoginPage extends StatelessWidget {
                   // Register Text
                   Center(
                     child: GestureDetector(
-                      onTap: () => Get.offAll(
-                        () => RegisterPage(),
-                        transition: Transition.upToDown,
-                        duration: const Duration(milliseconds: 400),
-                      ),
+                      onTap:
+                          () => Get.offAll(
+                            () => RegisterPage(),
+                            transition: Transition.upToDown,
+                            duration: const Duration(milliseconds: 400),
+                          ),
                       child: Text.rich(
                         TextSpan(
                           children: [
@@ -247,7 +314,8 @@ class LoginPage extends StatelessWidget {
                               style: GoogleFonts.poppins(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.accentColor, // Oranye untuk aksen
+                                color:
+                                    AppColors.accentColor, // Oranye untuk aksen
                               ),
                             ),
                           ],
