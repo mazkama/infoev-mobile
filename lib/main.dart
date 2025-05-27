@@ -8,8 +8,8 @@ import 'package:infoev/core/local_db.dart';
 void main() async { 
   WidgetsFlutterBinding.ensureInitialized();
   await LocalDB.init();
-  Get.lazyPut(() => MerekController()); 
   runApp(MyApp());
+  Get.lazyPut(() => MerekController(), fenix: true);
 }
 
 class MyApp extends StatelessWidget {
