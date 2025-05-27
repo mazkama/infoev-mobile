@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:infoev/app/modules/explore/view/JelajahPage.dart';
 import 'package:infoev/app/modules/home/views/home_view.dart';
 import 'package:infoev/app/modules/navbar/controllers/bottom_nav_controller.dart';
-import 'package:infoev/app/modules/news/views/news_all_view.dart';
 import 'package:infoev/app/modules/charger_station/views/ChargerStationPage.dart';
 import 'package:infoev/app/modules/ev_comparison/views/EvComparePage.dart';
 import 'package:infoev/app/modules/profil/views/ProfilePage.dart';

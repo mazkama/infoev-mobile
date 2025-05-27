@@ -5,10 +5,10 @@ import 'package:infoev/app/routes/app_pages.dart';
 import 'package:infoev/app/styles/app_colors.dart';
 import 'package:infoev/core/local_db.dart';
 
-void main() async {
-  Get.lazyPut(() => MerekController());
+void main() async { 
   WidgetsFlutterBinding.ensureInitialized();
   await LocalDB.init();
+  Get.lazyPut(() => MerekController()); 
   runApp(MyApp());
 }
 

@@ -1,4 +1,4 @@
-package com.example.infoev
+package id.ginio.infoev
 
 import io.flutter.embedding.android.FlutterActivity
 

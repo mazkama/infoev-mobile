@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.infoev" // Sesuaikan dengan nama package Anda
+    namespace = "id.ginio.infoev" // Sesuaikan dengan nama package Anda
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "29.0.13113456" // Pastikan versi NDK sesuai dengan yang Anda perlukan
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // Ganti applicationId sesuai dengan ID aplikasi yang unik
-        applicationId = "com.example.infoev"
+        applicationId = "id.ginio.infoev"
         // Pastikan ini sesuai dengan kebutuhan aplikasi Anda
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion

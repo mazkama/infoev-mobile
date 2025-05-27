@@ -17,7 +17,7 @@ class VehicleDetailPage extends StatefulWidget {
 
 class _VehicleDetailPageState extends State<VehicleDetailPage>
     with SingleTickerProviderStateMixin {
-  final VehicleDetailController controller = Get.put(VehicleDetailController()); 
+  final VehicleDetailController controller = Get.put(VehicleDetailController());
   final FavoriteVehicleController favoriteController = Get.put(FavoriteVehicleController());
   late final AnimationController _fadeController;
   late final Animation<double> _fadeAnimation;
@@ -295,6 +295,54 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                         ),
                       ),
 
+                      // Affiliate Links - beli sekarang section
+                      Obx(() {
+                        if (controller.affiliateLinks.isEmpty || 
+                            controller.affiliateLinks.length > 2) {
+                          return const SizedBox.shrink();
+                        }
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 24,
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                'Cek Harga Terbaru Di Sini',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+
+                              // Center layout for 1 or 2 items
+                              controller.affiliateLinks.length == 1
+                                  ? Center(
+                                      child: _buildAffiliateButton(
+                                        controller.affiliateLinks[0]
+                                      ),
+                                    )
+                                  : Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        _buildAffiliateButton(
+                                          controller.affiliateLinks[0]
+                                        ),
+                                        const SizedBox(width: 16),
+                                        _buildAffiliateButton(
+                                          controller.affiliateLinks[1]
+                                        ),
+                                      ],
+                                    ),
+                            ],
+                          ),
+                        );
+                      }),
+
                       const SizedBox(height: 32),
 
                       // Specifications with animation
@@ -442,109 +490,6 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                         ),
                       ),
 
-                      // Affiliate Links - beli sekarang section
-                      Obx(() {
-                        if (controller.affiliateLinks.isEmpty)
-                          return const SizedBox.shrink();
-
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 16,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Beli Sekarang',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-
-                              // Marketplace logo and links
-                              Wrap(
-                                spacing: 12,
-                                runSpacing: 12,
-                                children:
-                                    controller.affiliateLinks.map<Widget>((
-                                      link,
-                                    ) {
-                                      return InkWell(
-                                        onTap: () {
-                                          // Open link in browser
-                                          final url = link['link'];
-                                          if (url != null) {
-                                            try {
-                                              launchUrl(
-                                                Uri.parse(url),
-                                                mode:
-                                                    LaunchMode
-                                                        .externalApplication,
-                                              );
-                                            } catch (e) {
-                                              debugPrint(
-                                                'Error launching URL: $e',
-                                              );
-                                            }
-                                          }
-                                          HapticFeedback.lightImpact();
-                                        },
-                                        child: Container(
-                                          height: 48,
-                                          width: 140,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black.withOpacity(
-                                                  0.1,
-                                                ),
-                                                blurRadius: 8,
-                                                offset: const Offset(0, 2),
-                                              ),
-                                            ],
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 8,
-                                          ),
-                                          child: Center(
-                                            child: CachedNetworkImage(
-                                              imageUrl:
-                                                  link['marketplace_logo'] ??
-                                                  '',
-                                              fit: BoxFit.scaleDown,
-                                              placeholder:
-                                                  (context, url) => Container(
-                                                    color: Colors.grey[200],
-                                                  ),
-                                              errorWidget:
-                                                  (context, url, error) =>
-                                                      Center(
-                                                        child: Icon(
-                                                          Icons.shopping_bag,
-                                                          color:
-                                                              Colors.grey[400],
-                                                        ),
-                                                      ),
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
-                              ),
-                            ],
-                          ),
-                        );
-                      }),
-
                       // Comments Section
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -687,6 +632,55 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
             ],
           );
         }),
+      ),
+    );
+  }
+
+  Widget _buildAffiliateButton(dynamic link) {
+    return InkWell(
+      onTap: () async {
+        final url = link['link'] ?? link['url'];
+        if (url != null) {
+          try {
+            await launchUrl(
+              Uri.parse(url),
+              mode: LaunchMode.externalApplication,
+            );
+          } catch (e) {
+            debugPrint('Error launching URL: $e');
+          }
+        }
+        HapticFeedback.lightImpact();
+      },
+      child: Container(
+        height: 60,
+        width: 120,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Center(
+          child: CachedNetworkImage(
+            imageUrl: link['marketplace_logo'] ?? '',
+            fit: BoxFit.contain,
+            placeholder: (context, url) => Container(
+              color: Colors.white,
+            ),
+            errorWidget: (context, url, error) => Icon(
+              Icons.shopping_bag,
+              color: Colors.grey[400],
+              size: 32,
+            ),
+          ),
+        ),
       ),
     );
   }
