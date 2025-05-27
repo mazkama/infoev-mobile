@@ -17,8 +17,8 @@ class VehicleDetailPage extends StatefulWidget {
 
 class _VehicleDetailPageState extends State<VehicleDetailPage>
     with SingleTickerProviderStateMixin {
-  final VehicleDetailController controller = Get.put(VehicleDetailController());
-  final FavoriteVehicleController favoriteController = Get.find();
+  final VehicleDetailController controller = Get.put(VehicleDetailController()); 
+  final FavoriteVehicleController favoriteController = Get.put(FavoriteVehicleController());
   late final AnimationController _fadeController;
   late final Animation<double> _fadeAnimation;
 
