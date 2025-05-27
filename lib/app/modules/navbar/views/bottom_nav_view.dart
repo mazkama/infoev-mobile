@@ -18,7 +18,7 @@ const tabBarItem = {
   "Jelajah": Icons.explore_outlined,
   "Charge": Icons.bolt_outlined,
   "Bandingkan": Icons.compare_arrows_outlined,
-  "Profil": Icons.account_circle_outlined,
+  "Lainnya": Icons.more_horiz_rounded,
 };
 
 // Static mapping for tab items (selected)
@@ -27,7 +27,7 @@ const tabBarItemselect = {
   "Jelajah": Icons.explore,
   "Charge": Icons.bolt_rounded,
   "Bandingkan": Icons.compare_arrows_rounded,
-  "Profil": Icons.account_circle_rounded,
+  "Lainnya": Icons.more_horiz_rounded,
 };
 
 class BottomNavView extends GetView<BottomNavController> {
