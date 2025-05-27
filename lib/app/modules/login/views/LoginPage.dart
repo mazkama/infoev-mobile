@@ -74,7 +74,7 @@ class LoginPage extends StatelessWidget {
                       ),
                       prefixIcon: Icon(
                         Icons.email_outlined,
-                        color: AppColors.accentColor, // Oranye untuk aksen
+                        color: AppColors.primaryColor,
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -112,28 +112,28 @@ class LoginPage extends StatelessWidget {
                         ),
                         prefixIcon: Icon(
                           Icons.lock_outline,
-                          color: AppColors.accentColor, // Oranye untuk aksen
+                          color: AppColors.primaryColor, // Oranye untuk aksen
                         ),
                         suffixIcon: IconButton(
                           icon: Icon(
                             controller.obscurePassword.value
                                 ? Icons.visibility_off
                                 : Icons.visibility,
-                            color: AppColors.accentColor,
+                            color: AppColors.primaryColor,
                           ),
                           onPressed: controller.togglePasswordVisibility,
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.secondaryTextColor),
+                          borderSide: BorderSide(color: AppColors.primaryColor),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.secondaryTextColor),
+                          borderSide: BorderSide(color: AppColors.primaryColor),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.accentColor),
+                          borderSide: BorderSide(color: AppColors.primaryColor),
                         ),
                         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                       ),
@@ -215,7 +215,7 @@ class LoginPage extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(color: AppColors.secondaryTextColor),
+                            side: BorderSide(color: AppColors.secondaryColor),
                           ),
                           elevation: 0,
                         ),
