@@ -21,6 +21,9 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
   FavoriteVehicleController? favoriteController;
   late final AnimationController _fadeController;
   late final Animation<double> _fadeAnimation;
+  int?
+  replyingToCommentId; // null artinya tidak sedang membalas komentar manapun
+  final TextEditingController _replyController = TextEditingController();
 
   @override
   void initState() {
@@ -40,8 +43,22 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
     }
   }
 
+  void _sendReply(int parentCommentId) {
+    final replyText = _replyController.text;
+    if (replyText.isNotEmpty) {
+      // Kirim ke server atau simpan lokal
+      print('Mengirim balasan ke comment ID $parentCommentId: $replyText');
+
+      setState(() {
+        _replyController.clear();
+        replyingToCommentId = null;
+      });
+    }
+  }
+
   @override
   void dispose() {
+    _replyController.dispose();
     _fadeController.dispose();
     super.dispose();
   }
@@ -522,7 +539,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                 ),
                                 const Spacer(),
                                 Text(
-                                  '24 komentar', // This will be dynamic later
+                                  '${controller.commentCount} komentar', // This will be dynamic later
                                   style: GoogleFonts.poppins(
                                     fontSize: 14,
                                     color: Colors.grey[400],
@@ -607,7 +624,62 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                             const SizedBox(height: 16),
 
                             // Sample Comments
-                            ...List.generate(3, (index) => _buildCommentCard()),
+                            // ...List.generate(3, (index) => _buildCommentCard()),
+                            Obx(() {
+                              final comments = controller.comments;
+
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: comments.length,
+                                itemBuilder: (context, index) {
+                                  final comment = comments[index];
+                                  final createdAt = comment.createdAt;
+                                  final commentTimeAgo = timeAgo(
+                                    createdAt,
+                                  ); // konversi timestamp ke "x menit yang lalu"
+
+                                  List<Widget> widgets = [
+                                    _buildCommentCard(
+                                      commentId: comment.id,
+                                      name: comment.name,
+                                      comment: comment.comment,
+                                      timeAgo: commentTimeAgo,
+                                      onReplyTap: () {
+                                        setState(() {
+                                          replyingToCommentId = comment.id;
+                                        });
+                                      },
+                                    ),
+                                  ];
+
+                                  // Tambahkan replies
+                                  for (var reply in comment.replies) {
+                                    final replyTimeAgo = timeAgo(
+                                      reply.createdAt,
+                                    );
+
+                                    widgets.add(
+                                      _buildCommentCard(
+                                        commentId: reply.id,
+                                        name: reply.name,
+                                        comment: reply.comment,
+                                        timeAgo: replyTimeAgo,
+                                        isReply: true,
+                                        replyTo: comment.name,
+                                        onReplyTap: () {
+                                          setState(() {
+                                            replyingToCommentId = reply.id;
+                                          });
+                                        },
+                                      ),
+                                    );
+                                  }
+
+                                  return Column(children: widgets);
+                                },
+                              );
+                            }),
 
                             // Show More Button
                             Padding(
@@ -623,6 +695,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                     style: GoogleFonts.poppins(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
+                                      color: Colors.blue[400],
                                     ),
                                   ),
                                 ),
@@ -688,40 +761,39 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
     );
   }
 
-  Widget _buildCommentCard() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF212121),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+  Widget _buildCommentCard({
+    required int commentId,
+    required String name,
+    required String comment,
+    required String timeAgo,
+    bool isReply = false,
+    String? replyTo,
+    required VoidCallback onReplyTap,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: EdgeInsets.only(bottom: 12, left: isReply ? 48 : 0),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E1E1E),
+            borderRadius: BorderRadius.circular(12),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: Colors.blue[700],
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    'JD',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
+              CircleAvatar(
+                backgroundColor: Colors.blue[700],
+                radius: 18,
+                child: Text(
+                  (name.isEmpty || name == 'Anonimus')
+                      ? 'A'
+                      : name[0].toUpperCase(),
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -731,88 +803,97 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'John Doe',
+                      name.isEmpty ? 'Anonimus' : name,
                       style: GoogleFonts.poppins(
                         color: Colors.white,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Text(
-                      '2 jam yang lalu',
-                      style: GoogleFonts.poppins(
-                        color: Colors.grey[500],
-                        fontSize: 12,
+                    if (isReply && replyTo != null && replyTo.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2.0, bottom: 4),
+                        child: Text(
+                          'Membalas @$replyTo',
+                          style: GoogleFonts.poppins(
+                            color: Colors.grey[400],
+                            fontSize: 12,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
                       ),
+                    Text(
+                      comment.isEmpty ? 'Komentar tidak tersedia' : comment,
+                      style: GoogleFonts.poppins(
+                        color: Colors.grey[300],
+                        fontSize: 14,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Text(
+                          timeAgo,
+                          style: GoogleFonts.poppins(
+                            color: Colors.grey[500],
+                            fontSize: 11,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        GestureDetector(
+                          onTap: onReplyTap,
+                          child: Text(
+                            'Balas',
+                            style: GoogleFonts.poppins(
+                              color: Colors.grey[400],
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            'Kendaraan ini memiliki performa yang sangat baik dan hemat energi. Sangat cocok untuk penggunaan sehari-hari di kota.',
-            style: GoogleFonts.poppins(
-              color: Colors.grey[300],
-              fontSize: 14,
-              height: 1.5,
+        ),
+
+        // Tampilkan field jika sedang membalas komentar ini
+        if (replyingToCommentId == commentId)
+          Padding(
+            padding: EdgeInsets.only(left: isReply ? 48 : 0),
+            child: Column(
+              children: [
+                TextField(
+                  controller: _replyController,
+                  decoration: InputDecoration(
+                    hintText: 'Tulis balasan...',
+                    hintStyle: TextStyle(color: Colors.grey[400]),
+                    filled: true,
+                    fillColor: Colors.grey[800],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  style: TextStyle(color: Colors.white),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                      _sendReply(commentId);
+                    },
+                    child: Text('Kirim'),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              InkWell(
-                onTap: () {
-                  // TODO: Implement like functionality
-                  HapticFeedback.lightImpact();
-                },
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.thumb_up_outlined,
-                      size: 16,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '12',
-                      style: GoogleFonts.poppins(
-                        color: Colors.grey[400],
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
-              InkWell(
-                onTap: () {
-                  // TODO: Implement reply functionality
-                  HapticFeedback.lightImpact();
-                },
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.reply_outlined,
-                      size: 16,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Balas',
-                      style: GoogleFonts.poppins(
-                        color: Colors.grey[400],
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+      ],
     );
   }
 
@@ -1006,4 +1087,17 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
       snackPosition: SnackPosition.TOP,
     );
   }
+}
+
+String timeAgo(String datetimeString) {
+  final dateTime = DateTime.parse(datetimeString).toLocal();
+  final now = DateTime.now();
+  final diff = now.difference(dateTime);
+
+  if (diff.inSeconds < 60) return '${diff.inSeconds} detik yang lalu';
+  if (diff.inMinutes < 60) return '${diff.inMinutes} menit yang lalu';
+  if (diff.inHours < 24) return '${diff.inHours} jam yang lalu';
+  if (diff.inDays < 7) return '${diff.inDays} hari yang lalu';
+
+  return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
 }

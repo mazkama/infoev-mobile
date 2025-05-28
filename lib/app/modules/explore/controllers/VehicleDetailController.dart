@@ -5,9 +5,9 @@ import 'package:http/http.dart' as http;
 import 'package:infoev/app/modules/explore/model/SpecCategoryModel.dart';
 import 'package:infoev/core/halper.dart';
 import 'package:infoev/core/local_db.dart';
+import 'package:infoev/app/modules/explore/model/CommentModel.dart';
 
 class VehicleDetailController extends GetxController {
- 
   // Data state
   var isLoading = true.obs;
   var hasError = false.obs;
@@ -22,8 +22,10 @@ class VehicleDetailController extends GetxController {
   var vehicleImages = <String>[].obs;
   var highlightSpecs = [].obs;
   var affiliateLinks = [].obs;
+  var comments = <Comment>[].obs;
 
   var isLoggedIn = false.obs;
+  int commentCount = 0;
 
   @override
   void onInit() {
@@ -42,14 +44,14 @@ class VehicleDetailController extends GetxController {
 
     try {
       final token = LocalDB.getToken();
-      
+
       final response = await http.get(
         Uri.parse('${baseUrlDev}/$slug'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
         },
-      ); 
+      );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -61,7 +63,18 @@ class VehicleDetailController extends GetxController {
         vehicleSlug.value = vehicleData['slug'] ?? '';
 
         // Parse vehicle loved status
-        vehicleLoved.value = data['isLoved'] ?? false; 
+        vehicleLoved.value = data['isLoved'] ?? false;
+
+        // Comment count
+        commentCount = data['comments_count'] ?? 0; 
+
+        // Parse comments
+        if (data['comments'] != null) {
+          comments.value =
+              (data['comments'] as List)
+                  .map((json) => Comment.fromJson(json))
+                  .toList();
+        }
 
         // Parse images
         if (vehicleData['pictures'] != null) {
