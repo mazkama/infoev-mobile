@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:infoev/app/modules/explore/controllers/BrandDetailController.dart';
 import 'package:infoev/app/modules/explore/controllers/MerekController.dart';
 import 'package:infoev/app/modules/explore/model/VehicleModel.dart';
+import 'package:infoev/app/styles/app_colors.dart';
 import 'package:shimmer/shimmer.dart'; 
 
 class TipeProdukPage extends StatefulWidget {
@@ -59,7 +60,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: AppColors.backgroundColor,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Column(
@@ -83,7 +84,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                   child: Center(
                     child: Text(
                       'Tidak ada data',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: AppColors.textTertiary),
                     ),
                   ),
                 );
@@ -95,8 +96,8 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
             }),
             Obx(() => controller.isLoading.value && controller.brandDetail.value != null
                 ? const LinearProgressIndicator(
-                    backgroundColor: Color(0xFF303030),
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    backgroundColor: AppColors.backgroundColor,
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.secondaryColor),
                   )
                 : const SizedBox.shrink()),
           ],
@@ -110,10 +111,10 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: AppColors.cardBackgroundColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: AppColors.shadowMedium.withAlpha(25),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -127,7 +128,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    icon: const Icon(Icons.arrow_back, color: AppColors.primaryColor),
                     onPressed: () {
                       Get.back();
                     },
@@ -140,7 +141,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                     style: GoogleFonts.poppins(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: AppColors.textColor,
                     ),
                   )),
                 ],
@@ -148,7 +149,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.search, color: Colors.white),
+                    icon: const Icon(Icons.search, color: AppColors.primaryColor),
                     onPressed: () {
                       controller.toggleSearch();
                       // Give focus to search field after layout update
@@ -160,7 +161,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.filter_list, color: Colors.white),
+                    icon: const Icon(Icons.filter_list, color: AppColors.primaryColor),
                     onPressed: () {
                       _showFilterDialog(context);
                     },
@@ -177,7 +178,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
               margin: const EdgeInsets.only(top: 8),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: const Color(0xFF252525),
+                color: AppColors.backgroundSecondary,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -187,7 +188,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                       _buildFilterInfoText(),
                       style: GoogleFonts.poppins(
                         fontSize: 12,
-                        color: Colors.grey[300],
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ),
@@ -197,7 +198,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                     },
                     child: const Padding(
                       padding: EdgeInsets.all(4.0),
-                      child: Icon(Icons.close, color: Colors.grey, size: 16),
+                      child: Icon(Icons.close, color: AppColors.textSecondary, size: 16),
                     ),
                   ),
                 ],
@@ -209,7 +210,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
             'Menampilkan ${controller.filteredVehicles.length} dari ${controller.brandDetail.value?.vehicles.length ?? 0} kendaraan',
             style: GoogleFonts.poppins(
               fontSize: 12,
-              color: Colors.grey[400],
+              color: AppColors.textSecondary,
             ),
           )),
         ],
@@ -220,7 +221,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
   Widget _buildSearchBar() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: const Color(0xFF1A1A1A),
+      color: AppColors.cardBackgroundColor,
       child: TextField(
         controller: _searchController,
         onChanged: (value) {
@@ -232,12 +233,12 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
         },
         autofocus: true,
         focusNode: _searchFocusNode,
-        style: GoogleFonts.poppins(color: Colors.white),
+        style: GoogleFonts.poppins(color: AppColors.textColor),
         decoration: InputDecoration(
           hintText: 'Cari kendaraan...',
-          hintStyle: GoogleFonts.poppins(color: Colors.grey),
+          hintStyle: GoogleFonts.poppins(color: AppColors.textTertiary),
           prefixIcon: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.grey),
+            icon: const Icon(Icons.arrow_back, color: AppColors.textSecondary),
             onPressed: () {
               controller.isSearching.value = false;
               _searchController.clear();
@@ -249,7 +250,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
             builder: (context, value, child) {
               return value.text.isNotEmpty
                 ? IconButton(
-                    icon: const Icon(Icons.close, color: Colors.grey),
+                    icon: const Icon(Icons.close, color: AppColors.textSecondary),
                     onPressed: () {
                       _searchController.clear();
                       controller.searchVehicles('');
@@ -263,7 +264,6 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
             },
           ),
           filled: true,
-          fillColor: const Color(0xFF252525),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
@@ -271,11 +271,11 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Colors.grey.withOpacity(0.2)),
+            borderSide: BorderSide(color: AppColors.borderMedium),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Colors.white, width: 1),
+            borderSide: const BorderSide(color: AppColors.borderMedium, width: 1),
           ),
         ),
       ),
@@ -300,8 +300,8 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
 
   Widget _buildContent(BuildContext context, double screenWidth) {
     return RefreshIndicator(
-      color: Colors.white,
-      backgroundColor: const Color(0xFF303030),
+      color: AppColors.secondaryColor,
+      backgroundColor: AppColors.backgroundColor,
       onRefresh: () => controller.refreshData(),
       child: CustomScrollView(
         slivers: [
@@ -375,7 +375,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
         color: const Color(0xFF212121),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: AppColors.shadowMedium,
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -400,11 +400,11 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                 color: backgroundColor,
               ),
               errorWidget: (context, url, error) => Container(
-                color: Colors.grey[900],
+                color: AppColors.backgroundColor,
                 child: const Center(
                   child: Icon(
                     Icons.broken_image,
-                    color: Colors.white,
+                    color: AppColors.textSecondary,
                     size: 48,
                   ),
                 ),
@@ -417,8 +417,8 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.transparent,
-                    Colors.black.withOpacity(0.7),
+                    AppColors.primaryColor.withAlpha(0),
+                    AppColors.primaryColor.withAlpha(179),
                   ],
                   stops: const [0.5, 1.0],
                 ),
@@ -438,7 +438,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                   shadows: [
                     Shadow(
                       blurRadius: 10,
-                      color: Colors.black.withOpacity(0.5),
+                      color: AppColors.shadowMedium,
                     ),
                   ],
                 ),
@@ -503,11 +503,11 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: controller.filterByTypeId.value == id
-                        ? Colors.white
-                        : const Color(0xFF303030),
+                        ? AppColors.secondaryColor.withAlpha(45)
+                        : AppColors.backgroundSecondary,
                     foregroundColor: controller.filterByTypeId.value == id
-                        ? Colors.black
-                        : Colors.white,
+                        ? AppColors.secondaryColor
+                        : AppColors.textColor,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     shape: RoundedRectangleBorder(
@@ -540,13 +540,13 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
         return Padding(
           padding: const EdgeInsets.only(right: 8),
           child: Shimmer.fromColors(
-            baseColor: Colors.grey.shade800,
-            highlightColor: Colors.grey.shade700,
+            baseColor: AppColors.shimmerBase,
+            highlightColor: AppColors.shimmerHighlight,
             child: Container(
               width: 80,
               height: 32,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.shimmerBase,
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
@@ -566,11 +566,11 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF212121),
+          color: AppColors.primaryColor,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: AppColors.shadowMedium,
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -602,11 +602,11 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                             color: Colors.white,
                           ),
                           errorWidget: (context, url, error) => Container(
-                            color: Colors.grey[900],
+                            color: AppColors.backgroundColor,
                             child: const Center(
                               child: Icon(
                                 Icons.broken_image,
-                                color: Colors.white,
+                                color: AppColors.textSecondary,
                                 size: 32,
                               ),
                             ),
@@ -622,7 +622,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
+                            color: AppColors.secondaryColor,
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -640,7 +640,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
               ),
               // Info
               Container(
-                color: const Color(0xFF212121), // Background hitam untuk info
+                color: AppColors.primaryColor, // Background hitam untuk info
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -648,7 +648,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                     Text(
                       vehicle.name,
                       style: GoogleFonts.poppins(
-                        color: Colors.white,
+                        color: AppColors.textOnPrimary,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
@@ -659,7 +659,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                       Text(
                         'Tahun $year',
                         style: GoogleFonts.poppins(
-                          color: Colors.grey[400],
+                          color: AppColors.textOnPrimary,
                           fontSize: 12,
                         ),
                       ),
@@ -681,14 +681,14 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
           const Icon(
             Icons.filter_alt_off,
             size: 64,
-            color: Colors.grey,
+            color: AppColors.secondaryColor,
           ),
           const SizedBox(height: 16),
           Text(
             'Tidak ada kendaraan yang sesuai',
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-              color: Colors.white,
+              color: AppColors.textTertiary,
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
@@ -698,7 +698,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
             'Coba ubah kriteria pencarian atau filter Anda',
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-              color: Colors.grey[400],
+              color: AppColors.textTertiary,
               fontSize: 14,
             ),
           ),
@@ -735,14 +735,14 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
           const Icon(
             Icons.signal_wifi_off,
             size: 64,
-            color: Colors.grey,
+            color: AppColors.secondaryColor,
           ),
           const SizedBox(height: 16),
           Text(
             'Gagal memuat data',
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-              color: Colors.white,
+              color: AppColors.textTertiary,
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
@@ -752,7 +752,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
             controller.errorMessage.value,
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-              color: Colors.grey[400],
+              color: AppColors.textTertiary,
               fontSize: 14,
             ),
           ),
@@ -792,11 +792,11 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Shimmer.fromColors(
-              baseColor: Colors.grey.shade800,
-              highlightColor: Colors.grey.shade700,
+              baseColor: AppColors.shimmerBase,
+              highlightColor: AppColors.shimmerHighlight,
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.shimmerBase,
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
@@ -826,11 +826,11 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 return Shimmer.fromColors(
-                  baseColor: Colors.grey.shade800,
-                  highlightColor: Colors.grey.shade700,
+                  baseColor: AppColors.shimmerBase,
+                  highlightColor: AppColors.shimmerHighlight,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.shimmerBase,
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
@@ -854,11 +854,11 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              backgroundColor: const Color(0xFF252525),
+              backgroundColor: AppColors.cardBackgroundColor,
               title: Text(
                 'Filter Kendaraan',
                 style: GoogleFonts.poppins(
-                  color: Colors.white,
+                  color: AppColors.textColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -869,7 +869,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                   Text(
                     'Urutkan Berdasarkan',
                     style: GoogleFonts.poppins(
-                      color: Colors.white,
+                      color: AppColors.textColor,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -892,7 +892,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                   Text(
                     'Arah Urutan',
                     style: GoogleFonts.poppins(
-                      color: Colors.white,
+                      color: AppColors.textColor,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -917,7 +917,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                 TextButton(
                   child: Text(
                     'Reset',
-                    style: GoogleFonts.poppins(color: Colors.grey),
+                    style: GoogleFonts.poppins(color: AppColors.textSecondary),
                   ),
                   onPressed: () {
                     setState(() {
@@ -928,8 +928,8 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
+                    backgroundColor: AppColors.primaryColor,
+                    foregroundColor: AppColors.textOnPrimary,
                   ),
                   child: Text(
                     'Terapkan',
@@ -954,13 +954,13 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : const Color(0xFF303030),
+          color: isSelected ? AppColors.primaryColor : AppColors.backgroundSecondary,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
           label,
           style: GoogleFonts.poppins(
-            color: isSelected ? Colors.black : Colors.white,
+            color: isSelected ? AppColors.textOnPrimary : AppColors.textColor,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             fontSize: 12,
           ),

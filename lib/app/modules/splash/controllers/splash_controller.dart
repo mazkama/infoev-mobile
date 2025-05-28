@@ -16,7 +16,7 @@ class SplashController extends GetxController {
     await LocalDB.init(); 
     bool isLoggedIn = LocalDB.getToken() != null;
 
-    // await Future.delayed(Duration(milliseconds: 1850));
+    await Future.delayed(Duration(milliseconds: 1850));
     // if (!isLoggedIn) {
     //   Get.offAllNamed(Routes.LOGIN);
     // } else {

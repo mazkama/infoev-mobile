@@ -318,7 +318,7 @@ class _JelajahPageState extends State<JelajahPage> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isSelected
-                          ? AppColors.secondaryDark.withAlpha(45)
+                          ? AppColors.secondaryColor.withAlpha(45)
                           : AppColors.backgroundSecondary,
                       foregroundColor:
                           isSelected ? AppColors.secondaryColor : AppColors.textColor,
