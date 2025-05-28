@@ -66,11 +66,11 @@ class _ArticalPageState extends State<ArticalPage> {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.backgroundColor,
+        backgroundColor: AppColors.cardBackgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back, color: AppColors.primaryColor),
           onPressed: () => Get.back(),
         ),
         title: const Text(
@@ -82,7 +82,10 @@ class _ArticalPageState extends State<ArticalPage> {
         ),
         actions: [
           IconButton(
-            icon: Icon(_showSearch ? Icons.search_off : Icons.search),
+            icon: Icon(
+              _showSearch ? Icons.search_off : Icons.search,
+              color: AppColors.primaryColor,
+            ),
             onPressed: () {
               setState(() {
                 _showSearch = !_showSearch;
@@ -94,7 +97,7 @@ class _ArticalPageState extends State<ArticalPage> {
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _refreshNews,
-          color: AppColors.accentColor,
+          color: AppColors.secondaryColor,
           child: Obx(() {
             final query = newsController.searchQuery.value;
             final newsList = newsController.allNewsList;
@@ -123,7 +126,7 @@ class _ArticalPageState extends State<ArticalPage> {
                               vertical: 5,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.accentColor.withOpacity(0.1),
+                              color: AppColors.secondaryColor.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -131,9 +134,9 @@ class _ArticalPageState extends State<ArticalPage> {
                                   ? 'Hasil cari "$query"'
                                   : 'Semua Berita',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.accentColor,
+                                color: AppColors.secondaryColor,
                               ),
                             ),
                           ),

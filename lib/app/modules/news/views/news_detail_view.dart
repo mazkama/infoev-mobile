@@ -38,7 +38,7 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
             slivers: [
               SliverAppBar(
                 backgroundColor:
-                    AppColors.backgroundColor, // Ungu tua dari palet
+                    AppColors.backgroundColor,
                 expandedHeight: 250,
                 scrolledUnderElevation: 0, // Bayangan tetap saat scroll
                 pinned: true,
@@ -50,15 +50,15 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                       fit: BoxFit.cover,
                       placeholder:
                           (context, url) => Shimmer.fromColors(
-                            baseColor: Colors.grey.shade300,
-                            highlightColor: Colors.grey.shade100,
+                            baseColor: AppColors.shimmerBase,
+                            highlightColor: AppColors.shimmerHighlight,
                             child: Container(
-                              color: AppColors.cardBackgroundColor,
+                              color: AppColors.shimmerBase,
                             ),
                           ),
                       errorWidget:
                           (context, url, error) =>
-                              const Icon(Icons.error, color: Colors.redAccent),
+                              const Icon(Icons.error, color: AppColors.errorColor),
                     ),
                   ),
                 ),
@@ -66,7 +66,7 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                   padding: const EdgeInsets.only(left: 8, top: 10),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: AppColors.accentColor.withOpacity(
+                      color: AppColors.primaryColor.withOpacity(
                         0.5,
                       ), // Sesuaikan dengan tema
                       shape: BoxShape.circle,
@@ -103,7 +103,7 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
-                                color: AppColors.accentColor,
+                                color: AppColors.primaryColor,
                               ), // Abu-abu gelap
                             ),
                           ),

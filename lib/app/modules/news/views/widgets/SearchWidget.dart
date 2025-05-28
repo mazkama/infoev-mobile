@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:infoev/app/styles/app_colors.dart';
 
 class SearchWidget extends StatelessWidget {
   final TextEditingController controller;
@@ -14,12 +15,12 @@ class SearchWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black,
+        color: AppColors.cardBackgroundColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[800]!, width: 1),
+        border: Border.all(color: AppColors.borderMedium, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.purple.withOpacity(0.1),
+            color: AppColors.primaryColor.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -28,14 +29,14 @@ class SearchWidget extends StatelessWidget {
       child: TextField(
         controller: controller,
         onChanged: onSearch,
-        style: const TextStyle(color: Colors.white),
+        style: const TextStyle(color: AppColors.textColor),
         decoration: InputDecoration(
           hintText: "Cari berita...",
-          hintStyle: TextStyle(color: Colors.grey[400]),
-          prefixIcon: const Icon(Icons.search, color: Colors.white),
+          hintStyle: TextStyle(color: AppColors.textTertiary),
+          prefixIcon: const Icon(Icons.search, color: AppColors.primaryColor),
           suffixIcon: controller.text.isNotEmpty
               ? IconButton(
-                  icon: Icon(Icons.clear, color: Colors.white),
+                  icon: Icon(Icons.clear, color: AppColors.primaryColor),
                   onPressed: () {
                     controller.clear();
                     onSearch('');

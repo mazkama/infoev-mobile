@@ -21,15 +21,15 @@
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(
-              Icons.info_outline,
+              Icons.info_outline_rounded,
               size: 80,
-              color: AppColors.secondaryTextColor,
+              color: AppColors.primaryColor,
             ),
             const SizedBox(height: 16),
             Text(
               message,
               style: TextStyle(
-                color: AppColors.secondaryTextColor,
+                color: AppColors.textTertiary,
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
@@ -40,7 +40,7 @@
               ElevatedButton(
                 onPressed: onRetry,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.accentColor,
+                  backgroundColor: AppColors.secondaryColor,
                   foregroundColor: AppColors.textColor,
                 ),
                 child: Text(buttonText!),
