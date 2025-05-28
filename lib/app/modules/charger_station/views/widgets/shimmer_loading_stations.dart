@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:infoev/app/styles/app_colors.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ShimmerLoadingStations extends StatelessWidget {
@@ -13,15 +14,15 @@ class ShimmerLoadingStations extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.all(10),
           child: Shimmer.fromColors(
-            baseColor: Colors.grey.shade300,
-            highlightColor: Colors.grey.shade100,
+            baseColor: AppColors.shimmerBase,
+            highlightColor: AppColors.shimmerHighlight,
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.shimmerBase,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.shade200,
+                    color: AppColors.shadowMedium,
                     blurRadius: 15,
                     offset: const Offset(0, 5),
                   ),

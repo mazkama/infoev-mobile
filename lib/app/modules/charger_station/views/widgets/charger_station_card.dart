@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:infoev/app/styles/app_colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:core';
 import 'package:infoev/app/modules/charger_station/model/ChargerStationModel.dart';
@@ -34,11 +35,11 @@ class ChargerStationCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 10.0),
       decoration: BoxDecoration(
-        color: Colors.black,
+        color: AppColors.cardBackgroundColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.white,
+            color: AppColors.shadowMedium,
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -58,11 +59,11 @@ class ChargerStationCard extends StatelessWidget {
                 color:
                     isOperational
                         ? station.openNow == true
-                            ? Colors.green[400]
-                            : Colors.red[400]
+                            ? AppColors.successColor
+                            : AppColors.errorColor
                         // ? Colors.amber[400]
                         // : Colors.purple[400]
-                        : Colors.grey[600],
+                        : AppColors.textSecondary,
               ),
             ),
             Padding(
@@ -75,7 +76,7 @@ class ChargerStationCard extends StatelessWidget {
                     width: 60,
                     height: 60,
                     decoration: BoxDecoration(
-                      color: Colors.grey[800],
+                      color: AppColors.backgroundSecondary,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -84,11 +85,11 @@ class ChargerStationCard extends StatelessWidget {
                       color:
                           isOperational
                               ? station.openNow == true
-                                  ? Colors.green[400]
-                                  : Colors.red[400]
+                                  ? AppColors.successColor
+                                  : AppColors.errorColor
                               // ? Colors.amber[400]
                               // : Colors.purple[400]
-                              : Colors.grey[500],
+                              : AppColors.textSecondary,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -102,7 +103,7 @@ class ChargerStationCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: AppColors.textColor,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -110,7 +111,7 @@ class ChargerStationCard extends StatelessWidget {
                           station.vicinity,
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey[400],
+                            color: AppColors.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -125,12 +126,12 @@ class ChargerStationCard extends StatelessWidget {
                                           : "Tutup"),
                               backgroundColor:
                                   station.openNow == true
-                                      ? Colors.green.withOpacity(0.2)
-                                      : Colors.grey[800]!,
+                                      ? AppColors.successColor.withOpacity(0.2)
+                                      : AppColors.overlayColor,
                               textColor:
                                   station.openNow == true
-                                      ? Colors.green[400]!
-                                      : Colors.grey[400]!,
+                                      ? AppColors.successColor
+                                      : AppColors.textOnPrimary,
                             ),
                             if (station.rating != null) ...[
                               const SizedBox(width: 8),
