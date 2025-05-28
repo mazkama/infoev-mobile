@@ -11,10 +11,7 @@ class SplashController extends GetxController {
   }
 
   void initialiazed() async {
-    WidgetsFlutterBinding.ensureInitialized(); 
-
-    await LocalDB.init(); 
-    bool isLoggedIn = LocalDB.getToken() != null;
+    WidgetsFlutterBinding.ensureInitialized();  
 
     await Future.delayed(Duration(milliseconds: 1850));
     // if (!isLoggedIn) {
