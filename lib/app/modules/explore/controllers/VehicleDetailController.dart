@@ -38,6 +38,59 @@ class VehicleDetailController extends GetxController {
     }
   }
 
+  Future<bool> postComment({
+    required String type, // misal: 'vehicle'
+    required int id, // id kendaraan atau lainnya 
+    required String comment, // isi komentar
+    int? parent, // id comment induk jika balasan, boleh null
+  }) async {
+    final token = LocalDB.getToken();
+    final name = LocalDB.getName();
+
+    if (token == null || token.isEmpty) {
+      errorMessage.value = 'Token tidak tersedia. Silakan login kembali.';
+      return false;
+    }
+
+    final url = Uri.parse(
+      '${baseUrlDev}/comment/store',
+    ); 
+
+    final body = jsonEncode({
+      'type': type,
+      'id': id,
+      'name': name,
+      'comment': comment,
+      'parent': parent,
+    });
+
+
+    print('Posting comment: $body');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json', 
+          'Authorization': 'Bearer $token',
+        },
+        body: body,
+      );
+
+      if (response.statusCode == 201) {
+        print('Komentar berhasil dibuat');
+        return true;
+      } else {
+        print('Gagal membuat komentar: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Error saat mengirim komentar: $e');
+      return false;
+    }
+  }
+
   Future<void> fetchVehicleDetails(String slug) async {
     isLoading.value = true;
     hasError.value = false;
@@ -66,7 +119,7 @@ class VehicleDetailController extends GetxController {
         vehicleLoved.value = data['isLoved'] ?? false;
 
         // Comment count
-        commentCount = data['comments_count'] ?? 0; 
+        commentCount = data['comments_count'] ?? 0;
 
         // Parse comments
         if (data['comments'] != null) {

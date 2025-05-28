@@ -4,9 +4,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:infoev/app/modules/explore/controllers/VehicleDetailController.dart';
 import 'package:flutter/services.dart';
+import 'package:infoev/app/modules/explore/model/CommentModel.dart';
 import 'package:infoev/app/modules/favorite_vehicles/controllers/FavoriteVehiclesController.dart';
+import 'package:infoev/app/styles/app_colors.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:infoev/app/routes/app_pages.dart';
 
 class VehicleDetailPage extends StatefulWidget {
   const VehicleDetailPage({super.key});
@@ -21,9 +24,11 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
   FavoriteVehicleController? favoriteController;
   late final AnimationController _fadeController;
   late final Animation<double> _fadeAnimation;
-  int?
-  replyingToCommentId; // null artinya tidak sedang membalas komentar manapun
+  int? replyingToCommentId;
+  int? replyTargetId;
   final TextEditingController _replyController = TextEditingController();
+
+  Set<int> visibleReplies = {};
 
   @override
   void initState() {
@@ -43,16 +48,27 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
     }
   }
 
-  void _sendReply(int parentCommentId) {
+  void _sendReply(int parentCommentId, int vehicleId) async {
     final replyText = _replyController.text;
-    if (replyText.isNotEmpty) {
-      // Kirim ke server atau simpan lokal
-      print('Mengirim balasan ke comment ID $parentCommentId: $replyText');
+    if (replyText.isEmpty) return;
 
-      setState(() {
-        _replyController.clear();
-        replyingToCommentId = null;
-      });
+    bool success = await controller.postComment(
+      type: 'vehicle',
+      id: vehicleId,
+      comment: replyText,
+      parent: parentCommentId,
+    );
+
+    if (success) {
+      _replyController.clear();
+      replyTargetId = null;
+
+      // Refresh data lengkap, termasuk komentar
+      await controller.fetchVehicleDetails(controller.vehicleSlug.value);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal mengirim balasan. Silakan coba lagi.')),
+      );
     }
   }
 
@@ -576,8 +592,13 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                   ),
                                   const SizedBox(height: 12),
                                   TextField(
-                                    enabled: false, // Disabled for now
+                                    controller: _replyController,
                                     maxLines: 3,
+                                    onChanged: (value) {
+                                      setState(
+                                        () {},
+                                      ); // untuk update UI tombol kirim
+                                    },
                                     decoration: InputDecoration(
                                       hintText: 'Tulis komentar Anda...',
                                       hintStyle: GoogleFonts.poppins(
@@ -591,14 +612,81 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                       ),
                                       isDense: true,
                                     ),
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                    ),
                                   ),
                                   const SizedBox(height: 12),
                                   Align(
                                     alignment: Alignment.centerRight,
                                     child: ElevatedButton(
-                                      onPressed: null, // Disabled for now
+                                      onPressed:
+                                          _replyController.text.trim().isEmpty
+                                              ? null
+                                              : () async {
+                                                if (!controller
+                                                    .isLoggedIn
+                                                    .value) {
+                                                  Get.snackbar(
+                                                    'Akses Ditolak',
+                                                    'Anda harus login terlebih dahulu untuk membuat komentar',
+                                                    snackPosition:
+                                                        SnackPosition.TOP,
+                                                    backgroundColor:
+                                                        Colors.redAccent,
+                                                    colorText: Colors.white,
+                                                  );
+                                                  Get.toNamed(Path.LOGIN);
+                                                  return; // jangan lanjutkan kirim komentar
+                                                }
+
+                                                final success = await controller
+                                                    .postComment(
+                                                      type: 'vehicle',
+                                                      id:
+                                                          controller
+                                                              .vehicleId
+                                                              .value,
+                                                      comment:
+                                                          _replyController.text
+                                                              .trim(),
+                                                      parent:
+                                                          null, // isi jika reply ke comment tertentu
+                                                    );
+
+                                                if (success) {
+                                                  _replyController.clear();
+                                                  setState(() {}); // refresh UI
+
+                                                  await controller
+                                                      .fetchVehicleDetails(
+                                                        controller
+                                                            .vehicleSlug
+                                                            .value,
+                                                      );
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                        'Komentar berhasil dikirim',
+                                                      ),
+                                                    ),
+                                                  );
+                                                } else {
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                        'Gagal mengirim komentar. Silakan coba lagi.',
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.blue[700],
+                                        backgroundColor: AppColors.primaryColor,
                                         foregroundColor: Colors.white,
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 20,
@@ -609,11 +697,14 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                             8,
                                           ),
                                         ),
+                                        elevation: 4,
                                       ),
                                       child: Text(
                                         'Kirim',
                                         style: GoogleFonts.poppins(
-                                          fontWeight: FontWeight.w500,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                          fontSize: 16,
                                         ),
                                       ),
                                     ),
@@ -621,10 +712,10 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                 ],
                               ),
                             ),
+
                             const SizedBox(height: 16),
 
                             // Sample Comments
-                            // ...List.generate(3, (index) => _buildCommentCard()),
                             Obx(() {
                               final comments = controller.comments;
 
@@ -648,60 +739,18 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                       onReplyTap: () {
                                         setState(() {
                                           replyingToCommentId = comment.id;
+                                          replyTargetId = comment.id;
                                         });
                                       },
+                                      replies: comment.replies,
                                     ),
                                   ];
-
-                                  // Tambahkan replies
-                                  for (var reply in comment.replies) {
-                                    final replyTimeAgo = timeAgo(
-                                      reply.createdAt,
-                                    );
-
-                                    widgets.add(
-                                      _buildCommentCard(
-                                        commentId: reply.id,
-                                        name: reply.name,
-                                        comment: reply.comment,
-                                        timeAgo: replyTimeAgo,
-                                        isReply: true,
-                                        replyTo: comment.name,
-                                        onReplyTap: () {
-                                          setState(() {
-                                            replyingToCommentId = reply.id;
-                                          });
-                                        },
-                                      ),
-                                    );
-                                  }
 
                                   return Column(children: widgets);
                                 },
                               );
                             }),
-
-                            // Show More Button
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              child: Center(
-                                child: TextButton(
-                                  onPressed: null, // Disabled for now
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Colors.blue[400],
-                                  ),
-                                  child: Text(
-                                    'Lihat komentar lainnya',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.blue[400],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                           ],
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -769,7 +818,10 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
     bool isReply = false,
     String? replyTo,
     required VoidCallback onReplyTap,
+    List<Reply> replies = const [],
   }) {
+    final isRepliesVisible = visibleReplies.contains(commentId);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -842,7 +894,20 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                         ),
                         const SizedBox(width: 16),
                         GestureDetector(
-                          onTap: onReplyTap,
+                          onTap: () {
+                            if (!controller.isLoggedIn.value) {
+                              Get.snackbar(
+                                'Akses Ditolak',
+                                'Anda harus login terlebih dahulu untuk membalas komentar',
+                                snackPosition: SnackPosition.TOP,
+                                backgroundColor: Colors.redAccent,
+                                colorText: Colors.white,
+                              );
+                              Get.toNamed(Path.LOGIN);
+                              return;
+                            }
+                            onReplyTap();
+                          },
                           child: Text(
                             'Balas',
                             style: GoogleFonts.poppins(
@@ -852,6 +917,31 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                             ),
                           ),
                         ),
+
+                        if (replies.isNotEmpty) ...[
+                          const SizedBox(width: 16),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                if (isRepliesVisible) {
+                                  visibleReplies.remove(commentId);
+                                } else {
+                                  visibleReplies.add(commentId);
+                                }
+                              });
+                            },
+                            child: Text(
+                              isRepliesVisible
+                                  ? 'Sembunyikan Balasan'
+                                  : 'Lihat Balasan (${replies.length})',
+                              style: GoogleFonts.poppins(
+                                color: Colors.grey[400],
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ],
@@ -861,37 +951,70 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
           ),
         ),
 
-        // Tampilkan field jika sedang membalas komentar ini
-        if (replyingToCommentId == commentId)
+        // Tampilkan form balasan jika sedang membalas
+        if (replyTargetId == commentId)
           Padding(
-            padding: EdgeInsets.only(left: isReply ? 48 : 0),
+            padding: const EdgeInsets.only(left: 48),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 TextField(
                   controller: _replyController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Tulis balasan...',
-                    hintStyle: TextStyle(color: Colors.grey[400]),
+                    fillColor: Colors.white,
                     filled: true,
-                    fillColor: Colors.grey[800],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none,
-                    ),
                   ),
-                  style: TextStyle(color: Colors.white),
                 ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      _sendReply(commentId);
-                    },
-                    child: Text('Kirim'),
-                  ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ElevatedButton(
+                      onPressed:
+                          () => _sendReply(
+                            replyingToCommentId!,
+                            controller.vehicleId.value,
+                          ),
+                      child: const Text('Kirim'),
+                    ),
+                    const SizedBox(width: 8),
+                    OutlinedButton(
+                      onPressed: () {
+                        setState(() {
+                          replyingToCommentId = null;
+                          replyTargetId = null;
+                          _replyController.clear();
+                        });
+                      },
+                      child: const Text('Batal'),
+                    ),
+                  ],
                 ),
               ],
             ),
+          ),
+
+        // Tampilkan daftar balasan jika aktif
+        if (isRepliesVisible)
+          Column(
+            children:
+                replies.map((reply) {
+                  return _buildCommentCard(
+                    commentId: reply.id,
+                    name: reply.name,
+                    comment: reply.comment,
+                    timeAgo: timeAgo,
+                    isReply: true,
+                    replyTo: name,
+                    onReplyTap: () {
+                      setState(() {
+                        replyingToCommentId = commentId;
+                        replyTargetId = reply.id;
+                      });
+                    },
+                  );
+                }).toList(),
           ),
       ],
     );
@@ -1087,17 +1210,17 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
       snackPosition: SnackPosition.TOP,
     );
   }
-}
 
-String timeAgo(String datetimeString) {
-  final dateTime = DateTime.parse(datetimeString).toLocal();
-  final now = DateTime.now();
-  final diff = now.difference(dateTime);
+  String timeAgo(String datetimeString) {
+    final dateTime = DateTime.parse(datetimeString).toLocal();
+    final now = DateTime.now();
+    final diff = now.difference(dateTime);
 
-  if (diff.inSeconds < 60) return '${diff.inSeconds} detik yang lalu';
-  if (diff.inMinutes < 60) return '${diff.inMinutes} menit yang lalu';
-  if (diff.inHours < 24) return '${diff.inHours} jam yang lalu';
-  if (diff.inDays < 7) return '${diff.inDays} hari yang lalu';
+    if (diff.inSeconds < 60) return '${diff.inSeconds} detik yang lalu';
+    if (diff.inMinutes < 60) return '${diff.inMinutes} menit yang lalu';
+    if (diff.inHours < 24) return '${diff.inHours} jam yang lalu';
+    if (diff.inDays < 7) return '${diff.inDays} hari yang lalu';
 
-  return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+    return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+  }
 }
