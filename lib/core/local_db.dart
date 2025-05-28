@@ -52,6 +52,25 @@ class LocalDB {
     return _prefs?.getString('token');
   }
 
+  static String? getEmail() {
+    final userData = _prefs?.getString('user');
+    if (userData != null) {
+      try {
+        final user = jsonDecode(userData);
+        if (user['email'] != null && user['email'].toString().trim().isNotEmpty) {
+          return user['email'];
+        } else {
+          return null;
+        }
+      } catch (e) {
+        print("Gagal parsing data user: $e");
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
   // --- Properti dan Metode ---
 
   // static void setFirstTime(bool isFirstTime) {

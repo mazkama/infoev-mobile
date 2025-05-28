@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:infoev/app/modules/login/views/Logout.dart';
 import 'package:get/get.dart';
-import '../../../../core/local_db.dart';
+import 'package:infoev/app/modules/profil/controllers/profile_controller.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -12,178 +12,135 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  Future<String?> loadUserName() async {
-    final token = LocalDB.getToken();
-    if (token == null) return null;
-    final name = LocalDB.getName();
-    return name ?? 'User Noname';
-  }
+  final ProfileController profileController = Get.put(ProfileController());
 
   @override
   Widget build(BuildContext context) {
-    final bool isLoggedIn = LocalDB.getToken() != null;
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 18),
-            Center(
-              child: Text(
-                'More',
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w600,
+    return Obx(() {
+      final bool isLoggedIn = profileController.isLoggedIn.value;
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 18),
+              Center(
+                child: Text(
+                  'Lainnya',
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 50),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                children: [
-                  if (isLoggedIn) 
-                    FutureBuilder<String?>(
-                      future: loadUserName(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return _buildMenuItem(
-                            icon: Icons.person,
-                            title: 'Loading...',
-                            subtitle: 'Pengaturan Profil Pengguna',
-                            onTap: () {},
-                            backgroundColor: Colors.grey.shade100,
-                            iconColor: Colors.black,
-                            textColor: Colors.black,
-                            showArrow: false, 
-                          );
-                        } else if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
-                          return _buildMenuItem(
-                            icon: Icons.person,
-                            title: 'User Noname',
-                            subtitle: 'Pengaturan Profil Pengguna',
-                            onTap: () {},
-                            backgroundColor: Colors.grey.shade100,
-                            iconColor: Colors.black,
-                            textColor: Colors.black,
-                            showArrow: false, 
-                          );
+              const SizedBox(height: 50),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  children: [
+                    if (isLoggedIn)
+                      _buildMenuItem(
+                        icon: Icons.person,
+                        title: profileController.name.value,
+                        subtitle: profileController.email.value,
+                        onTap: () {},
+                        backgroundColor: Colors.grey.shade100,
+                        iconColor: Colors.black,
+                        textColor: Colors.black,
+                        showArrow: false,
+                      )
+                    else
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: Colors.orange.withOpacity(0.4),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(Icons.info_outline_rounded, color: Colors.orange.shade700, size: 20),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Info',
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.orange.shade700,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Anda belum login. Silakan login untuk mengakses fitur lebih lengkap.',
+                              style: GoogleFonts.poppins(
+                                color: Colors.orange.shade900,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    const SizedBox(height: 12),
+                    if (isLoggedIn) ...[
+                      _buildMenuItem(
+                        icon: Icons.calculate_outlined,
+                        title: 'Kalkulator Kendaraan',
+                        subtitle: 'Aplikasi kalkulator kendaraan listrik',
+                        onTap: () {
+                          Get.toNamed('/calculator');
+                        },
+                        backgroundColor: Colors.grey.shade100,
+                        iconColor: Colors.black,
+                        textColor: Colors.black,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildMenuItem(
+                        icon: Icons.security,
+                        title: 'Privasi & Keamanan',
+                        subtitle: 'Kelola kata sandi dan autentikasi',
+                        onTap: () {},
+                        backgroundColor: Colors.grey.shade100,
+                        iconColor: Colors.black,
+                        textColor: Colors.black,
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                    _buildMenuItem(
+                      icon: isLoggedIn ? Icons.logout_rounded : Icons.login_rounded,
+                      title: isLoggedIn ? 'Log Out' : 'Log In',
+                      subtitle: isLoggedIn
+                          ? 'Keluar dari Aplikasi Infoev'
+                          : 'Masuk untuk akses fitur lengkap aplikasi',
+                      onTap: () {
+                        if (isLoggedIn) {
+                          Get.offAll(() => LogoutPage());
                         } else {
-                          final name = snapshot.data!;
-                          return _buildMenuItem(
-                            icon: Icons.person,
-                            title: name,
-                            subtitle: 'Pengaturan Profil Pengguna',
-                            onTap: () {},
-                            backgroundColor: Colors.grey.shade100,
-                            iconColor: Colors.black,
-                            textColor: Colors.black,
-                            showArrow: false, 
-                          );
+                          Get.toNamed('/login');
                         }
                       },
-                    )
-                  else
-Container(
-  padding: const EdgeInsets.all(12),
-  decoration: BoxDecoration(
-    color: Colors.orange.withOpacity(0.15), // background sedikit lebih terang
-    borderRadius: BorderRadius.circular(8),
-    border: Border.all(
-      color: Colors.orange.withOpacity(0.4), // border lebih tegas
-    ),
-  ),
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        children: [
-          Icon(Icons.info_outline_rounded, color: Colors.orange.shade700, size: 20),
-          const SizedBox(width: 8),
-          Text(
-            'Info',
-            style: GoogleFonts.poppins(
-              color: Colors.orange.shade700,
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
-      const SizedBox(height: 4),
-      Text(
-        'Anda belum login. Silakan login untuk mengakses fitur lebih lengkap.',
-        style: GoogleFonts.poppins(
-          color: Colors.orange.shade900,
-          fontSize: 12,
-        ),
-      ),
-    ],
-  ),
-),
-
-
-
-                  const SizedBox(height: 12),
-
-                  // Tampilkan fitur lain hanya jika sudah login
-                  if (isLoggedIn) ...[
-                    _buildMenuItem(
-                      icon: Icons.calculate_outlined,
-                      title: 'Kalkulator Kendaraan',
-                      subtitle: 'Aplikasi kalkulator kendaraan listrik',
-                      onTap: () {
-                        Get.toNamed('/calculator');
-                      },
-                      backgroundColor: Colors.grey.shade100,
-                      iconColor: Colors.black,
-                      textColor: Colors.black,
+                      backgroundColor: isLoggedIn
+                          ? Colors.red.withOpacity(0.1)
+                          : Colors.blue.withOpacity(0.1),
+                      iconColor: isLoggedIn ? Colors.red : Colors.blue,
+                      textColor: isLoggedIn ? Colors.red.shade700 : Colors.blue.shade700,
                     ),
-                    const SizedBox(height: 12),
-                    _buildMenuItem(
-                      icon: Icons.security,
-                      title: 'Privasi & Keamanan',
-                      subtitle: 'Kelola kata sandi dan autentikasi',
-                      onTap: () {
-                        // Arahkan ke halaman pengaturan keamanan
-                      },
-                      backgroundColor: Colors.grey.shade100,
-                      iconColor: Colors.black,
-                      textColor: Colors.black,
-                    ),
-                    const SizedBox(height: 24),
                   ],
-
-                  // Tombol logout jika login, login jika belum
-                  _buildMenuItem(
-                    icon: isLoggedIn ? Icons.logout_rounded : Icons.login_rounded,
-                    title: isLoggedIn ? 'Log Out' : 'Log In',
-                    subtitle: isLoggedIn
-                        ? 'Keluar dari Aplikasi Infoev'
-                        : 'Masuk untuk akses fitur lengkap aplikasi',
-                    onTap: () {
-                      if (isLoggedIn) {
-                        Get.offAll(() => LogoutPage());
-                      } else {
-                        Get.toNamed('/login');
-                      }
-                    },
-                    backgroundColor: isLoggedIn
-                        ? Colors.red.withOpacity(0.1)
-                        : Colors.blue.withOpacity(0.1),
-                    iconColor: isLoggedIn ? Colors.red : Colors.blue,
-                    textColor: isLoggedIn ? Colors.red.shade700 : Colors.blue.shade700,
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget _buildMenuItem({
