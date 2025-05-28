@@ -21,6 +21,12 @@ class AppColors {
   
   /// Darker variant of primary color
   static const Color primaryDark = Color(0xFF553C9A);
+  
+  /// Lighter variant of primary color
+  static const Color secondaryLight = Color(0xFFFF9547);
+  
+  /// Darker variant of primary color
+  static const Color secondaryDark = Color(0xFFDB5F0B);
 
   // ============================================================================
   // BACKGROUND & SURFACE COLORS

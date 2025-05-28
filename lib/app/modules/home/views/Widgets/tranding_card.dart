@@ -36,7 +36,7 @@ class TrandingCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05), // Bayangan lebih halus
+              color: AppColors.shadowMedium, // Bayangan lebih halus
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -52,19 +52,19 @@ class TrandingCard extends StatelessWidget {
                 imageUrl: imageUrl,
                 placeholder:
                     (context, url) => Shimmer.fromColors(
-                      baseColor: Colors.grey.shade300,
-                      highlightColor: Colors.grey.shade100,
+                      baseColor: AppColors.shimmerBase,
+                      highlightColor: AppColors.shimmerHighlight,
                       child: Container(
                         height: 160,
                         width: double.infinity,
-                        color: AppColors.cardBackgroundColor,
+                        color: AppColors.shimmerBase,
                       ),
                     ),
                 errorWidget:
                     (context, url, error) => Container(
                       height: 160,
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.error, color: Colors.redAccent),
+                      color: AppColors.shimmerBase,
+                      child: const Icon(Icons.error, color: AppColors.errorColor),
                     ),
                 height: 160,
                 width: double.infinity,

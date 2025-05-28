@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:infoev/app/styles/app_colors.dart';
 import 'package:shimmer/shimmer.dart';
 
 class VehiclePopulerCard extends StatelessWidget {
@@ -24,11 +25,11 @@ class VehiclePopulerCard extends StatelessWidget {
         width: 150,
         margin: const EdgeInsets.only(right: 10),
         decoration: BoxDecoration(
-          color: Colors.white, // ✅ Background tetap putih
+          color: AppColors.cardBackgroundColor, // ✅ Background tetap putih
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: AppColors.shadowLight,
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -50,17 +51,17 @@ class VehiclePopulerCard extends StatelessWidget {
                     width: double.infinity,
                     fit: BoxFit.cover,
                     placeholder: (context, url) => Shimmer.fromColors(
-                      baseColor: Colors.grey.shade300,
-                      highlightColor: Colors.grey.shade100,
+                      baseColor: AppColors.shimmerBase,
+                      highlightColor: AppColors.shimmerHighlight,
                       child: Container(
                         height: 140,
-                        color: Colors.grey[300],
+                        color: AppColors.shimmerBase,
                       ),
                     ),
                     errorWidget: (context, url, error) => Container(
                       height: 140,
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.error, color: Colors.red),
+                      color: AppColors.shimmerBase,
+                      child: const Icon(Icons.error, color: AppColors.errorColor),
                     ),
                   ),
                 ),
@@ -72,9 +73,9 @@ class VehiclePopulerCard extends StatelessWidget {
                   right: 0,
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: const BoxDecoration(
-                      color: Color.fromARGB(117, 88, 75, 0), // ✅ Latar gelap hanya untuk info kendaraan
-                      borderRadius: BorderRadius.only(
+                    decoration: BoxDecoration(
+                        color: AppColors.secondaryDark.withAlpha(153), // ✅ Latar gelap hanya untuk info kendaraan, alpha 50%
+                      borderRadius: const BorderRadius.only(
                         bottomLeft: Radius.circular(16),
                         bottomRight: Radius.circular(16),
                       ),
@@ -86,7 +87,7 @@ class VehiclePopulerCard extends StatelessWidget {
                           brand,
                           style: const TextStyle(
                             fontSize: 12,
-                            color: Colors.white70,
+                            color: AppColors.textOnPrimary,
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -97,7 +98,7 @@ class VehiclePopulerCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: AppColors.textOnPrimary,
                           ),
                         ),
                       ],

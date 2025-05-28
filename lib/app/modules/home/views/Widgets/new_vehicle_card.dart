@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:infoev/app/styles/app_colors.dart';
 import 'package:shimmer/shimmer.dart';
 
 class VehicleNewCard extends StatelessWidget {
@@ -24,11 +25,11 @@ class VehicleNewCard extends StatelessWidget {
         width: 280,
         margin: const EdgeInsets.only(right: 10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.cardBackgroundColor,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.12),
+              color: AppColors.shadowLight.withAlpha(33),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -45,19 +46,19 @@ class VehicleNewCard extends StatelessWidget {
                 width: double.infinity,
                 fit: BoxFit.cover,
                 placeholder: (context, url) => Shimmer.fromColors(
-                  baseColor: Colors.grey.shade300,
-                  highlightColor: Colors.grey.shade100,
+                  baseColor: AppColors.shimmerBase,
+                  highlightColor: AppColors.shimmerHighlight,
                   child: Container(
                     height: 150,
                     width: double.infinity,
-                    color: Colors.grey[300],
+                    color: AppColors.shimmerBase,
                   ),
                 ),
                 errorWidget: (context, url, error) => Container(
                   height: 150,
                   width: double.infinity,
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.error, color: Colors.red),
+                  color: AppColors.shimmerBase,
+                  child: const Icon(Icons.error, color: AppColors.errorColor),
                 ),
               ),
 
@@ -69,7 +70,7 @@ class VehicleNewCard extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(150, 78, 0, 97).withOpacity(0.5),
+                    color: AppColors.primaryColor.withAlpha(153),
                     borderRadius: const BorderRadius.vertical(
                       bottom: Radius.circular(20),
                     ),
@@ -81,7 +82,7 @@ class VehicleNewCard extends StatelessWidget {
                         brand,
                         style: const TextStyle(
                           fontSize: 15,
-                          color: Colors.white70,
+                          color: AppColors.textOnPrimary,
                         ),
                       ), 
                       Text(
@@ -91,7 +92,7 @@ class VehicleNewCard extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: AppColors.textOnPrimary,
                         ),
                       ),
                     ],

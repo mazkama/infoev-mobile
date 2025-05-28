@@ -28,7 +28,7 @@ class HomePage extends StatelessWidget {
     initializeDateFormatting('id_ID', null);
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white, // Gunakan ungu tua dari palet
+        backgroundColor: AppColors.cardBackgroundColor, // Gunakan ungu tua dari palet
         scrolledUnderElevation: 0, // Bayangan tetap saat scroll
         title: InkWell(
           onTap: () {
@@ -62,7 +62,7 @@ class HomePage extends StatelessWidget {
           const SizedBox(width: 8), // Padding di sebelah kanan ikon
         ],
       ),
-      backgroundColor: const Color(0xFFF5F5F5), // Latar belakang putih
+      backgroundColor: AppColors.backgroundColor, // Latar belakang putih
       body: Padding(
         padding: const EdgeInsets.only(top: 15, left: 16, right: 16),
         child: RefreshIndicator(

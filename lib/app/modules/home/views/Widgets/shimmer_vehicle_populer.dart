@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:infoev/app/styles/app_colors.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ShimmerVehiclePopuler extends StatelessWidget {
@@ -16,12 +17,12 @@ class ShimmerVehiclePopuler extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.only(right: 10.0),
             child: Shimmer.fromColors(
-              baseColor: Colors.grey.shade300,
-              highlightColor: Colors.grey.shade100,
+              baseColor: AppColors.shimmerBase,
+              highlightColor: AppColors.shimmerHighlight,
               child: Container(
                 width: 150, // ✅ Fix: lebar card
                 decoration: BoxDecoration(
-                  color: Colors.grey,
+                  color: AppColors.shimmerBase,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -32,7 +33,7 @@ class ShimmerVehiclePopuler extends StatelessWidget {
                       height: 50,
                       width: double.infinity,
                       decoration: const BoxDecoration(
-                        color: Colors.grey,
+                        color: AppColors.shimmerBase,
                         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
                       ),
                     ),
@@ -42,9 +43,9 @@ class ShimmerVehiclePopuler extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(width: 90, height: 12, color: Colors.white), // Nama kendaraan
+                          Container(width: 90, height: 12, color: AppColors.textOnPrimary), // Nama kendaraan
                           const SizedBox(height: 4),
-                          Container(width: 60, height: 8, color: Colors.white),  // Brand
+                          Container(width: 60, height: 8, color: AppColors.textOnPrimary),  // Brand
                         ],
                       ),
                     ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:infoev/app/modules/home/views/home_view.dart';
 import 'package:infoev/app/modules/login/controllers/LoginController.dart';
 import 'package:infoev/app/modules/navbar/views/bottom_nav_view.dart';
 import 'package:infoev/app/modules/register/views/RegisterPage.dart';
@@ -176,8 +175,7 @@ class LoginPage extends StatelessWidget {
                             controller.isLoading.value
                                 ? CircularProgressIndicator(
                                   color:
-                                      AppColors
-                                          .accentColor, // Oranye untuk loading
+                                      AppColors.backgroundColor, // Putih untuk loading
                                 )
                                 : Text(
                                   'Login',

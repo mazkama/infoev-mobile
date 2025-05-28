@@ -29,11 +29,11 @@ class NewsTitle extends StatelessWidget {
         padding: const EdgeInsets.all(10),
         margin: const EdgeInsets.only(bottom: 12), // Margin konsisten dengan TrandingCard
         decoration: BoxDecoration(
-          color: AppColors.backgroundColor, // Abu-abu terang dari palet
+          color: AppColors.cardBackgroundColor, // Abu-abu terang dari palet
           borderRadius: BorderRadius.circular(12), // Sudut lebih halus, konsisten dengan TrandingCard
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05), // Bayangan halus
+              color: AppColors.shadowLight.withAlpha(33), // Bayangan halus
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -47,25 +47,25 @@ class NewsTitle extends StatelessWidget {
               height: 120,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12), // Sesuaikan dengan borderRadius container
-                color: AppColors.backgroundColor, // Putih untuk latar belakang gambar
+                color: AppColors.cardBackgroundColor, // Putih untuk latar belakang gambar
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: CachedNetworkImage(
                   imageUrl: imageUrl,
                   placeholder: (context, url) => Shimmer.fromColors(
-                    baseColor: Colors.grey.shade300,
-                    highlightColor: Colors.grey.shade100,
+                    baseColor: AppColors.shimmerBase,
+                    highlightColor: AppColors.shimmerHighlight,
                     child: Container(
                       height: 120,
                       width: double.infinity,
-                      color: AppColors.cardBackgroundColor,
+                      color: AppColors.shimmerBase,
                     ),
                   ),
                   errorWidget: (context, url, error) => Container(
                     height: 120,
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.error, color: Colors.redAccent),
+                    color: AppColors.shimmerBase,
+                    child: const Icon(Icons.error, color: AppColors.errorColor),
                   ),
                   height: 120,
                   width: double.infinity,
