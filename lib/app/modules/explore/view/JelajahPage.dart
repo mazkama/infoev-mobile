@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:infoev/app/modules/explore/controllers/MerekController.dart';
 import 'package:infoev/app/modules/explore/model/MerekModel.dart';
+import 'package:infoev/app/styles/app_colors.dart';
 import 'package:shimmer/shimmer.dart';
 
 class JelajahPage extends StatefulWidget {
@@ -87,7 +88,7 @@ class _JelajahPageState extends State<JelajahPage> {
         return true;
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF121212),
+        backgroundColor: AppColors.backgroundColor,
         body: SafeArea(
           child: Column(
             children: [
@@ -119,12 +120,12 @@ class _JelajahPageState extends State<JelajahPage> {
 
   Widget _buildSearchAppBar() {
     return Container(
-      color: const Color(0xFF1A1A1A),
+      color: AppColors.cardBackgroundColor,
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: const Icon(Icons.arrow_back, color: AppColors.primaryColor),
             onPressed: () {
               controller.resetSearch();
               controller.resetFilters(); // Reset filter saat tombol back diklik
@@ -135,10 +136,10 @@ class _JelajahPageState extends State<JelajahPage> {
             child: TextField(
               controller: _searchController,
               focusNode: _searchFocusNode,
-              style: GoogleFonts.poppins(color: Colors.white),
+              style: GoogleFonts.poppins(color: AppColors.textColor),
               decoration: InputDecoration(
                 hintText: 'Cari kendaraan listrik...',
-                hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+                hintStyle: GoogleFonts.poppins(color: AppColors.textTertiary),
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
@@ -147,7 +148,7 @@ class _JelajahPageState extends State<JelajahPage> {
                   builder: (context, value, child) {
                     return value.text.isNotEmpty
                         ? IconButton(
-                          icon: const Icon(Icons.close, color: Colors.grey),
+                          icon: const Icon(Icons.close, color: AppColors.primaryColor),
                           onPressed: () {
                             _searchController.clear();
                             controller.searchBrands('');
@@ -179,10 +180,10 @@ class _JelajahPageState extends State<JelajahPage> {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: AppColors.cardBackgroundColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: AppColors.shadowMedium,
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -198,13 +199,13 @@ class _JelajahPageState extends State<JelajahPage> {
                 style: GoogleFonts.poppins(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppColors.textColor,
                 ),
               ),
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.search, color: Colors.white),
+                    icon: const Icon(Icons.search, color: AppColors.primaryColor),
                     onPressed: () {
                       controller.toggleSearch();
                       Future.delayed(const Duration(milliseconds: 100), () {
@@ -217,7 +218,7 @@ class _JelajahPageState extends State<JelajahPage> {
                       IconButton(
                         icon: const Icon(
                           Icons.filter_list,
-                          color: Colors.white,
+                          color: AppColors.primaryColor,
                         ),
                         onPressed: () {
                           _showFilterDialog(context, controller);
@@ -232,7 +233,7 @@ class _JelajahPageState extends State<JelajahPage> {
                             width: 8,
                             height: 8,
                             decoration: const BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.primaryColor,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -246,7 +247,7 @@ class _JelajahPageState extends State<JelajahPage> {
           const SizedBox(height: 8),
           Text(
             'Temukan berbagai kendaraan listrik favorit Anda',
-            style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[400]),
+            style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
           ),
         ],
       ),
@@ -258,11 +259,11 @@ class _JelajahPageState extends State<JelajahPage> {
       children: [
         Container(
           height: 40,
-          margin: const EdgeInsets.symmetric(horizontal: 12),
+          // Keep background full width, no margin here!
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A),
+            color: AppColors.cardBackgroundColor,
             border: Border(
-              bottom: BorderSide(color: Colors.grey.withOpacity(0.1), width: 1),
+              bottom: BorderSide(color: AppColors.borderMedium.withOpacity(0.1), width: 1),
             ),
           ),
           child: Obx(() {
@@ -287,59 +288,59 @@ class _JelajahPageState extends State<JelajahPage> {
 
             return ListView(
               scrollDirection: Axis.horizontal,
-              children:
-                  fixedTypeOrder.map((type) {
-                    final id = type['id'] as int;
-                    final name = type['name'] as String;
-                    final count =
-                        id == 0
-                            ? controller.merekList.length
-                            : type['count'] as int;
-                    final isSelected =
-                        id == 0
-                            ? controller.filterOptions['typeId'] == null ||
-                                controller.filterOptions['typeId'] == 0
-                            : controller.filterOptions['typeId'] == id;
+              children: fixedTypeOrder.asMap().entries.map((entry) {
+                final idx = entry.key;
+                final type = entry.value;
+                final id = type['id'] as int;
+                final name = type['name'] as String;
+                final count = id == 0
+                    ? controller.merekList.length
+                    : type['count'] as int;
+                final isSelected = id == 0
+                    ? controller.filterOptions['typeId'] == null ||
+                        controller.filterOptions['typeId'] == 0
+                    : controller.filterOptions['typeId'] == id;
 
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (id == 0) {
-                            controller.resetFilters();
-                          } else {
-                            controller.filterBrandsByType(id);
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              isSelected
-                                  ? Colors.white
-                                  : const Color(0xFF303030),
-                          foregroundColor:
-                              isSelected ? Colors.black : Colors.white,
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: Text(
-                          id == 0 ? name : '$name ($count)',
-                          style: GoogleFonts.poppins(
-                            fontWeight:
-                                isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                            fontSize: 12,
-                          ),
-                        ),
+                // Only add left margin for the first chip ("Semua")
+                final chipPadding = idx == 0
+                    ? const EdgeInsets.only(left: 16, right: 8)
+                    : const EdgeInsets.only(right: 8);
+
+                return Padding(
+                  padding: chipPadding,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (id == 0) {
+                        controller.resetFilters();
+                      } else {
+                        controller.filterBrandsByType(id);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isSelected
+                          ? AppColors.secondaryDark.withAlpha(45)
+                          : AppColors.backgroundSecondary,
+                      foregroundColor:
+                          isSelected ? AppColors.secondaryColor : AppColors.textColor,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
                       ),
-                    );
-                  }).toList(),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      id == 0 ? name : '$name ($count)',
+                      style: GoogleFonts.poppins(
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
             );
           }),
         ),
@@ -353,7 +354,7 @@ class _JelajahPageState extends State<JelajahPage> {
       if (controller.isSearchLoading.value) {
         return const Center(
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.secondaryColor),
           ),
         );
       }
@@ -366,7 +367,7 @@ class _JelajahPageState extends State<JelajahPage> {
         return Center(
           child: Text(
             'Tidak ditemukan hasil',
-            style: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 16),
+            style: GoogleFonts.poppins(color: AppColors.textTertiary, fontSize: 16),
           ),
         );
       }
@@ -386,7 +387,7 @@ class _JelajahPageState extends State<JelajahPage> {
                 child: Text(
                   sectionTitle,
                   style: GoogleFonts.poppins(
-                    color: Colors.grey[400],
+                    color: AppColors.secondaryColor,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -401,7 +402,7 @@ class _JelajahPageState extends State<JelajahPage> {
                 }
               }).toList(),
               if (index < controller.searchResults.length - 1)
-                const Divider(color: Colors.grey),
+                const Divider(color: AppColors.dividerColor),
             ],
           );
         },
@@ -415,7 +416,7 @@ class _JelajahPageState extends State<JelajahPage> {
         return Center(
           child: Text(
             'Belum ada riwayat pencarian',
-            style: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 16),
+            style: GoogleFonts.poppins(color: AppColors.textTertiary, fontSize: 16),
           ),
         );
       }
@@ -431,7 +432,7 @@ class _JelajahPageState extends State<JelajahPage> {
                 Text(
                   'Riwayat Pencarian',
                   style: GoogleFonts.poppins(
-                    color: Colors.grey[400],
+                    color: AppColors.textSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -441,7 +442,7 @@ class _JelajahPageState extends State<JelajahPage> {
                   child: Text(
                     'Hapus Semua',
                     style: GoogleFonts.poppins(
-                      color: Colors.blue,
+                      color: AppColors.secondaryColor,
                       fontSize: 12,
                     ),
                   ),
@@ -456,16 +457,16 @@ class _JelajahPageState extends State<JelajahPage> {
                 final query = controller.searchHistory[index];
                 return ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                  leading: const Icon(Icons.history, color: Colors.grey),
+                  leading: const Icon(Icons.history, color: AppColors.textSecondary),
                   title: Text(
                     query,
                     style: GoogleFonts.poppins(
-                      color: Colors.white,
+                      color: AppColors.textColor,
                       fontSize: 14,
                     ),
                   ),
                   trailing: IconButton(
-                    icon: const Icon(Icons.close, color: Colors.grey, size: 20),
+                    icon: const Icon(Icons.close, color: AppColors.textSecondary, size: 20),
                     onPressed: () => controller.removeFromSearchHistory(query),
                   ),
                   onTap: () {
@@ -514,13 +515,13 @@ class _JelajahPageState extends State<JelajahPage> {
                     fit: BoxFit.contain,
                     placeholder:
                         (context, url) => Shimmer.fromColors(
-                          baseColor: Colors.grey[300]!,
-                          highlightColor: Colors.grey[100]!,
+                          baseColor: AppColors.shimmerBase,
+                          highlightColor: AppColors.shimmerHighlight,
                           child: Container(color: backgroundColor),
                         ),
                     errorWidget:
                         (context, url, error) =>
-                            const Icon(Icons.error_outline, color: Colors.grey),
+                            const Icon(Icons.error_outline, color: AppColors.primaryColor),
                   ),
                 ),
               )
@@ -530,10 +531,10 @@ class _JelajahPageState extends State<JelajahPage> {
                 height: 48,
                 margin: const EdgeInsets.only(right: 12),
                 decoration: BoxDecoration(
-                  color: Colors.grey[800],
+                  color: AppColors.textSecondary,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.electric_car, color: Colors.white),
+                child: const Icon(Icons.electric_car, color: AppColors.textSecondary),
               ),
             Expanded(
               child: Column(
@@ -542,7 +543,7 @@ class _JelajahPageState extends State<JelajahPage> {
                   Text(
                     brand.name,
                     style: GoogleFonts.poppins(
-                      color: Colors.white,
+                      color: AppColors.textColor,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
@@ -550,14 +551,14 @@ class _JelajahPageState extends State<JelajahPage> {
                   Text(
                     '${brand.vehiclesCount} kendaraan',
                     style: GoogleFonts.poppins(
-                      color: Colors.grey[400],
+                      color: AppColors.textSecondary,
                       fontSize: 12,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: Colors.grey),
+            const Icon(Icons.chevron_right, color: AppColors.textSecondary),
           ],
         ),
       ),
@@ -588,13 +589,13 @@ class _JelajahPageState extends State<JelajahPage> {
                   fit: BoxFit.contain,
                   placeholder:
                       (context, url) => Shimmer.fromColors(
-                        baseColor: Colors.grey[300]!,
-                        highlightColor: Colors.grey[100]!,
+                        baseColor: AppColors.shimmerBase,
+                        highlightColor: AppColors.shimmerHighlight,
                         child: Container(color: Colors.white),
                       ),
                   errorWidget:
                       (context, url, error) =>
-                          const Icon(Icons.error_outline, color: Colors.grey),
+                          const Icon(Icons.error_outline, color: AppColors.textSecondary),
                 ),
               ),
             ),
@@ -605,7 +606,7 @@ class _JelajahPageState extends State<JelajahPage> {
                   Text(
                     vehicle['name'] ?? '',
                     style: GoogleFonts.poppins(
-                      color: Colors.white,
+                      color: AppColors.textColor,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
@@ -614,7 +615,7 @@ class _JelajahPageState extends State<JelajahPage> {
                     Text(
                       vehicle['brand']['name'] ?? '',
                       style: GoogleFonts.poppins(
-                        color: Colors.grey[400],
+                        color: AppColors.textSecondary,
                         fontSize: 12,
                       ),
                     ),
@@ -631,8 +632,8 @@ class _JelajahPageState extends State<JelajahPage> {
   Widget _buildMainContent() {
     final screenWidth = MediaQuery.of(context).size.width;
     return RefreshIndicator(
-      color: Colors.white,
-      backgroundColor: const Color(0xFF303030),
+      color: AppColors.secondaryColor,
+      backgroundColor: AppColors.backgroundColor,
       onRefresh: () => controller.refreshData(),
       child: Obx(() {
         if (controller.isLoading.value && controller.merekList.isEmpty) {
@@ -683,11 +684,11 @@ class _JelajahPageState extends State<JelajahPage> {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF212121),
+              color: AppColors.cardBackgroundColor,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: AppColors.shadowMedium.withAlpha(51),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -760,7 +761,7 @@ class _JelajahPageState extends State<JelajahPage> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                colors: [AppColors.primaryColor.withAlpha(0), AppColors.primaryColor.withAlpha(179)],
                 stops: const [0.5, 1.0],
               ),
             ),
@@ -779,7 +780,7 @@ class _JelajahPageState extends State<JelajahPage> {
                 Text(
                   merek.name,
                   style: GoogleFonts.poppins(
-                    color: Colors.white,
+                    color: AppColors.textOnPrimary,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
@@ -789,7 +790,7 @@ class _JelajahPageState extends State<JelajahPage> {
                 Text(
                   '${merek.vehiclesCount} kendaraan',
                   style: GoogleFonts.poppins(
-                    color: Colors.grey[300],
+                    color: AppColors.textOnPrimary,
                     fontSize: 12,
                   ),
                 ),
@@ -803,9 +804,9 @@ class _JelajahPageState extends State<JelajahPage> {
 
   Widget _buildShimmerPlaceholder() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[800]!,
-      highlightColor: Colors.grey[700]!,
-      child: Container(color: Colors.white),
+      baseColor: AppColors.shimmerBase,
+      highlightColor: AppColors.shimmerHighlight,
+      child: Container(color: AppColors.shimmerBase),
     );
   }
 
@@ -816,16 +817,16 @@ class _JelajahPageState extends State<JelajahPage> {
       child: Stack(
         children: [
           Shimmer.fromColors(
-            baseColor: Colors.grey.shade800,
-            highlightColor: Colors.grey.shade700,
-            child: Container(color: Colors.white),
+            baseColor: AppColors.shimmerBase,
+            highlightColor: AppColors.shimmerHighlight,
+            child: Container(color: AppColors.shimmerBase),
           ),
           if (isError)
             Center(
               child: Icon(
                 Icons.broken_image,
                 size: 40,
-                color: Colors.grey[600],
+                color: AppColors.textSecondary,
               ),
             ),
           Positioned(
@@ -838,12 +839,12 @@ class _JelajahPageState extends State<JelajahPage> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                  colors: [AppColors.primaryColor.withAlpha(0), AppColors.primaryColor.withAlpha(179)],
                 ),
               ),
               child: Shimmer.fromColors(
-                baseColor: Colors.grey.shade800,
-                highlightColor: Colors.grey.shade700,
+                baseColor: AppColors.shimmerBase,
+                highlightColor: AppColors.shimmerHighlight,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -851,7 +852,7 @@ class _JelajahPageState extends State<JelajahPage> {
                       width: 120,
                       height: 20,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.shimmerBase,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -860,7 +861,7 @@ class _JelajahPageState extends State<JelajahPage> {
                       width: 80,
                       height: 16,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.shimmerBase,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -886,13 +887,13 @@ class _JelajahPageState extends State<JelajahPage> {
       ),
       itemBuilder: (context, index) {
         return Shimmer.fromColors(
-          baseColor: Colors.grey.shade800,
-          highlightColor: Colors.grey.shade700,
+          baseColor: AppColors.shimmerBase,
+          highlightColor: AppColors.shimmerHighlight,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.shimmerBase,
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
@@ -907,13 +908,13 @@ class _JelajahPageState extends State<JelajahPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.filter_alt_off, size: 64, color: Colors.grey),
+          const Icon(Icons.filter_alt_off, size: 64, color: AppColors.primaryColor),
           const SizedBox(height: 16),
           Text(
             'Tidak ada merek yang sesuai',
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-              color: Colors.white,
+              color: AppColors.textTertiary,
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
@@ -922,7 +923,7 @@ class _JelajahPageState extends State<JelajahPage> {
           Text(
             'Coba ubah kriteria pencarian atau filter Anda',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 14),
+            style: GoogleFonts.poppins(color: AppColors.textTertiary, fontSize: 14),
           ),
           const SizedBox(height: 24),
           ElevatedButton(
@@ -930,8 +931,8 @@ class _JelajahPageState extends State<JelajahPage> {
               controller.resetFilters();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
+              backgroundColor: AppColors.backgroundColor,
+              foregroundColor: AppColors.textColor,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -958,7 +959,7 @@ class _JelajahPageState extends State<JelajahPage> {
             'Gagal memuat data merek',
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-              color: Colors.white,
+              color: AppColors.textColor,
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
@@ -967,14 +968,14 @@ class _JelajahPageState extends State<JelajahPage> {
           Text(
             'Periksa koneksi internet Anda\ndan coba lagi',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 14),
+            style: GoogleFonts.poppins(color: AppColors.textTertiary, fontSize: 14),
           ),
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: () => controller.refreshData(),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
+              backgroundColor: AppColors.backgroundColor,
+              foregroundColor: AppColors.textColor,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -1003,11 +1004,11 @@ class _JelajahPageState extends State<JelajahPage> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              backgroundColor: const Color(0xFF252525),
+              backgroundColor: AppColors.cardBackgroundColor,
               title: Text(
                 'Filter Merek',
                 style: GoogleFonts.poppins(
-                  color: Colors.white,
+                  color: AppColors.textColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -1018,18 +1019,18 @@ class _JelajahPageState extends State<JelajahPage> {
                   const SizedBox(height: 16),
                   Text(
                     'Jumlah Kendaraan Minimal',
-                    style: GoogleFonts.poppins(color: Colors.white),
+                    style: GoogleFonts.poppins(color: AppColors.textColor),
                   ),
                   const SizedBox(height: 8),
                   SliderTheme(
                     data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: Colors.white,
-                      inactiveTrackColor: Colors.white.withOpacity(0.3),
-                      thumbColor: Colors.white,
-                      overlayColor: Colors.white.withOpacity(0.1),
-                      valueIndicatorColor: Colors.white,
+                      activeTrackColor: AppColors.primaryColor,
+                      inactiveTrackColor: AppColors.primaryColor.withAlpha(77),
+                      thumbColor: AppColors.primaryColor,
+                      overlayColor: AppColors.primaryColor.withAlpha(25),
+                      valueIndicatorColor: AppColors.primaryColor,
                       valueIndicatorTextStyle: const TextStyle(
-                        color: Colors.black,
+                        color: AppColors.textOnPrimary,
                       ),
                     ),
                     child: Slider(
@@ -1048,14 +1049,14 @@ class _JelajahPageState extends State<JelajahPage> {
                   const SizedBox(height: 16),
                   Text(
                     'Urutkan Berdasarkan',
-                    style: GoogleFonts.poppins(color: Colors.white),
+                    style: GoogleFonts.poppins(color: AppColors.textColor),
                   ),
                   const SizedBox(height: 8),
                   Theme(
                     data: Theme.of(context).copyWith(
-                      unselectedWidgetColor: Colors.white.withOpacity(0.5),
+                      unselectedWidgetColor: AppColors.primaryColor.withAlpha(128),
                       radioTheme: RadioThemeData(
-                        fillColor: MaterialStateProperty.all(Colors.white),
+                        fillColor: MaterialStateProperty.all(AppColors.primaryColor),
                       ),
                     ),
                     child: Column(
@@ -1064,7 +1065,7 @@ class _JelajahPageState extends State<JelajahPage> {
                           contentPadding: EdgeInsets.zero,
                           title: Text(
                             'Nama',
-                            style: GoogleFonts.poppins(color: Colors.white),
+                            style: GoogleFonts.poppins(color: AppColors.textColor),
                           ),
                           leading: Radio<String>(
                             value: 'name',
@@ -1080,7 +1081,7 @@ class _JelajahPageState extends State<JelajahPage> {
                           contentPadding: EdgeInsets.zero,
                           title: Text(
                             'Jumlah Kendaraan',
-                            style: GoogleFonts.poppins(color: Colors.white),
+                            style: GoogleFonts.poppins(color: AppColors.textColor),
                           ),
                           leading: Radio<String>(
                             value: 'vehicles_count',
@@ -1098,7 +1099,7 @@ class _JelajahPageState extends State<JelajahPage> {
                   const SizedBox(height: 16),
                   Text(
                     'Urutan',
-                    style: GoogleFonts.poppins(color: Colors.white),
+                    style: GoogleFonts.poppins(color: AppColors.textColor),
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -1108,12 +1109,12 @@ class _JelajahPageState extends State<JelajahPage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 sortOrder == 'asc'
-                                    ? Colors.white
-                                    : Colors.grey[800],
+                                    ? AppColors.primaryColor
+                                    : AppColors.cardBackgroundColor,
                             foregroundColor:
                                 sortOrder == 'asc'
-                                    ? Colors.black
-                                    : Colors.white,
+                                    ? AppColors.cardBackgroundColor
+                                    : AppColors.primaryColor,
                           ),
                           onPressed: () {
                             setState(() {
@@ -1129,12 +1130,12 @@ class _JelajahPageState extends State<JelajahPage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 sortOrder == 'desc'
-                                    ? Colors.white
-                                    : Colors.grey[800],
+                                    ? AppColors.primaryColor
+                                    : AppColors.cardBackgroundColor,
                             foregroundColor:
                                 sortOrder == 'desc'
-                                    ? Colors.black
-                                    : Colors.white,
+                                    ? AppColors.cardBackgroundColor
+                                    : AppColors.primaryColor,
                           ),
                           onPressed: () {
                             setState(() {
@@ -1152,7 +1153,7 @@ class _JelajahPageState extends State<JelajahPage> {
                 TextButton(
                   child: Text(
                     'Reset',
-                    style: GoogleFonts.poppins(color: Colors.grey),
+                    style: GoogleFonts.poppins(color: AppColors.textSecondary),
                   ),
                   onPressed: () {
                     // Reset hanya nilai pada dialog, bukan nilai filter sebenarnya
@@ -1166,8 +1167,8 @@ class _JelajahPageState extends State<JelajahPage> {
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
+                    backgroundColor: AppColors.primaryColor,
+                    foregroundColor: AppColors.cardBackgroundColor,
                   ),
                   child: Text(
                     'Terapkan',
