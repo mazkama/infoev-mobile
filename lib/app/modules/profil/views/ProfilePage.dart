@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:infoev/app/modules/login/views/Logout.dart';
 import 'package:get/get.dart';
 import 'package:infoev/app/modules/profil/controllers/profile_controller.dart';
+import 'package:infoev/app/styles/app_colors.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -19,7 +20,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Obx(() {
       final bool isLoggedIn = profileController.isLoggedIn.value;
       return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.backgroundColor,
         body: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -46,7 +47,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         title: profileController.name.value,
                         subtitle: profileController.email.value,
                         onTap: () {},
-                        backgroundColor: Colors.grey.shade100,
+                        backgroundColor: AppColors.backgroundSecondary,
                         iconColor: Colors.black,
                         textColor: Colors.black,
                         showArrow: false,
@@ -55,10 +56,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.orange.withOpacity(0.15),
+                          color: AppColors.secondaryColor.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: Colors.orange.withOpacity(0.4),
+                            color: AppColors.secondaryColor.withOpacity(0.4),
                           ),
                         ),
                         child: Column(
@@ -66,12 +67,12 @@ class _ProfilePageState extends State<ProfilePage> {
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.info_outline_rounded, color: Colors.orange.shade700, size: 20),
+                                Icon(Icons.info_outline_rounded, color: AppColors.secondaryColor, size: 20),
                                 const SizedBox(width: 8),
                                 Text(
                                   'Info',
                                   style: GoogleFonts.poppins(
-                                    color: Colors.orange.shade700,
+                                    color: AppColors.secondaryColor,
                                     fontWeight: FontWeight.w600,
                                     fontSize: 14,
                                   ),
@@ -82,7 +83,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             Text(
                               'Anda belum login. Silakan login untuk mengakses fitur lebih lengkap.',
                               style: GoogleFonts.poppins(
-                                color: Colors.orange.shade900,
+                                color: AppColors.errorColor,
                                 fontSize: 12,
                               ),
                             ),
@@ -98,7 +99,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         onTap: () {
                           Get.toNamed('/calculator');
                         },
-                        backgroundColor: Colors.grey.shade100,
+                        backgroundColor: AppColors.backgroundSecondary,
                         iconColor: Colors.black,
                         textColor: Colors.black,
                       ),
@@ -108,7 +109,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         title: 'Privasi & Keamanan',
                         subtitle: 'Kelola kata sandi dan autentikasi',
                         onTap: () {},
-                        backgroundColor: Colors.grey.shade100,
+                        backgroundColor: AppColors.backgroundSecondary,
                         iconColor: Colors.black,
                         textColor: Colors.black,
                       ),
@@ -128,10 +129,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         }
                       },
                       backgroundColor: isLoggedIn
-                          ? Colors.red.withOpacity(0.1)
-                          : Colors.blue.withOpacity(0.1),
-                      iconColor: isLoggedIn ? Colors.red : Colors.blue,
-                      textColor: isLoggedIn ? Colors.red.shade700 : Colors.blue.shade700,
+                          ? AppColors.errorColor.withOpacity(0.1)
+                          : AppColors.infoColor.withOpacity(0.1),
+                      iconColor: isLoggedIn ? AppColors.errorColor : AppColors.infoColor,
+                      textColor: isLoggedIn ? AppColors.errorColor : AppColors.infoColor,
                     ),
                   ],
                 ),
@@ -148,7 +149,7 @@ class _ProfilePageState extends State<ProfilePage> {
     required String title,
     required String subtitle,
     required VoidCallback onTap,
-    Color backgroundColor = Colors.white,
+    Color backgroundColor = AppColors.backgroundColor,
     Color iconColor = Colors.black,
     Color textColor = Colors.black, 
     bool showArrow = true,
@@ -182,7 +183,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Text(
                     subtitle,
                     style: GoogleFonts.poppins(
-                      color: Colors.grey.shade600,
+                      color: AppColors.textSecondary,
                       fontSize: 12,
                     ),
                   ),
@@ -193,7 +194,7 @@ class _ProfilePageState extends State<ProfilePage> {
               const Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 14,
-                color: Colors.grey,
+                color: AppColors.textSecondary,
               ),
           ],
         ),
