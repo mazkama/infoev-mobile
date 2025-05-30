@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:infoev/app/modules/explore/model/VehicleModel.dart';
 import 'package:infoev/app/modules/news/model/NewsModel.dart';
 import 'package:infoev/core/halper.dart';
+import 'package:infoev/core/local_db.dart';
 
 class NewsController extends GetxController {
   RxList<NewsModel> newNewsList = <NewsModel>[].obs;
@@ -15,13 +16,13 @@ class NewsController extends GetxController {
   RxBool isLoadingMore = false.obs;
   RxBool hasMoreNews = true.obs;
   RxBool isError = false.obs; // Menambahkan status error
-  var searchQuery = ''.obs;
+  var searchQuery = ''.obs;  
 
   int currentPage = 1;
 
   @override
   void onInit() {
-    super.onInit();
+    super.onInit(); 
     loadAllData();
   }
 

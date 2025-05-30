@@ -417,8 +417,8 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    AppColors.primaryColor.withAlpha(0),
-                    AppColors.primaryColor.withAlpha(179),
+                    AppColors.textSecondary.withAlpha(0),
+                    AppColors.textSecondary.withAlpha(179),
                   ],
                   stops: const [0.5, 1.0],
                 ),

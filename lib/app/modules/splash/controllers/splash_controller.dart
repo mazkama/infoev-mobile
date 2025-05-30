@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:infoev/core/local_db.dart';
+import 'package:get/get.dart'; 
 import '../../../routes/app_pages.dart';
 
 class SplashController extends GetxController {
@@ -22,3 +21,4 @@ class SplashController extends GetxController {
     Get.offAllNamed(Routes.NAVBAR);
   }
 }
+
