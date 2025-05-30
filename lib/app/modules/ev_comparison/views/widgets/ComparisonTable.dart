@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:infoev/app/modules/ev_comparison/model/VehicleModel.dart';
+import 'package:infoev/app/styles/app_colors.dart';
 
 class ComparisonTable extends StatelessWidget {
   final VehicleModel? vehicleA;
@@ -63,18 +64,18 @@ class ComparisonTable extends StatelessWidget {
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 // color: Colors.amber,
-                color: Colors.black,
+                color: AppColors.textColor,
               ),
             ),
             const SizedBox(height: 10),
             Container(
               decoration: BoxDecoration(
                 // color: Colors.grey[600],
-                color: Colors.grey[300],
+                color: AppColors.cardBackgroundColor,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: AppColors.shadowMedium.withOpacity(0.1),
                     blurRadius: 6,
                     offset: const Offset(0, 3),
                   ),
@@ -93,7 +94,7 @@ class ComparisonTable extends StatelessWidget {
                     decoration: BoxDecoration(
                       border: Border(
                         // top: BorderSide(color: Colors.grey[850]!),
-                        top: BorderSide(color: Colors.white),
+                        top: BorderSide(color: AppColors.dividerColor),
                       ),
                     ),
                     child: Row(
@@ -105,7 +106,7 @@ class ComparisonTable extends StatelessWidget {
                             spec.name,
                             style: const TextStyle(
                               // color: Colors.white70,
-                              color: Colors.black,
+                              color: AppColors.textColor,
                               fontSize: 14,
                               // fontWeight: FontWeight.w500,
                               fontWeight: FontWeight.w900,
@@ -120,7 +121,7 @@ class ComparisonTable extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               // color: Colors.white,
-                              color: Colors.black,
+                              color: AppColors.textSecondary,
                               fontSize: 14,
                             ),
                           ),
@@ -133,7 +134,7 @@ class ComparisonTable extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               // color: Colors.white,
-                              color: Colors.black,
+                              color: AppColors.textSecondary,
                               fontSize: 14,
                             ),
                           ),

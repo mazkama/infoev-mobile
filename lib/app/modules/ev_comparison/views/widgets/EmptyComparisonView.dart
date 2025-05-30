@@ -16,13 +16,13 @@ class EmptyComparisonView extends StatelessWidget {
             Icon(
               Icons.search_off,
               size: 80,
-              color: AppColors.secondaryTextColor,
+              color: AppColors.secondaryColor,
             ),
             const SizedBox(height: 16),
             Text(
               'Belum ada kendaraan yang dibandingkan',
               style: TextStyle(
-                color: AppColors.secondaryTextColor,
+                color: AppColors.textSecondary,
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
@@ -32,7 +32,7 @@ class EmptyComparisonView extends StatelessWidget {
             Text(
               'Silakan pilih kendaraan untuk memulai perbandingan.',
               style: TextStyle(
-                color: AppColors.secondaryTextColor.withOpacity(0.8),
+                color: AppColors.textTertiary,
                 fontSize: 14,
               ),
               textAlign: TextAlign.center,

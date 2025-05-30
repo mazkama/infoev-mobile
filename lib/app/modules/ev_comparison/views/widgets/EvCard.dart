@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:infoev/app/modules/ev_comparison/model/VehicleModel.dart';
+import 'package:infoev/app/styles/app_colors.dart';
 
 class EVCard extends StatelessWidget {
   final VehicleModel vehicle;
@@ -23,11 +24,11 @@ class EVCard extends StatelessWidget {
     return Container(
       height: 270,
       decoration: BoxDecoration(
-        color: const Color(0xFF1C1C1E),
+        color: AppColors.cardBackgroundColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: const [
           BoxShadow(
-            color: Colors.black54,
+            color: AppColors.shadowMedium,
             blurRadius: 12,
             offset: Offset(0, 6),
           ),
@@ -40,7 +41,7 @@ class EVCard extends StatelessWidget {
             child: AspectRatio(
               aspectRatio: 16 / 9,
               child: Container(
-                color: Colors.white, // Background putih
+                color: AppColors.cardBackgroundColor, // Background putih
                 child: Image.network(
                   image,
                   fit: BoxFit.cover,
@@ -66,7 +67,7 @@ class EVCard extends StatelessWidget {
                   Text(
                     '${vehicle.brand} ${vehicle.name}',
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textColor,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -83,19 +84,19 @@ class EVCard extends StatelessWidget {
                         Icons.speed,
                         "Kecepatan",
                         getHighlightValue("maxSpeed"),
-                        iconColor: Colors.yellow[400],
+                        iconColor: AppColors.secondaryColor,
                       ),
                       _specColumn(
                         Icons.ev_station,
                         "Jarak",
                         getHighlightValue("range"),
-                        iconColor: Colors.yellow[400],
+                        iconColor: AppColors.secondaryColor,
                       ),
                       _specColumn(
                         Icons.bolt,
                         "Isi Ulang",
                         getHighlightValue("charge"),
-                        iconColor: Colors.yellow[400],
+                        iconColor: AppColors.secondaryColor,
                       ),
                     ],
                   ),
@@ -116,16 +117,16 @@ class EVCard extends StatelessWidget {
   }) {
     return Column(
       children: [
-        Icon(icon, color: iconColor ?? Colors.indigoAccent, size: 24),
+        Icon(icon, color: iconColor ?? AppColors.secondaryColor, size: 24),
         const SizedBox(height: 4),
         Text(
           value ?? "-",
           style: const TextStyle(
-            color: Colors.white,
+            color: AppColors.textColor,
             fontWeight: FontWeight.w600,
           ),
         ),
-        Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
+        Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
       ],
     );
   }

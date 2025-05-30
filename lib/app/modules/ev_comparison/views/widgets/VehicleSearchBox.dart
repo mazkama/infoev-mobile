@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infoev/app/modules/ev_comparison/controllers/EvCompareController.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:infoev/app/styles/app_colors.dart';
 import 'package:shimmer/shimmer.dart';
 
 class EVSearchField extends StatefulWidget {
@@ -60,28 +61,28 @@ class _EVSearchFieldState extends State<EVSearchField> {
       children: [
         TextField(
           controller: _controller,
-          style: const TextStyle(color: Colors.black),
+          style: const TextStyle(color: AppColors.textColor),
           onChanged: _searchVehicles,
           decoration: InputDecoration(
             hintText: widget.hintText,
-            hintStyle: const TextStyle(color: Colors.black54),
+            hintStyle: const TextStyle(color: AppColors.textTertiary),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: AppColors.cardBackgroundColor,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 14,
               vertical: 12,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Colors.grey),
+              borderSide: const BorderSide(color: AppColors.borderMedium),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Colors.grey),
+              borderSide: const BorderSide(color: AppColors.borderMedium),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Colors.amber),
+              borderSide: const BorderSide(color: AppColors.primaryColor),
             ),
             suffixIcon:
                 _isLoading
@@ -89,12 +90,12 @@ class _EVSearchFieldState extends State<EVSearchField> {
                       padding: EdgeInsets.all(5),
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: Colors.amber,
+                        color: AppColors.secondaryColor,
                       ),
                     )
                     : (_controller.text.isNotEmpty
                         ? IconButton(
-                          icon: const Icon(Icons.clear, color: Colors.black54),
+                          icon: const Icon(Icons.clear, color: AppColors.textColor),
                           onPressed: () {
                             setState(() {
                               _controller.clear();
@@ -102,23 +103,23 @@ class _EVSearchFieldState extends State<EVSearchField> {
                             });
                           },
                         )
-                        : const Icon(Icons.search, color: Colors.black54)),
+                        : const Icon(Icons.search, color: AppColors.textColor)),
           ),
         ),
         if (_results.isNotEmpty)
           Container(
             margin: const EdgeInsets.only(top: 8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.cardBackgroundColor,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: AppColors.shadowMedium.withOpacity(0.1),
                   blurRadius: 6,
                   offset: const Offset(0, 3),
                 ),
               ],
-              border: Border.all(color: Colors.grey[300]!),
+              border: Border.all(color: AppColors.borderLight),
             ),
             child: SizedBox(
               height: 260,
@@ -127,7 +128,7 @@ class _EVSearchFieldState extends State<EVSearchField> {
                 itemCount: _results.length,
                 separatorBuilder:
                     (_, __) => Divider(
-                      color: Colors.grey[300],
+                      color: AppColors.dividerColor,
                       height: 1,
                       indent: 12,
                       endIndent: 12,
@@ -144,19 +145,19 @@ class _EVSearchFieldState extends State<EVSearchField> {
                       child: CachedNetworkImage(
                       imageUrl: vehicle['thumbnail_url'],
                       placeholder: (context, url) => Shimmer.fromColors(
-                        baseColor: Colors.grey.shade300,
-                        highlightColor: Colors.grey.shade100,
+                        baseColor: AppColors.shimmerBase,
+                        highlightColor: AppColors.shimmerHighlight,
                         child: Container(
                         height: 48,
                         width: 48,
-                        color: Colors.grey.shade300,
+                        color: AppColors.shimmerBase,
                         ),
                       ),
                       errorWidget: (context, url, error) => Container(
                         height: 48,
                         width: 48,
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.error, color: Colors.redAccent),
+                        color: AppColors.cardBackgroundColor,
+                        child: const Icon(Icons.error, color: AppColors.errorColor),
                       ),
                       height: 48,
                       width: 48,
@@ -166,20 +167,20 @@ class _EVSearchFieldState extends State<EVSearchField> {
                     title: Text(
                       '${vehicle['brand']['name']} ${vehicle['name']}',
                       style: const TextStyle(
-                        color: Colors.black87,
+                        color: AppColors.textColor,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     subtitle: Text(
                       'Tahun ${double.parse(vehicle['pivot']['value'].toString()).toStringAsFixed(0)}',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
                     ),
                     onTap:
                         () => {
                           _selectVehicle(vehicle),
                           FocusManager.instance.primaryFocus?.unfocus(),
                         },
-                    hoverColor: Colors.grey[100],
+                    hoverColor: AppColors.backgroundColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

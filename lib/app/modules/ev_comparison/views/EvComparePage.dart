@@ -56,19 +56,19 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: AppColors.shadowMedium.withOpacity(0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
                   ],
-                  border: Border.all(color: Colors.grey[300]!),
+                  border: Border.all(color: AppColors.borderMedium),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Pilih Kendaraan 1:',
-                      style: TextStyle(color: AppColors.secondaryTextColor),
+                      style: TextStyle(color: AppColors.textColor),
                     ),
                     const SizedBox(height: 6),
                     EVSearchField(
@@ -79,7 +79,7 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
                     const SizedBox(height: 16),
                     Text(
                       'Pilih Kendaraan 2:',
-                      style: TextStyle(color: AppColors.secondaryTextColor),
+                      style: TextStyle(color: AppColors.textColor),
                     ),
                     const SizedBox(height: 6),
                     EVSearchField(
@@ -93,7 +93,7 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 24),
                           child: CircularProgressIndicator(
-                            color: AppColors.accentColor,
+                            color: AppColors.secondaryColor,
                           ),
                         ),
                       ),
@@ -106,8 +106,8 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
                           icon: const Icon(Icons.compare_arrows),
                           label: const Text('Compare Sekarang'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.accentColor,
-                            foregroundColor: Colors.black,
+                            backgroundColor: AppColors.primaryColor,
+                            foregroundColor: AppColors.textOnPrimary,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 8,
@@ -124,8 +124,8 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
                           icon: const Icon(Icons.refresh),
                           label: const Text('Reset'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.textColor,
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppColors.backgroundSecondary,
+                            foregroundColor: AppColors.textColor,
                           ),
                         ),
                       ],
@@ -185,12 +185,12 @@ class PlaceholderCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: AppColors.shadowMedium.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(color: Colors.grey[400]!),
+        border: Border.all(color: AppColors.borderMedium),
       ),
       alignment: Alignment.center,
       child: Text(
