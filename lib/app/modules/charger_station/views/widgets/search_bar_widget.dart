@@ -49,12 +49,12 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Colors.black,
+            color: AppColors.cardBackgroundColor,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey[800]!, width: 1),
+            border: Border.all(color: AppColors.borderLight, width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.purple.withOpacity(0.1),
+                color: AppColors.shadowMedium.withOpacity(0.1),
                 blurRadius: 10,
                 offset: const Offset(0, 5),
               ),
@@ -77,17 +77,17 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
               FocusScope.of(context).unfocus();
               FocusManager.instance.primaryFocus?.unfocus();
             },
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: AppColors.textColor),
             decoration: InputDecoration(
               hintText: 'Cari lokasi...',
-              hintStyle: TextStyle(color: Colors.grey[400]),
-              prefixIcon: const Icon(Icons.search, color: Colors.white),
+              hintStyle: TextStyle(color: AppColors.textTertiary),
+              prefixIcon: const Icon(Icons.search, color: AppColors.textColor),
               suffixIcon:
                   textController.text.isNotEmpty
                       ? IconButton(
                         icon: Icon(
                           Icons.clear,
-                          color: AppColors.backgroundColor,
+                          color: AppColors.textColor,
                         ),
                         onPressed: () {
                           textController.clear();
@@ -116,16 +116,16 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             constraints: const BoxConstraints(maxHeight: 200),
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.black,
+              color: AppColors.cardBackgroundColor,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey[800]!, width: 1),
+              border: Border.all(color: AppColors.borderLight, width: 1),
             ),
             child:
                 isLoading
                     ? const Center(
                       child: Padding(
                         padding: EdgeInsets.all(12.0),
-                        child: CircularProgressIndicator(color: Colors.amber),
+                        child: CircularProgressIndicator(color: AppColors.secondaryColor),
                       ),
                     )
                     : ListView.builder(
@@ -138,11 +138,11 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                           title: Text(
                             suggestions[index]
                                 .name, // Use .name property from CitySuggestion
-                            style: const TextStyle(color: Colors.white),
+                            style: const TextStyle(color: AppColors.textColor),
                           ),
                           leading: const Icon(
                             Icons.location_city,
-                            color: Colors.amber,
+                            color: AppColors.secondaryColor,
                           ),
                           onTap: () {
                             textController.text = suggestions[index].name;
@@ -163,7 +163,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             return const Padding(
               padding: EdgeInsets.all(16.0),
               child: Center(
-                child: CircularProgressIndicator(color: Colors.amber),
+                child: CircularProgressIndicator(color: AppColors.secondaryColor),
               ),
             );
           } else if (widget.controller.hasError.value) {
@@ -171,7 +171,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 widget.controller.errorMessage.value,
-                style: const TextStyle(color: Colors.red),
+                style: const TextStyle(color: AppColors.errorColor),
                 textAlign: TextAlign.center,
               ),
             );

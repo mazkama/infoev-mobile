@@ -16,7 +16,7 @@ class EmptyStationsWidget extends StatelessWidget {
             Icon(
               Icons.ev_station_outlined,
               size: 70,
-              color: Colors.grey[600],
+              color: AppColors.secondaryColor,
             ),
             const SizedBox(height: 16),
             Text(
@@ -24,7 +24,7 @@ class EmptyStationsWidget extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
-                color: Colors.grey[400],
+                color: AppColors.textTertiary,
               ),
             ),
             const SizedBox(height: 8),
@@ -32,20 +32,20 @@ class EmptyStationsWidget extends StatelessWidget {
               'Coba cari lokasi lain',
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey[600],
+                color: AppColors.textTertiary,
               ),
             ),
             const SizedBox(height: 24),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.2),
+                color: AppColors.primaryColor.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
                 'Coba "Jakarta" atau "Surabaya"',
                 style: TextStyle(
-                  color: AppColors.accentColor,
+                  color: AppColors.primaryColor,
                   fontWeight: FontWeight.w500,
                 ),
               ),

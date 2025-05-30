@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:infoev/app/styles/app_colors.dart';
 
 class ErrorDisplayWidget extends StatelessWidget {
   final String message;
@@ -22,7 +23,7 @@ class ErrorDisplayWidget extends StatelessWidget {
             Icon(
               Icons.error_outline,
               size: 70,
-              color: Colors.red[400],
+              color: AppColors.errorColor,
             ),
             const SizedBox(height: 16),
             Text(
@@ -30,7 +31,7 @@ class ErrorDisplayWidget extends StatelessWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.red[300],
+                color: AppColors.textOnPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -41,7 +42,7 @@ class ErrorDisplayWidget extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey[400],
+                  color: AppColors.textSecondary,
                 ),
               ),
             ),
@@ -49,7 +50,7 @@ class ErrorDisplayWidget extends StatelessWidget {
             ElevatedButton(
               onPressed: onRetry,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple[700],
+                backgroundColor: AppColors.primaryColor,
                 padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),

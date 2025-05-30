@@ -137,8 +137,8 @@ class ChargerStationCard extends StatelessWidget {
                               const SizedBox(width: 8),
                               InfoChip(
                                 label: "★ ${station.rating}",
-                                backgroundColor: Colors.amber.withOpacity(0.2),
-                                textColor: Colors.amber[400]!,
+                                backgroundColor: AppColors.secondaryColor.withOpacity(0.2),
+                                textColor: AppColors.secondaryColor,
                               ),
                             ],
                           ],
@@ -160,9 +160,9 @@ class ChargerStationCard extends StatelessWidget {
                               icon: Icon(Icons.directions, size: 16),
                               label: Text('Detail Maps'),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.amber[400],
+                                backgroundColor: AppColors.buttonPrimary,
                                 // backgroundColor: Colors.purple[400],
-                                foregroundColor: Colors.black,
+                                foregroundColor: AppColors.textOnPrimary,
                                 textStyle: TextStyle(
                                   fontWeight: FontWeight.w500,
                                 ),

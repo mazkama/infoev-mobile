@@ -192,7 +192,9 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
         ),
         actions: [
           IconButton(
-            icon: Icon(_showSearch ? Icons.search_off : Icons.search),
+            icon: Icon(_showSearch ? Icons.search_off : Icons.search,
+            color: AppColors.primaryColor,
+            ),
             onPressed: () {
               setState(() {
                 _showSearch = !_showSearch;
