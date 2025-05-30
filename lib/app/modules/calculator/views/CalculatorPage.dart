@@ -129,42 +129,34 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
   }
   
   Widget _buildAppBar() {
-    return Obx(() {
-      if (controller.isSearching.value) {
-        return _buildSearchAppBar();
-      }
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        color: AppColors.cardBackgroundColor,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Kalkulator EV',
-                style: GoogleFonts.poppins(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textColor,
-                ),
-            ),
-          ],
-        ),
-      );
-    });
-  }
-  
-  Widget _buildSearchAppBar() {
     return Container(
-      color: AppColors.cardBackgroundColor,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      color: AppColors.cardBackgroundColor,
       child: Row(
         children: [
+          // Back button
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              child: const Icon(
+                Icons.arrow_back_ios,
+                color: AppColors.textColor,
+                size: 20,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          
+          // Title
           Text(
             'Kalkulator EV',
             style: GoogleFonts.poppins(
-              color: AppColors.textColor,
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.w600,
+              color: AppColors.textColor,
             ),
           ),
         ],

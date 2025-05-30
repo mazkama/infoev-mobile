@@ -128,7 +128,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back, color: AppColors.primaryColor),
+                    icon: const Icon(Icons.arrow_back_ios, color: AppColors.textColor),
                     onPressed: () {
                       Get.back();
                     },
@@ -238,7 +238,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
           hintText: 'Cari kendaraan...',
           hintStyle: GoogleFonts.poppins(color: AppColors.textTertiary),
           prefixIcon: IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColors.textSecondary),
+            icon: const Icon(Icons.arrow_back_ios, color: AppColors.textSecondary),
             onPressed: () {
               controller.isSearching.value = false;
               _searchController.clear();

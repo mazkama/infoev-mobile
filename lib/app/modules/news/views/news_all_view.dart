@@ -70,7 +70,7 @@ class _ArticalPageState extends State<ArticalPage> {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColors.primaryColor),
+            icon: const Icon(Icons.arrow_back_ios, color: AppColors.textColor),
           onPressed: () => Get.back(),
         ),
         title: const Text(
