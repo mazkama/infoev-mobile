@@ -761,7 +761,7 @@ class _JelajahPageState extends State<JelajahPage> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [AppColors.linearGradientJelajah.withAlpha(0), AppColors.linearGradientJelajah.withAlpha(179)],
+                colors: [Colors.black.withAlpha(0), Colors.black.withAlpha(179)],
                 stops: const [0.5, 1.0],
               ),
             ),
@@ -839,7 +839,7 @@ class _JelajahPageState extends State<JelajahPage> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [AppColors.linearGradientJelajah.withAlpha(0), AppColors.linearGradientJelajah.withAlpha(179)],
+                  colors: [Colors.black.withAlpha(0), Colors.black.withAlpha(179)],
                 ),
               ),
               child: Shimmer.fromColors(

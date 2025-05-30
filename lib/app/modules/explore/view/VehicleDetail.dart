@@ -82,7 +82,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value) {
@@ -97,7 +97,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
             slivers: [
               // Animated AppBar
               SliverAppBar(
-                backgroundColor: const Color(0xFF1A1A1A),
+                backgroundColor: AppColors.cardBackgroundColor,
                 expandedHeight: 60,
                 floating: true,
                 pinned: true,
@@ -109,21 +109,21 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Colors.blue.withOpacity(0.2),
-                          Colors.purple.withOpacity(0.1),
+                          AppColors.cardBackgroundColor.withOpacity(0.2),
+                          // Colors.purple.withOpacity(0.1),
                         ],
                       ),
                     ),
                   ),
                 ),
                 leading: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  icon: const Icon(Icons.arrow_back, color: AppColors.primaryColor),
                   onPressed: () => Get.back(),
                 ),
                 title: Text(
                   'Detail Kendaraan',
                   style: GoogleFonts.poppins(
-                    color: Colors.white,
+                    color: AppColors.textColor,
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                   ),
@@ -141,7 +141,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                         color:
                             controller.vehicleLoved.value
                                 ? Colors.red
-                                : Colors.white,
+                                : AppColors.primaryColor,
                       ),
                       onPressed: () async {
                         HapticFeedback.lightImpact();
@@ -154,7 +154,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                             showCustomSnackbar(
                               title: 'Berhasil',
                               message: 'Kendaraan dihapus dari favorit',
-                              backgroundColor: Colors.red.shade400,
+                              backgroundColor: AppColors.errorColor,
                               icon: Icons.favorite,
                             );
                           } else {
@@ -163,7 +163,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                             showCustomSnackbar(
                               title: 'Berhasil',
                               message: 'Kendaraan ditambahkan ke favorit',
-                              backgroundColor: Colors.green.shade600,
+                              backgroundColor: AppColors.successColor,
                               icon: Icons.favorite,
                             );
                           }
@@ -171,7 +171,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                           showCustomSnackbar(
                             title: 'Error',
                             message: 'Terjadi kesalahan: $e',
-                            backgroundColor: Colors.orange.shade700,
+                            backgroundColor: AppColors.warningColor,
                             icon: Icons.error_outline,
                           );
                         }
@@ -197,11 +197,11 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                             width: double.infinity,
                             margin: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.cardBackgroundColor,
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.3),
+                                  color: AppColors.shadowMedium.withOpacity(0.3),
                                   blurRadius: 15,
                                   offset: const Offset(0, 5),
                                 ),
@@ -219,8 +219,8 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                           begin: Alignment.topLeft,
                                           end: Alignment.bottomRight,
                                           colors: [
-                                            Colors.white,
-                                            Colors.grey[100]!,
+                                            AppColors.cardBackgroundColor,
+                                            AppColors.cardBackgroundColor,
                                           ],
                                         ),
                                       ),
@@ -236,11 +236,11 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                               _buildImageShimmer(),
                                       errorWidget:
                                           (context, url, error) => Container(
-                                            color: const Color(0xFF212121),
+                                            color: AppColors.backgroundColor,
                                             child: const Center(
                                               child: Icon(
                                                 Icons.broken_image,
-                                                color: Colors.white54,
+                                                color: AppColors.primaryColor,
                                                 size: 48,
                                               ),
                                             ),
@@ -259,7 +259,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                         child: Text(
                           controller.vehicleName.value,
                           style: GoogleFonts.poppins(
-                            color: Colors.white,
+                            color: AppColors.textColor,
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             height: 1.2,
@@ -354,7 +354,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                 style: GoogleFonts.poppins(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.white,
+                                  color: AppColors.textColor,
                                 ),
                               ),
                               const SizedBox(height: 16),
@@ -400,7 +400,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                       children: [
                                         Icon(
                                           _getCategoryIcon(category.name),
-                                          color: Colors.white70,
+                                          color: AppColors.secondaryColor,
                                           size: 24,
                                         ),
                                         const SizedBox(width: 8),
@@ -409,7 +409,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                           style: GoogleFonts.poppins(
                                             fontSize: 20,
                                             fontWeight: FontWeight.w600,
-                                            color: Colors.white,
+                                            color: AppColors.textColor,
                                           ),
                                         ),
                                       ],
@@ -417,11 +417,11 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                     const SizedBox(height: 12),
                                     Container(
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFF212121),
+                                        color: AppColors.cardBackgroundColor,
                                         borderRadius: BorderRadius.circular(16),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withOpacity(
+                                            color: AppColors.shadowMedium.withOpacity(
                                               0.2,
                                             ),
                                             blurRadius: 8,
@@ -455,7 +455,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                                       border: Border(
                                                         top: BorderSide(
                                                           color:
-                                                              Colors.grey[850]!,
+                                                              AppColors.dividerColor,
                                                           width: 0.5,
                                                         ),
                                                       ),
@@ -468,8 +468,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                                             spec.name,
                                                             style: GoogleFonts.poppins(
                                                               color:
-                                                                  Colors
-                                                                      .grey[400],
+                                                                  AppColors.textColor,
                                                               fontSize: 14,
                                                               fontWeight:
                                                                   FontWeight
@@ -484,8 +483,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                                             style:
                                                                 GoogleFonts.poppins(
                                                                   color:
-                                                                      Colors
-                                                                          .white,
+                                                                      AppColors.textColor,
                                                                   fontSize: 14,
                                                                   fontWeight:
                                                                       FontWeight
@@ -523,7 +521,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                           "InfoEV tidak menjamin informasi yang ada di halaman ini akurat 100%.",
                           style: GoogleFonts.poppins(
                             fontSize: 12,
-                            color: Colors.grey[500],
+                            color: AppColors.textSecondary,
                             fontStyle: FontStyle.italic,
                           ),
                           textAlign: TextAlign.center,
@@ -541,7 +539,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                               children: [
                                 Icon(
                                   Icons.chat_bubble_outline_rounded,
-                                  color: Colors.white70,
+                                  color: AppColors.secondaryColor,
                                   size: 24,
                                 ),
                                 const SizedBox(width: 8),
@@ -550,7 +548,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                   style: GoogleFonts.poppins(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.white,
+                                    color: AppColors.textColor,
                                   ),
                                 ),
                                 const Spacer(),
@@ -558,7 +556,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                   '${controller.commentCount} komentar', // This will be dynamic later
                                   style: GoogleFonts.poppins(
                                     fontSize: 14,
-                                    color: Colors.grey[400],
+                                    color: AppColors.textSecondary,
                                   ),
                                 ),
                               ],
@@ -569,11 +567,11 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                             Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF212121),
+                                color: AppColors.cardBackgroundColor,
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
+                                    color: AppColors.shadowMedium.withOpacity(0.2),
                                     blurRadius: 8,
                                     offset: const Offset(0, 4),
                                   ),
@@ -587,7 +585,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                     style: GoogleFonts.poppins(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
-                                      color: Colors.white,
+                                      color: AppColors.textColor,
                                     ),
                                   ),
                                   const SizedBox(height: 12),
@@ -602,10 +600,10 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                     decoration: InputDecoration(
                                       hintText: 'Tulis komentar Anda...',
                                       hintStyle: GoogleFonts.poppins(
-                                        color: Colors.grey[600],
+                                        color: AppColors.textTertiary,
                                       ),
                                       filled: true,
-                                      fillColor: const Color(0xFF1A1A1A),
+                                      fillColor: AppColors.backgroundSecondary,
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(8),
                                         borderSide: BorderSide.none,
@@ -613,7 +611,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                       isDense: true,
                                     ),
                                     style: GoogleFonts.poppins(
-                                      color: Colors.white,
+                                      color: AppColors.textColor,
                                     ),
                                   ),
                                   const SizedBox(height: 12),
@@ -633,8 +631,8 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                                     snackPosition:
                                                         SnackPosition.TOP,
                                                     backgroundColor:
-                                                        Colors.redAccent,
-                                                    colorText: Colors.white,
+                                                        AppColors.errorColor,
+                                                    colorText: AppColors.textOnPrimary,
                                                   );
                                                   Get.toNamed(Path.LOGIN);
                                                   return; // jangan lanjutkan kirim komentar
@@ -687,7 +685,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                               },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: AppColors.primaryColor,
-                                        foregroundColor: Colors.white,
+                                        foregroundColor: AppColors.primaryLight,
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 20,
                                           vertical: 12,
@@ -703,7 +701,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                         'Kirim',
                                         style: GoogleFonts.poppins(
                                           fontWeight: FontWeight.w600,
-                                          color: Colors.white,
+                                          color: AppColors.textOnPrimary,
                                           fontSize: 16,
                                         ),
                                       ),
@@ -785,11 +783,11 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
         height: 60,
         width: 120,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.cardBackgroundColor,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: AppColors.shadowMedium.withOpacity(0.1),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -800,10 +798,10 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
           child: CachedNetworkImage(
             imageUrl: link['marketplace_logo'] ?? '',
             fit: BoxFit.contain,
-            placeholder: (context, url) => Container(color: Colors.white),
+            placeholder: (context, url) => Container(color: AppColors.cardBackgroundColor),
             errorWidget:
                 (context, url, error) =>
-                    Icon(Icons.shopping_bag, color: Colors.grey[400], size: 32),
+                    Icon(Icons.shopping_bag, color: AppColors.primaryColor, size: 32),
           ),
         ),
       ),
@@ -829,21 +827,21 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
           margin: EdgeInsets.only(bottom: 12, left: isReply ? 48 : 0),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFF1E1E1E),
+            color: AppColors.cardBackgroundColor,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CircleAvatar(
-                backgroundColor: Colors.blue[700],
+                backgroundColor: AppColors.secondaryColor,
                 radius: 18,
                 child: Text(
                   (name.isEmpty || name == 'Anonimus')
                       ? 'A'
                       : name[0].toUpperCase(),
                   style: GoogleFonts.poppins(
-                    color: Colors.white,
+                    color: AppColors.textOnPrimary,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
@@ -857,7 +855,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                     Text(
                       name.isEmpty ? 'Anonimus' : name,
                       style: GoogleFonts.poppins(
-                        color: Colors.white,
+                        color: AppColors.textColor,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
@@ -868,7 +866,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                         child: Text(
                           'Membalas @$replyTo',
                           style: GoogleFonts.poppins(
-                            color: Colors.grey[400],
+                            color: AppColors.textTertiary,
                             fontSize: 12,
                             fontStyle: FontStyle.italic,
                           ),
@@ -877,7 +875,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                     Text(
                       comment.isEmpty ? 'Komentar tidak tersedia' : comment,
                       style: GoogleFonts.poppins(
-                        color: Colors.grey[300],
+                        color: AppColors.textColor,
                         fontSize: 14,
                         height: 1.4,
                       ),
@@ -888,7 +886,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                         Text(
                           timeAgo,
                           style: GoogleFonts.poppins(
-                            color: Colors.grey[500],
+                            color: AppColors.textTertiary,
                             fontSize: 11,
                           ),
                         ),
@@ -900,8 +898,8 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                 'Akses Ditolak',
                                 'Anda harus login terlebih dahulu untuk membalas komentar',
                                 snackPosition: SnackPosition.TOP,
-                                backgroundColor: Colors.redAccent,
-                                colorText: Colors.white,
+                                backgroundColor: AppColors.errorColor,
+                                colorText: AppColors.textOnPrimary,
                               );
                               Get.toNamed(Path.LOGIN);
                               return;
@@ -911,7 +909,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                           child: Text(
                             'Balas',
                             style: GoogleFonts.poppins(
-                              color: Colors.grey[400],
+                              color: AppColors.textTertiary,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),
@@ -935,7 +933,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                   ? 'Sembunyikan Balasan'
                                   : 'Lihat Balasan (${replies.length})',
                               style: GoogleFonts.poppins(
-                                color: Colors.grey[400],
+                                color: AppColors.textTertiary,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -962,7 +960,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                   controller: _replyController,
                   decoration: const InputDecoration(
                     hintText: 'Tulis balasan...',
-                    fillColor: Colors.white,
+                    fillColor: AppColors.cardBackgroundColor,
                     filled: true,
                   ),
                 ),
@@ -1044,7 +1042,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: AppColors.shadowMedium.withOpacity(0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -1053,12 +1051,12 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(icon, color: Colors.white, size: 32),
+                Icon(icon, color: AppColors.cardBackgroundColor, size: 32),
                 const Spacer(),
                 Text(
                   title,
                   style: GoogleFonts.poppins(
-                    color: Colors.white70,
+                    color: AppColors.textOnPrimary,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -1067,7 +1065,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                 Text(
                   value != '0' ? '$value $unit' : '-',
                   style: GoogleFonts.poppins(
-                    color: Colors.white,
+                    color: AppColors.textOnPrimary,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -1080,7 +1078,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                     child: Text(
                       controller.getHighlightDesc('charge') ?? '',
                       style: GoogleFonts.poppins(
-                        color: Colors.white70,
+                        color: AppColors.textOnPrimary,
                         fontSize: 11,
                         fontWeight: FontWeight.w400,
                       ),
@@ -1123,14 +1121,14 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
             width: 50,
             height: 50,
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue[400]!),
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.secondaryColor),
               strokeWidth: 3,
             ),
           ),
           const SizedBox(height: 16),
           Text(
             'Loading...',
-            style: GoogleFonts.poppins(color: Colors.white70, fontSize: 16),
+            style: GoogleFonts.poppins(color: AppColors.textColor, fontSize: 16),
           ),
         ],
       ),
@@ -1142,14 +1140,14 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.error_outline_rounded, size: 64, color: Colors.red),
+          const Icon(Icons.error_outline_rounded, size: 64, color: AppColors.errorColor),
           const SizedBox(height: 16),
           Text(
             'Terjadi Kesalahan',
             style: GoogleFonts.poppins(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppColors.textOnPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -1158,14 +1156,14 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
             child: Text(
               controller.errorMessage.value,
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[400]),
+              style: GoogleFonts.poppins(fontSize: 14, color: AppColors.textSecondary),
             ),
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () => controller.refreshData(),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue[700],
+              backgroundColor: AppColors.primaryColor,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -1184,9 +1182,9 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
 
   Widget _buildImageShimmer() {
     return Shimmer.fromColors(
-      baseColor: const Color(0xFF262626),
-      highlightColor: const Color(0xFF303030),
-      child: Container(color: Colors.white),
+      baseColor: AppColors.shimmerBase,
+      highlightColor: AppColors.shimmerHighlight,
+      child: Container(color: AppColors.shimmerBase),
     );
   }
 
@@ -1199,7 +1197,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
     Get.rawSnackbar(
       title: title,
       message: message,
-      icon: icon != null ? Icon(icon, color: Colors.white) : null,
+      icon: icon != null ? Icon(icon, color: AppColors.secondaryColor) : null,
       duration: const Duration(seconds: 3),
       backgroundColor: backgroundColor,
       margin: const EdgeInsets.all(16),

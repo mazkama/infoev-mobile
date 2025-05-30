@@ -44,9 +44,6 @@ class AppColors {
   /// Card background color
   static const Color cardBackgroundColor = Color(0xFFFFFFFF);
 
-  /// Card background color
-  static const Color linearGradientJelajah = Color(0xFF000000);
-
   /// Elevated card background color
   static const Color cardElevated = Color(0xFFFFFBFF);
 
