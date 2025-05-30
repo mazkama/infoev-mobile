@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:infoev/app/modules/calculator/controllers/CalculatorController.dart';
+import 'package:infoev/app/styles/app_colors.dart';
 import 'package:shimmer/shimmer.dart'; 
 
 class CalculatorPage extends StatefulWidget {
@@ -70,7 +71,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
@@ -95,7 +96,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
                             'Hitung perkiraan biaya penggunaan kendaraan listrik berdasarkan konsumsi energi dan harga listrik di daerah Anda.',
                             style: GoogleFonts.poppins(
                               fontSize: 14,
-                              color: Colors.grey[400],
+                              color: AppColors.textSecondary,
                             ),
                           ),
                           const SizedBox(height: 24),
@@ -134,7 +135,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
       }
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        color: const Color(0xFF1A1A1A),
+        color: AppColors.cardBackgroundColor,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -143,7 +144,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
                 style: GoogleFonts.poppins(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppColors.textColor,
                 ),
             ),
           ],
@@ -154,14 +155,14 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
   
   Widget _buildSearchAppBar() {
     return Container(
-      color: const Color(0xFF1A1A1A),
+      color: AppColors.cardBackgroundColor,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
           Text(
             'Kalkulator EV',
             style: GoogleFonts.poppins(
-              color: Colors.white,
+              color: AppColors.textColor,
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
@@ -180,7 +181,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
           style: GoogleFonts.poppins(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: AppColors.textTertiary,
           ),
         ),
         const SizedBox(height: 8),
@@ -215,18 +216,18 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A),
+          color: AppColors.backgroundSecondary,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey[800]!),
+          border: Border.all(color: AppColors.borderLight),
         ),
         child: TextField(
           controller: _searchController,
           focusNode: _searchFocusNode,
-          style: GoogleFonts.poppins(color: Colors.white),
+          style: GoogleFonts.poppins(color: AppColors.textColor),
           decoration: InputDecoration(
             hintText: 'Pilih kendaraan listrik',
-            hintStyle: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 14),
-            prefixIcon: const Icon(Icons.search, color: Colors.grey),
+            hintStyle: GoogleFonts.poppins(color: AppColors.textTertiary, fontSize: 14),
+            prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
             border: InputBorder.none,
             enabledBorder: InputBorder.none,
             focusedBorder: InputBorder.none,
@@ -236,7 +237,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
               builder: (context, value, child) {
                 return value.text.isNotEmpty
                   ? IconButton(
-                      icon: const Icon(Icons.close, color: Colors.grey),
+                      icon: const Icon(Icons.close, color: AppColors.textSecondary),
                       onPressed: () {
                         _searchController.clear();
                         controller.resetSearch();
@@ -272,11 +273,11 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: AppColors.cardBackgroundColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: AppColors.shadowMedium.withOpacity(0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -291,7 +292,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
               height: 80,
               margin: const EdgeInsets.only(right: 12),
               decoration: BoxDecoration(
-                color: Colors.white, // Background putih untuk gambar PNG
+                color: AppColors.cardBackgroundColor, // Background putih untuk gambar PNG
                 borderRadius: BorderRadius.circular(8),
               ),
               child: ClipRRect(
@@ -300,12 +301,12 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
                   imageUrl: imageUrl,
                   fit: BoxFit.contain, // Mengubah fit menjadi contain
                   placeholder: (context, url) => Shimmer.fromColors(
-                    baseColor: Colors.grey[850]!,
-                    highlightColor: Colors.grey[700]!,
+                    baseColor: AppColors.shimmerBase,
+                    highlightColor: AppColors.shimmerHighlight,
                     child: Container(color: Colors.white),
                   ),
                   errorWidget: (context, url, error) => const Center(
-                    child: Icon(Icons.broken_image, color: Colors.grey),
+                    child: Icon(Icons.broken_image, color: AppColors.secondaryColor),
                   ),
                 ),
               ),
@@ -316,10 +317,10 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
               height: 80,
               margin: const EdgeInsets.only(right: 12),
               decoration: BoxDecoration(
-                color: Colors.grey[800],
+                color: AppColors.shimmerBase,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.directions_car, color: Colors.white70, size: 40),
+              child: const Icon(Icons.directions_car, color: AppColors.secondaryColor, size: 40),
             ),
 
           // Vehicle Info
@@ -330,7 +331,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
                 Text(
                   brandName,
                   style: GoogleFonts.poppins(
-                    color: Colors.blue[300],
+                    color: AppColors.primaryColor,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -338,7 +339,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
                 Text(
                   vehicle['name'] ?? '',
                   style: GoogleFonts.poppins(
-                    color: Colors.white,
+                    color: AppColors.textColor,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -347,7 +348,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
                   ? Text(
                       'Baterai: ${controller.batteryCapacity.value} kWh',
                       style: GoogleFonts.poppins(
-                        color: Colors.grey[400],
+                        color: AppColors.textSecondary,
                         fontSize: 12,
                       ),
                     )
@@ -375,7 +376,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
             },
             child: const Padding(
               padding: EdgeInsets.all(8.0),
-              child: Icon(Icons.change_circle_outlined, color: Colors.blue),
+              child: Icon(Icons.change_circle_outlined, color: AppColors.primaryColor),
             ),
           ),
         ],
@@ -403,7 +404,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
               child: Text(
                 'Tidak ada hasil ditemukan',
                 style: GoogleFonts.poppins(
-                  color: Colors.grey[400],
+                  color: AppColors.textTertiary,
                   fontSize: 14,
                 ),
               ),
@@ -424,7 +425,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
             child: Text(
               'Tidak ada kendaraan ditemukan',
               style: GoogleFonts.poppins(
-                color: Colors.grey[400],
+                color: AppColors.textTertiary,
                 fontSize: 14,
               ),
             ),
@@ -434,9 +435,9 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
 
       return Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A),
+          color: AppColors.cardBackgroundColor,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey[800]!),
+          border: Border.all(color: AppColors.borderLight),
         ),
         constraints: const BoxConstraints(maxHeight: 400),
         child: ListView.separated(
@@ -444,7 +445,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
           shrinkWrap: true,
           itemCount: vehicles.length,
           separatorBuilder: (context, index) => Divider(
-            color: Colors.grey[850],
+            color: AppColors.dividerColor,
             height: 1,
           ),
           itemBuilder: (context, index) {
@@ -459,7 +460,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
                       width: 50,
                       height: 50,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.cardBackgroundColor,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: ClipRRect(
@@ -468,12 +469,12 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
                           imageUrl: imageUrl,
                           fit: BoxFit.contain,
                           placeholder: (context, url) => Shimmer.fromColors(
-                            baseColor: Colors.grey[850]!,
-                            highlightColor: Colors.grey[700]!,
-                            child: Container(color: Colors.white),
+                            baseColor: AppColors.shimmerBase,
+                            highlightColor: AppColors.shimmerHighlight,
+                            child: Container(color: AppColors.shimmerBase),
                           ),
                           errorWidget: (context, url, error) => const Center(
-                            child: Icon(Icons.broken_image, color: Colors.grey, size: 24),
+                            child: Icon(Icons.broken_image, color: AppColors.secondaryColor, size: 24),
                           ),
                         ),
                       ),
@@ -482,22 +483,22 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
                       width: 50,
                       height: 50,
                       decoration: BoxDecoration(
-                        color: Colors.grey[800],
+                        color: AppColors.cardBackgroundColor,
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Icon(Icons.directions_car, color: Colors.white70, size: 30),
+                      child: const Icon(Icons.directions_car, color: AppColors.secondaryColor, size: 30),
                     ),
               title: Text(
                 vehicle['name'] ?? '',
                 style: GoogleFonts.poppins(
-                  color: Colors.white,
+                  color: AppColors.textColor,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               subtitle: Text(
                 brandName,
                 style: GoogleFonts.poppins(
-                  color: Colors.blue[300],
+                  color: AppColors.primaryColor,
                   fontSize: 12,
                 ),
               ),
@@ -514,13 +515,13 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
   
   Widget _buildLoadingState() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[850]!,
-      highlightColor: Colors.grey[800]!,
+      baseColor: AppColors.shimmerBase,
+      highlightColor: AppColors.shimmerHighlight,
       child: Container(
         width: double.infinity,
         height: 200,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.shimmerBase,
           borderRadius: BorderRadius.circular(8),
         ),
       ),
@@ -532,22 +533,22 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
+        color: AppColors.errorColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.red.withOpacity(0.5)),
+        border: Border.all(color: AppColors.errorColor.withOpacity(0.5)),
       ),
       child: Column(
         children: [
           const Icon(
             Icons.error_outline,
-            color: Colors.red,
+            color: AppColors.errorColor,
             size: 32,
           ),
           const SizedBox(height: 8),
           Text(
             'Terjadi kesalahan',
             style: GoogleFonts.poppins(
-              color: Colors.red,
+              color: AppColors.errorColor,
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
@@ -567,8 +568,8 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
               controller.performSearch(_searchController.text);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: AppColors.errorColor,
+              foregroundColor: AppColors.textOnPrimary,
             ),
             child: Text(
               'Coba Lagi',
@@ -590,7 +591,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
           style: GoogleFonts.poppins(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: AppColors.textColor,
           ),
         ),
         const SizedBox(height: 8),
@@ -599,9 +600,9 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
           children: [
             // Distance prefix
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
               decoration: BoxDecoration(
-                color: Colors.grey[850],
+                color: AppColors.cardBackgroundColor,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(8),
                   bottomLeft: Radius.circular(8),
@@ -610,7 +611,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
               child: Text(
                 'KM',
                 style: GoogleFonts.poppins(
-                  color: Colors.white,
+                  color: AppColors.textColor,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -620,14 +621,14 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
             Expanded(
               child: TextField(
                 controller: _dailyDistanceController,
-                style: GoogleFonts.poppins(color: Colors.white),
+                style: GoogleFonts.poppins(color: AppColors.textColor),
                 keyboardType: TextInputType.number,
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
                 ],
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: const Color(0xFF1A1A1A),
+                  fillColor: AppColors.backgroundSecondary,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                   border: const OutlineInputBorder(
                     borderRadius: BorderRadius.only(
@@ -637,9 +638,9 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
                     borderSide: BorderSide.none,
                   ),
                   hintText: '30',
-                  hintStyle: GoogleFonts.poppins(color: Colors.grey[600]),
+                  hintStyle: GoogleFonts.poppins(color: AppColors.textTertiary),
                   suffixText: 'per hari',
-                  suffixStyle: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 12),
+                  suffixStyle: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 12),
                 ),
                 onChanged: (value) {
                   if (value.isNotEmpty) {
@@ -664,8 +665,8 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
               max: 500,
               divisions: 499, // (500-1)
               label: '${controller.dailyDistanceSlider.value.toStringAsFixed(0)} KM',
-              activeColor: Colors.blue,
-              inactiveColor: Colors.grey[800],
+              activeColor: AppColors.primaryColor,
+              inactiveColor: AppColors.borderMedium,
               onChanged: (value) {
                 controller.updateDailyDistance(value);
                 _dailyDistanceController.text = value.toStringAsFixed(0);
@@ -679,14 +680,14 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
                   Text(
                     '1 KM',
                     style: GoogleFonts.poppins(
-                      color: Colors.grey[400],
+                      color: AppColors.textOnPrimary,
                       fontSize: 12,
                     ),
                   ),
                   Text(
                     '500 KM',
                     style: GoogleFonts.poppins(
-                      color: Colors.grey[400],
+                      color: AppColors.textOnPrimary,
                       fontSize: 12,
                     ),
                   ),
@@ -704,7 +705,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
           style: GoogleFonts.poppins(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: AppColors.textColor,
           ),
         ),
         const SizedBox(height: 8),
@@ -713,9 +714,9 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
           children: [
             // Price prefix
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
               decoration: BoxDecoration(
-                color: Colors.grey[850],
+                color: AppColors.cardBackgroundColor,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(8),
                   bottomLeft: Radius.circular(8),
@@ -724,7 +725,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
               child: Text(
                 'Rp',
                 style: GoogleFonts.poppins(
-                  color: Colors.white,
+                  color: AppColors.textColor,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -734,14 +735,14 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
             Expanded(
               child: TextField(
                 controller: _priceController,
-                style: GoogleFonts.poppins(color: Colors.white),
+                style: GoogleFonts.poppins(color: AppColors.textColor),
                 keyboardType: TextInputType.number,
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
                 ],
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: const Color(0xFF1A1A1A),
+                  fillColor: AppColors.backgroundSecondary,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                   border: const OutlineInputBorder(
                     borderRadius: BorderRadius.only(
@@ -751,9 +752,9 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
                     borderSide: BorderSide.none,
                   ),
                   hintText: '1445',
-                  hintStyle: GoogleFonts.poppins(color: Colors.grey[600]),
+                  hintStyle: GoogleFonts.poppins(color: AppColors.textTertiary),
                   suffixText: 'per kWh',
-                  suffixStyle: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 12),
+                  suffixStyle: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 12),
                 ),
                 onChanged: (value) {
                   if (value.isNotEmpty) {
@@ -778,8 +779,8 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
               max: 2600,
               divisions: 34, // (2600-900)/50
               label: 'Rp ${controller.sliderValue.value.toStringAsFixed(0)}',
-              activeColor: Colors.blue,
-              inactiveColor: Colors.grey[800],
+              activeColor: AppColors.primaryColor,
+              inactiveColor: AppColors.borderMedium,
               onChanged: (value) {
                 controller.updateElectricityPrice(value);
                 _priceController.text = value.toStringAsFixed(0);
@@ -793,14 +794,14 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
                   Text(
                     'Rp 900',
                     style: GoogleFonts.poppins(
-                      color: Colors.grey[400],
+                      color: AppColors.textOnPrimary,
                       fontSize: 12,
                     ),
                   ),
                   Text(
                     'Rp 2.600',
                     style: GoogleFonts.poppins(
-                      color: Colors.grey[400],
+                      color: AppColors.textOnPrimary,
                       fontSize: 12,
                     ),
                   ),
@@ -821,17 +822,17 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.blue.withOpacity(0.1),
+            color: AppColors.infoColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.blue.withOpacity(0.3),
+              color: AppColors.infoColor.withOpacity(0.3),
             ),
           ),
           child: Column(
             children: [
               const Icon(
                 Icons.info_outline,
-                color: Colors.blue,
+                color: AppColors.infoColor,
                 size: 32,
               ),
               const SizedBox(height: 8),
@@ -839,7 +840,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
                 'Pilih kendaraan untuk melihat hasil perhitungan',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
-                  color: Colors.blue[300],
+                  color: AppColors.infoColor,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -853,11 +854,11 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF212121),
+          color: AppColors.cardBackgroundColor,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: AppColors.borderMedium,
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -869,7 +870,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
             Text(
               'Hasil Perhitungan',
               style: GoogleFonts.poppins(
-                color: Colors.white,
+                color: AppColors.textColor,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -951,10 +952,10 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: Colors.blue.withOpacity(0.1),
+            color: AppColors.secondaryColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: Colors.blue[300]),
+          child: Icon(icon, color: AppColors.secondaryColor),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -964,7 +965,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
               Text(
                 title,
                 style: GoogleFonts.poppins(
-                  color: Colors.grey[400],
+                  color: AppColors.textSecondary,
                   fontSize: 12,
                 ),
               ),
@@ -972,7 +973,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
               Text(
                 value,
                 style: GoogleFonts.poppins(
-                  color: Colors.white,
+                  color: AppColors.textColor,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -980,7 +981,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
               Text(
                 subtitle,
                 style: GoogleFonts.poppins(
-                  color: Colors.grey[500],
+                  color: AppColors.textTertiary,
                   fontSize: 11,
                 ),
               ),
@@ -995,22 +996,22 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.orange.withOpacity(0.1),
+        color: AppColors.secondaryColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Colors.orange.withOpacity(0.3),
+          color: AppColors.secondaryColor.withOpacity(0.3),
         ),
       ),
       child: Column(
         children: [
           Row(
             children: [
-              Icon(Icons.warning_amber_rounded, color: Colors.orange[300], size: 20),
+              Icon(Icons.warning_amber_rounded, color: AppColors.secondaryColor, size: 20),
               const SizedBox(width: 8),
               Text(
                 'Disclaimer',
                 style: GoogleFonts.poppins(
-                  color: Colors.orange[300],
+                  color: AppColors.secondaryColor,
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
@@ -1021,7 +1022,7 @@ class _CalculatorPageState extends State<CalculatorPage> with SingleTickerProvid
           Text(
             'Perhitungan ini hanya perkiraan dan dapat berbeda dengan penggunaan sebenarnya. Hasil aktual dapat bervariasi tergantung pada berbagai faktor seperti kondisi jalan, gaya mengemudi, suhu, dan penggunaan AC.',
             style: GoogleFonts.poppins(
-              color: Colors.orange[100],
+              color: AppColors.secondaryColor,
               fontSize: 12,
             ),
           ),
