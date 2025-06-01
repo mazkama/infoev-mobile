@@ -21,6 +21,7 @@ class _JelajahPageState extends State<JelajahPage> {
   final FocusNode _searchFocusNode = FocusNode();
   Timer? _debounceTimer;
   String _lastSearchQuery = '';
+  bool _shouldAutoFocus = true; // Flag to control autofocus behavior
 
   @override
   void initState() {
@@ -33,6 +34,11 @@ class _JelajahPageState extends State<JelajahPage> {
 
       if (controller.merekList.isEmpty && !controller.isLoading.value) {
         await controller.refreshData();
+      }
+      
+      // Ensure focus is not active when returning from other pages
+      if (_searchFocusNode.hasFocus) {
+        _searchFocusNode.unfocus();
       }
     });
 
@@ -54,6 +60,26 @@ class _JelajahPageState extends State<JelajahPage> {
     _searchFocusNode.addListener(_onFocusChange);
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Ensure keyboard is dismissed when page becomes visible again
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _searchFocusNode.hasFocus) {
+        _searchFocusNode.unfocus();
+        FocusScope.of(context).unfocus();
+      }
+      // Reset autofocus flag after a delay to allow for normal search behavior
+      if (!_shouldAutoFocus) {
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            _shouldAutoFocus = true;
+          }
+        });
+      }
+    });
+  }
+
   void _onFocusChange() {
     if (!_searchFocusNode.hasFocus) {
       _debounceTimer?.cancel();
@@ -66,6 +92,10 @@ class _JelajahPageState extends State<JelajahPage> {
     _searchController.dispose();
     _searchFocusNode.removeListener(_onFocusChange);
     _searchFocusNode.dispose();
+    
+    // Clear search state when leaving JelajahPage
+    controller.resetSearch();
+    
     super.dispose();
   }
 
@@ -137,6 +167,7 @@ class _JelajahPageState extends State<JelajahPage> {
               controller: _searchController,
               focusNode: _searchFocusNode,
               style: GoogleFonts.poppins(color: AppColors.textColor),
+              textInputAction: TextInputAction.search,
               decoration: InputDecoration(
                 hintText: 'Cari kendaraan listrik...',
                 hintStyle: GoogleFonts.poppins(color: AppColors.textTertiary),
@@ -168,7 +199,24 @@ class _JelajahPageState extends State<JelajahPage> {
                   }
                 });
               },
-              autofocus: true,
+              onSubmitted: (value) {
+                if (value.trim().isNotEmpty) {
+                  // Clear search field before navigation
+                  _searchController.clear();
+                  _lastSearchQuery = '';
+                  
+                  // Navigate to search results page when user presses enter
+                  // Mark this as manual search (not from history)
+                  Get.toNamed(
+                    '/search-results',
+                    parameters: {
+                      'query': value.trim(),
+                      'fromManualSearch': 'true'
+                    },
+                  );
+                }
+              },
+              autofocus: _shouldAutoFocus,
             ),
           ),
         ],
@@ -470,9 +518,23 @@ class _JelajahPageState extends State<JelajahPage> {
                     onPressed: () => controller.removeFromSearchHistory(query),
                   ),
                   onTap: () {
-                    _searchController.text = query;
-                    _searchController.selection = TextSelection.fromPosition(
-                      TextPosition(offset: query.length),
+                    // Dismiss keyboard before navigation
+                    FocusScope.of(context).unfocus();
+                    
+                    // Set flag to prevent autofocus when returning
+                    _shouldAutoFocus = false;
+                    
+                    // Clear search field and navigate to SearchResultsPage
+                    _searchController.clear();
+                    _lastSearchQuery = '';
+                    
+                    // Navigate to SearchResultsPage when selecting from search history
+                    Get.toNamed(
+                      '/search-results',
+                      parameters: {
+                        'query': query,
+                        'fromManualSearch': 'false'
+                      },
                     );
                   },
                 );

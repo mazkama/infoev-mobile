@@ -6,6 +6,7 @@ import 'package:infoev/app/modules/ev_comparison/controllers/EvCompareController
 import 'package:infoev/app/modules/ev_comparison/views/EvComparePage.dart';
 import 'package:infoev/app/modules/explore/controllers/MerekController.dart';
 import 'package:infoev/app/modules/explore/view/JelajahPage.dart';
+import 'package:infoev/app/modules/explore/view/SearchResultsPage.dart';
 import 'package:infoev/app/modules/explore/view/TipeProduk.dart';
 import 'package:infoev/app/modules/explore/view/VehicleDetail.dart';
 import 'package:infoev/app/modules/home/views/home_view.dart';
@@ -64,6 +65,14 @@ class AppPages {
     GetPage(
       name: Path.JELAJAH,
       page: () => JelajahPage(),
+      transition: Transition.rightToLeft,
+      binding: BindingsBuilder(() {
+        Get.put(MerekController());
+      }),
+    ),
+    GetPage(
+      name: Path.SEARCH_RESULTS,
+      page: () => const SearchResultsPage(),
       transition: Transition.rightToLeft,
       binding: BindingsBuilder(() {
         Get.put(MerekController());

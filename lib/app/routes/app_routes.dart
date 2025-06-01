@@ -11,6 +11,7 @@ abstract class Routes {
 
   static const HOME = Path.HOME;
   static const JELAJAH = Path.JELAJAH;
+  static const SEARCH_RESULTS = Path.SEARCH_RESULTS;
   static const BRAND = Path.BRAND;
   static const VEHICLE = Path.VEHICLE;
   static const NEWS = Path.NEWS; 
@@ -28,6 +29,7 @@ abstract class Path {
 
   static const HOME = '/beranda';
   static const JELAJAH = '/jelajah'; 
+  static const SEARCH_RESULTS = '/search-results';
   static const BRAND = '/brand/:brandId';
   static const VEHICLE = '/kendaraan/:slug';
   static const NEWS = '/news'; 

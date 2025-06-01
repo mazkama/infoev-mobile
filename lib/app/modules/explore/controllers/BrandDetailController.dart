@@ -118,6 +118,12 @@ class BrandDetailController extends GetxController {
           );
           
           dataFromCache = true;
+          
+          // Load year cache from SharedPreferences
+          await _loadYearCacheFromPrefs(brandId);
+          
+          // Load vehicle years before applying filters
+          await _loadVehicleYears(allVehicles);
           applyFilters();
           
           // Refresh in background after delay
@@ -179,6 +185,12 @@ class BrandDetailController extends GetxController {
           banner: brandData['banner'] ?? '',
           brandId: brandId
         );
+        
+        // Load vehicle years from API before applying filters
+        await _loadVehicleYears(allVehicles);
+        
+        // Save year cache to SharedPreferences
+        await _saveYearCacheToPrefs(brandId);
         
         // Save complete data to cache
         await _saveToCache(brandId, allVehicles, brandData);
@@ -311,6 +323,148 @@ class BrandDetailController extends GetxController {
     return type?.name ?? 'Tidak diketahui';
   }
   
+  // Mendapatkan tahun kendaraan berdasarkan VehicleModel
+  String getVehicleYear(VehicleModel vehicle) {
+    // Check cache first (same pattern as getTypeName)
+    if (_vehicleYearCache.containsKey(vehicle.slug)) {
+      return _vehicleYearCache[vehicle.slug]!;
+    }
+    
+    // Method 1: Try from spec.value (current approach)
+    if (vehicle.spec?.value != null && vehicle.spec!.value.isNotEmpty) {
+      final year = vehicle.spec!.value.split('.').first;
+      if (RegExp(r'^\d{4}$').hasMatch(year)) {
+        return year;
+      }
+    }
+    
+    // Method 2: Try to get year from vehicle name if it contains 4 digits
+    final nameYearMatch = RegExp(r'\b(20\d{2})\b').firstMatch(vehicle.name);
+    if (nameYearMatch != null) {
+      return nameYearMatch.group(1) ?? '';
+    }
+    
+    // Method 3: Extract year from slug if it contains year pattern
+    final slugYearMatch = RegExp(r'\b(20\d{2})\b').firstMatch(vehicle.slug);
+    if (slugYearMatch != null) {
+      return slugYearMatch.group(1) ?? '';
+    }
+    
+    return '';
+  }
+
+  // Cache untuk menyimpan data tahun kendaraan
+  final Map<String, String> _vehicleYearCache = {};
+
+  // Mendapatkan tahun kendaraan dengan mengakses API detail kendaraan (optimized concurrent loading)
+  Future<void> _loadVehicleYears(List<VehicleModel> vehicles) async {
+    // Filter vehicles that are not in cache
+    final vehiclesToLoad = vehicles.where((vehicle) => !_vehicleYearCache.containsKey(vehicle.slug)).toList();
+    
+    if (vehiclesToLoad.isEmpty) {
+      debugPrint('All vehicle years already in cache');
+      return;
+    }
+    
+    debugPrint('Loading years for ${vehiclesToLoad.length} vehicles');
+    
+    // Process vehicles in batches of 6 concurrent requests to avoid overwhelming the server
+    const batchSize = 6;
+    for (int i = 0; i < vehiclesToLoad.length; i += batchSize) {
+      final batch = vehiclesToLoad.skip(i).take(batchSize).toList();
+      
+      // Create concurrent futures for this batch
+      final futures = batch.map((vehicle) => _loadSingleVehicleYear(vehicle)).toList();
+      
+      // Wait for all requests in this batch to complete
+      await Future.wait(futures);
+      
+      debugPrint('Completed batch ${(i / batchSize).floor() + 1}/${((vehiclesToLoad.length - 1) / batchSize).floor() + 1}');
+    }
+    
+    debugPrint('Finished loading all vehicle years');
+  }
+  
+  // Helper method to load year for a single vehicle
+  Future<void> _loadSingleVehicleYear(VehicleModel vehicle) async {
+    try {
+      final response = await http.get(Uri.parse('$apiUrl/${vehicle.slug}'));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final specCategories = data['specCategories'] as List<dynamic>?;
+        
+        if (specCategories != null) {
+          for (var category in specCategories) {
+            final specs = category['specs'] as List<dynamic>?;
+            if (specs != null) {
+              for (var spec in specs) {
+                final specName = spec['name'] as String?;
+                if (specName != null && specName.toLowerCase().contains('tahun')) {
+                  final specVehicles = spec['vehicles'] as List<dynamic>?;
+                  if (specVehicles != null) {
+                    for (var specVehicle in specVehicles) {
+                      if (specVehicle['id'] == vehicle.id) {
+                        final pivot = specVehicle['pivot'];
+                        if (pivot != null && pivot['value'] != null) {
+                          final value = pivot['value'].toString();
+                          final extractedYear = value.split('.').first;
+                          if (RegExp(r'^\d{4}$').hasMatch(extractedYear)) {
+                            _vehicleYearCache[vehicle.slug] = extractedYear;
+                            return; // Exit early when year is found
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error loading year for ${vehicle.slug}: $e');
+    }
+    
+    // Jika tidak ditemukan, cache sebagai string kosong
+    if (!_vehicleYearCache.containsKey(vehicle.slug)) {
+      _vehicleYearCache[vehicle.slug] = '';
+    }
+  }
+  
+  // Load year cache from SharedPreferences
+  Future<void> _loadYearCacheFromPrefs(int brandId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final yearCacheKey = "${redisCacheKey}years_$brandId";
+      final cacheData = prefs.getString(yearCacheKey);
+      final cacheTimestamp = prefs.getInt("${yearCacheKey}_timestamp") ?? 0;
+      final currentTime = DateTime.now().millisecondsSinceEpoch;
+      
+      if (cacheData != null && (currentTime - cacheTimestamp < cacheExpiration)) {
+        final Map<String, dynamic> cachedYears = jsonDecode(cacheData);
+        _vehicleYearCache.addAll(cachedYears.cast<String, String>());
+        debugPrint('Loaded ${_vehicleYearCache.length} vehicle years from cache');
+      }
+    } catch (e) {
+      debugPrint('Error loading year cache: $e');
+    }
+  }
+  
+  // Save year cache to SharedPreferences
+  Future<void> _saveYearCacheToPrefs(int brandId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final yearCacheKey = "${redisCacheKey}years_$brandId";
+      
+      await prefs.setString(yearCacheKey, jsonEncode(_vehicleYearCache));
+      await prefs.setInt("${yearCacheKey}_timestamp", DateTime.now().millisecondsSinceEpoch);
+      debugPrint('Saved ${_vehicleYearCache.length} vehicle years to cache');
+    } catch (e) {
+      debugPrint('Error saving year cache: $e');
+    }
+  }
+  
   // Menerapkan filter dan sort pada kendaraan
   void applyFilters() {
     if (brandDetail.value == null) return;
@@ -383,9 +537,13 @@ class BrandDetailController extends GetxController {
       int comparison;
       
       if (sortBy.value == 'year') {
-        final yearA = a.spec?.value ?? '0';
-        final yearB = b.spec?.value ?? '0';
-        comparison = yearA.compareTo(yearB);
+        // Use the helper method to extract years consistently
+        final yearA = getVehicleYear(a);
+        final yearB = getVehicleYear(b);
+        
+        final yearIntA = int.tryParse(yearA) ?? 0;
+        final yearIntB = int.tryParse(yearB) ?? 0;
+        comparison = yearIntA.compareTo(yearIntB);
       } else {
         comparison = a.name.compareTo(b.name);
       }
@@ -442,10 +600,13 @@ class BrandDetailController extends GetxController {
           comparison = a.slug.compareTo(b.slug); // Changed from name to slug for consistent sorting
           break;
         case 'year':
-          // Try to get year from spec, fallback to slug comparison if not available
-          final yearA = int.tryParse(a.spec?.value.split('.').first ?? '') ?? 0;
-          final yearB = int.tryParse(b.spec?.value.split('.').first ?? '') ?? 0;
-          comparison = yearA.compareTo(yearB);
+          // Use the helper method to extract years consistently
+          final yearA = getVehicleYear(a);
+          final yearB = getVehicleYear(b);
+          
+          final yearIntA = int.tryParse(yearA) ?? 0;
+          final yearIntB = int.tryParse(yearB) ?? 0;
+          comparison = yearIntA.compareTo(yearIntB);
           // If years are equal, sort by slug for consistency
           if (comparison == 0) {
             comparison = a.slug.compareTo(b.slug);
@@ -525,14 +686,21 @@ class BrandDetailController extends GetxController {
   
   // Refresh data
   Future<void> refreshData() async {
-    final slug = Get.parameters['slug'];
-    if (slug != null) {
-      // Hapus cache untuk memaksa load baru
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove("$redisCacheKey$slug");
-      await prefs.remove("${redisCacheKey}${slug}_timestamp");
-      
-      await fetchBrandDetail(int.parse(slug));
+    final brandIdStr = Get.parameters['brandId'];
+    if (brandIdStr != null) {
+      final brandId = int.tryParse(brandIdStr);
+      if (brandId != null) {
+        // Hapus cache untuk memaksa load baru
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove("${redisCacheKey}brand_$brandId");
+        await prefs.remove("${redisCacheKey}brand_${brandId}_timestamp");
+        
+        // Clear current data and reload
+        hasError.value = false;
+        errorMessage.value = "";
+        
+        await fetchBrandDetail(brandId);
+      }
     }
   }
 

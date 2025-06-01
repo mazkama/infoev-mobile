@@ -317,9 +317,47 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
           
           // Grid produk
           Obx(() {
-            if (controller.filteredVehicles.isEmpty) {
+            // Show loading indicator when loading and no data available yet
+            if (controller.isLoading.value && controller.brandDetail.value == null) {
+              return SliverFillRemaining(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CircularProgressIndicator(
+                        color: AppColors.secondaryColor,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Memuat data kendaraan...',
+                        style: GoogleFonts.poppins(
+                          color: AppColors.textSecondary,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            
+            // Show empty filter results only if:
+            // 1. Not loading AND 
+            // 2. Brand detail exists AND 
+            // 3. Filtered vehicles is empty
+            if (!controller.isLoading.value && 
+                controller.brandDetail.value != null && 
+                controller.filteredVehicles.isEmpty) {
               return SliverFillRemaining(
                 child: _buildEmptyFilterResults(),
+              );
+            }
+            
+            // If no brand detail available or no vehicles after loading
+            if (controller.brandDetail.value == null || 
+                controller.filteredVehicles.isEmpty) {
+              return const SliverFillRemaining(
+                child: SizedBox.shrink(),
               );
             }
             
@@ -558,7 +596,12 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
   
   Widget _buildVehicleCard(VehicleModel vehicle) {
     final typeName = vehicle.typeId != null ? controller.getTypeName(vehicle.typeId!) : '';
-    final year = vehicle.spec?.value.split('.').first ?? '';
+    final year = controller.getVehicleYear(vehicle);
+    
+    return _buildVehicleCardContent(vehicle, typeName, year);
+  }
+
+  Widget _buildVehicleCardContent(VehicleModel vehicle, String typeName, String year) {
     
     return GestureDetector(
       onTap: () {
@@ -622,7 +665,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: AppColors.secondaryColor,
+                            color: AppColors.primaryColor.withAlpha(179),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -645,6 +688,14 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (year.isNotEmpty)
+                      Text(
+                        year,
+                        style: GoogleFonts.poppins(
+                          color: AppColors.textOnPrimary,
+                          fontSize: 12,
+                        ),
+                      ),
                     Text(
                       vehicle.name,
                       style: GoogleFonts.poppins(
@@ -655,14 +706,6 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (year.isNotEmpty)
-                      Text(
-                        'Tahun $year',
-                        style: GoogleFonts.poppins(
-                          color: AppColors.textOnPrimary,
-                          fontSize: 12,
-                        ),
-                      ),
                   ],
                 ),
               ),
