@@ -23,11 +23,24 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
     ChargerStationController(),
   );
   late GoogleMapController mapController;
+  late DraggableScrollableController _draggableController;
 
   bool _showSearch = true;
 
   final LatLng _defaultCenter = const LatLng(-6.200000, 106.816666); // Jakarta
   final RxString selectedMarkerId = ''.obs;
+
+  @override
+  void initState() {
+    super.initState();
+    _draggableController = DraggableScrollableController();
+  }
+
+  @override
+  void dispose() {
+    _draggableController.dispose();
+    super.dispose();
+  }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -240,13 +253,31 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                   _showSearch
                       ? SearchBarWidget(controller: controller)
                       : Container(),
-            ),
-            DraggableScrollableSheet(
+            ),            DraggableScrollableSheet(
+              controller: _draggableController,
               initialChildSize: 0.50,
-              minChildSize: 0.15,
+              minChildSize: 0.1,
               maxChildSize: 0.6,
-              builder: (context, scrollController) {
-                return Container(
+              builder: (context, scrollController) {                return GestureDetector(
+                  onPanUpdate: (details) {
+                    // Deteksi swipe down (delta y positif)
+                    if (details.delta.dy > 5) {
+                      _draggableController.animateTo(
+                        0.1,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOut,
+                      );
+                    }
+                    // Deteksi swipe up (delta y negatif)
+                    else if (details.delta.dy < -5) {
+                      _draggableController.animateTo(
+                        0.6,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOut,
+                      );
+                    }
+                  },
+                  child: Container(
                   decoration: BoxDecoration(
                     color: AppColors.backgroundColor,
                     borderRadius: const BorderRadius.vertical(
@@ -267,7 +298,7 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                         height: 5,
                         margin: const EdgeInsets.only(top: 10),
                         decoration: BoxDecoration(
-                          color: Colors.grey[300],
+                          color: AppColors.textTertiary,
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
@@ -315,10 +346,10 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                                     mapController.showMarkerInfoWindow(
                                       MarkerId(station.placeId),
                                     );
-                                  },
-                                ),
+                                  },                                ),
                       ),
                     ],
+                  ),
                   ),
                 );
               },
