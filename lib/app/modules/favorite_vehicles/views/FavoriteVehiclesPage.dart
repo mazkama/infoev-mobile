@@ -12,6 +12,11 @@ class FavoritVehiclesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(FavoriteVehicleController());
 
+    // Add this at the start of build method
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.clearAndRefreshData();
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
