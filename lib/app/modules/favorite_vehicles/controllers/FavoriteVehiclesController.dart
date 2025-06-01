@@ -32,6 +32,20 @@ class FavoriteVehicleController extends GetxController {
     await fetchFavoriteVehicles(reset: true);
   }
 
+  Future<void> clearAndRefreshData() async {
+    // Clear existing data
+    favoriteVehicles.clear();
+    currentPage = 1;
+    hasMoreFavorites.value = true;
+    errorMessage.value = '';
+    isLoading.value = false;
+    isLoadingMore.value = false;
+    isError.value = false;
+
+    // Fetch new data
+    await fetchFavoriteVehicles(reset: true);
+  }
+
   // Ambil daftar kendaraan favorit user
   Future<void> fetchFavoriteVehicles({bool reset = false}) async {
     // Cegah fetch bersamaan, baik loading biasa atau loading more

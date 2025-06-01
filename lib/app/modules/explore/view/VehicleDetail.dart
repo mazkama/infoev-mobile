@@ -117,7 +117,10 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                   ),
                 ),
                 leading: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios, color: AppColors.textColor),
+                  icon: const Icon(
+                    Icons.arrow_back_ios,
+                    color: AppColors.textColor,
+                  ),
                   onPressed: () => Get.back(),
                 ),
                 title: Text(
@@ -201,7 +204,9 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.shadowMedium.withOpacity(0.3),
+                                  color: AppColors.shadowMedium.withOpacity(
+                                    0.3,
+                                  ),
                                   blurRadius: 15,
                                   offset: const Offset(0, 5),
                                 ),
@@ -421,9 +426,8 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                         borderRadius: BorderRadius.circular(16),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: AppColors.shadowMedium.withOpacity(
-                                              0.2,
-                                            ),
+                                            color: AppColors.shadowMedium
+                                                .withOpacity(0.2),
                                             blurRadius: 8,
                                             offset: const Offset(0, 4),
                                           ),
@@ -455,7 +459,8 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                                       border: Border(
                                                         top: BorderSide(
                                                           color:
-                                                              AppColors.dividerColor,
+                                                              AppColors
+                                                                  .dividerColor,
                                                           width: 0.5,
                                                         ),
                                                       ),
@@ -468,7 +473,8 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                                             spec.name,
                                                             style: GoogleFonts.poppins(
                                                               color:
-                                                                  AppColors.textColor,
+                                                                  AppColors
+                                                                      .textColor,
                                                               fontSize: 14,
                                                               fontWeight:
                                                                   FontWeight
@@ -480,15 +486,15 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                                           flex: 3,
                                                           child: Text(
                                                             formattedValue,
-                                                            style:
-                                                                GoogleFonts.poppins(
-                                                                  color:
-                                                                      AppColors.textColor,
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                ),
+                                                            style: GoogleFonts.poppins(
+                                                              color:
+                                                                  AppColors
+                                                                      .textColor,
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
                                                             textAlign:
                                                                 TextAlign.right,
                                                           ),
@@ -571,7 +577,9 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppColors.shadowMedium.withOpacity(0.2),
+                                    color: AppColors.shadowMedium.withOpacity(
+                                      0.2,
+                                    ),
                                     blurRadius: 8,
                                     offset: const Offset(0, 4),
                                   ),
@@ -625,17 +633,197 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                                 if (!controller
                                                     .isLoggedIn
                                                     .value) {
-                                                  Get.snackbar(
-                                                    'Akses Ditolak',
-                                                    'Anda harus login terlebih dahulu untuk membuat komentar',
-                                                    snackPosition:
-                                                        SnackPosition.TOP,
-                                                    backgroundColor:
-                                                        AppColors.errorColor,
-                                                    colorText: AppColors.textOnPrimary,
+                                                  // Hide keyboard first
+                                                  FocusScope.of(
+                                                    context,
+                                                  ).unfocus();
+
+                                                  // Add delay
+                                                  await Future.delayed(
+                                                    const Duration(seconds: 1),
                                                   );
-                                                  Get.toNamed(Path.LOGIN);
-                                                  return; // jangan lanjutkan kirim komentar
+                                                  Get.bottomSheet(
+                                                    Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                            24,
+                                                          ),
+                                                      decoration: const BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius.vertical(
+                                                              top:
+                                                                  Radius.circular(
+                                                                    16,
+                                                                  ),
+                                                            ),
+                                                      ),
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .stretch,
+                                                        children: [
+                                                          // Handle Bar
+                                                          Center(
+                                                            child: Container(
+                                                              width: 40,
+                                                              height: 4,
+                                                              margin:
+                                                                  const EdgeInsets.only(
+                                                                    bottom: 24,
+                                                                  ),
+                                                              decoration: BoxDecoration(
+                                                                color:
+                                                                    Colors
+                                                                        .grey[300],
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      2,
+                                                                    ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          // Icon
+                                                          Container(
+                                                            padding:
+                                                                const EdgeInsets.all(
+                                                                  12,
+                                                                ),
+                                                            decoration: BoxDecoration(
+                                                              color: AppColors
+                                                                  .secondaryColor
+                                                                  .withOpacity(
+                                                                    0.1,
+                                                                  ),
+                                                              shape:
+                                                                  BoxShape
+                                                                      .circle,
+                                                            ),
+                                                            child: const Icon(
+                                                              Icons
+                                                                  .comment_rounded,
+                                                              color:
+                                                                  AppColors
+                                                                      .secondaryColor,
+                                                              size: 32,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 24,
+                                                          ),
+                                                          // Title
+                                                          Text(
+                                                            'Masuk untuk Menambahkan Komentar',
+                                                            textAlign:
+                                                                TextAlign
+                                                                    .center,
+                                                            style: TextStyle(
+                                                              fontSize: 20,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color:
+                                                                  Colors
+                                                                      .grey[800],
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 12,
+                                                          ),
+                                                          // Subtitle
+                                                          Text(
+                                                            'Untuk dapat memberikan komentar, silakan login terlebih dahulu',
+                                                            textAlign:
+                                                                TextAlign
+                                                                    .center,
+                                                            style: TextStyle(
+                                                              fontSize: 14,
+                                                              color:
+                                                                  Colors
+                                                                      .grey[600],
+                                                              height: 1.5,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 32,
+                                                          ),
+                                                          // Login Button
+                                                          ElevatedButton(
+                                                            onPressed: () {
+                                                              Get.back();
+                                                              Get.toNamed(
+                                                                Path.LOGIN,
+                                                              );
+                                                            },
+                                                            style: ElevatedButton.styleFrom(
+                                                              backgroundColor:
+                                                                  AppColors
+                                                                      .primaryColor,
+                                                              padding:
+                                                                  const EdgeInsets.symmetric(
+                                                                    vertical:
+                                                                        16,
+                                                                  ),
+                                                              shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      20,
+                                                                    ),
+                                                              ),
+                                                              elevation: 0,
+                                                            ),
+                                                            child: const Text(
+                                                              'Login Sekarang',
+                                                              style: TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 16,
+                                                          ),
+                                                          // Cancel Button
+                                                          TextButton(
+                                                            onPressed:
+                                                                () =>
+                                                                    Get.back(),
+                                                            style: TextButton.styleFrom(
+                                                              padding:
+                                                                  const EdgeInsets.symmetric(
+                                                                    vertical:
+                                                                        16,
+                                                                  ),
+                                                            ),
+                                                            child: Text(
+                                                              'Nanti Saja',
+                                                              style: TextStyle(
+                                                                fontSize: 16,
+                                                                color:
+                                                                    Colors
+                                                                        .grey[600],
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 8,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    isDismissible: true,
+                                                    enableDrag: true,
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                  );
+                                                  return; // Stop execution
                                                 }
 
                                                 final success = await controller
@@ -748,7 +936,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                                 },
                               );
                             }),
-                           ],
+                          ],
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -798,10 +986,15 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
           child: CachedNetworkImage(
             imageUrl: link['marketplace_logo'] ?? '',
             fit: BoxFit.contain,
-            placeholder: (context, url) => Container(color: AppColors.cardBackgroundColor),
+            placeholder:
+                (context, url) =>
+                    Container(color: AppColors.cardBackgroundColor),
             errorWidget:
-                (context, url, error) =>
-                    Icon(Icons.shopping_bag, color: AppColors.primaryColor, size: 32),
+                (context, url, error) => Icon(
+                  Icons.shopping_bag,
+                  color: AppColors.primaryColor,
+                  size: 32,
+                ),
           ),
         ),
       ),
@@ -892,17 +1085,135 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                         ),
                         const SizedBox(width: 16),
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async {
                             if (!controller.isLoggedIn.value) {
-                              Get.snackbar(
-                                'Akses Ditolak',
-                                'Anda harus login terlebih dahulu untuk membalas komentar',
-                                snackPosition: SnackPosition.TOP,
-                                backgroundColor: AppColors.errorColor,
-                                colorText: AppColors.textOnPrimary,
+                              // Hide keyboard first
+                              FocusScope.of(context).unfocus();
+
+                              // Add delay
+                              await Future.delayed(const Duration(seconds: 1));
+
+                              Get.bottomSheet(
+                                Container(
+                                  padding: const EdgeInsets.all(24),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(16),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      // Handle Bar
+                                      Center(
+                                        child: Container(
+                                          width: 40,
+                                          height: 4,
+                                          margin: const EdgeInsets.only(
+                                            bottom: 24,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[300],
+                                            borderRadius: BorderRadius.circular(
+                                              2,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      // Icon
+                                      Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.secondaryColor
+                                              .withOpacity(0.1),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.comment_rounded,
+                                          color: AppColors.secondaryColor,
+                                          size: 32,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 24),
+                                      // Title
+                                      Text(
+                                        'Masuk untuk Menambahkan Komentar',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey[800],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      // Subtitle
+                                      Text(
+                                        'Untuk dapat memberikan komentar, silakan login terlebih dahulu',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[600],
+                                          height: 1.5,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 32),
+                                      // Login Button
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Get.back();
+                                          Get.toNamed(Path.LOGIN);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              AppColors.primaryColor,
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 16,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                          ),
+                                          elevation: 0,
+                                        ),
+                                        child: const Text(
+                                          'Login Sekarang',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      // Cancel Button
+                                      TextButton(
+                                        onPressed: () => Get.back(),
+                                        style: TextButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 16,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          'Nanti Saja',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey[600],
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                    ],
+                                  ),
+                                ),
+                                isDismissible: true,
+                                enableDrag: true,
+                                backgroundColor: Colors.transparent,
                               );
-                              Get.toNamed(Path.LOGIN);
-                              return;
+                              return; // Stop execution
                             }
                             onReplyTap();
                           },
@@ -1121,14 +1432,19 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
             width: 50,
             height: 50,
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.secondaryColor),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                AppColors.secondaryColor,
+              ),
               strokeWidth: 3,
             ),
           ),
           const SizedBox(height: 16),
           Text(
             'Loading...',
-            style: GoogleFonts.poppins(color: AppColors.textColor, fontSize: 16),
+            style: GoogleFonts.poppins(
+              color: AppColors.textColor,
+              fontSize: 16,
+            ),
           ),
         ],
       ),
@@ -1140,7 +1456,11 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.error_outline_rounded, size: 64, color: AppColors.errorColor),
+          const Icon(
+            Icons.error_outline_rounded,
+            size: 64,
+            color: AppColors.errorColor,
+          ),
           const SizedBox(height: 16),
           Text(
             'Terjadi Kesalahan',
@@ -1156,7 +1476,10 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
             child: Text(
               controller.errorMessage.value,
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(fontSize: 14, color: AppColors.textSecondary),
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+              ),
             ),
           ),
           const SizedBox(height: 24),
