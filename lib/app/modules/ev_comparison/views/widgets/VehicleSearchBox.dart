@@ -4,6 +4,7 @@ import 'package:infoev/app/modules/ev_comparison/controllers/EvCompareController
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:infoev/app/styles/app_colors.dart';
 import 'package:shimmer/shimmer.dart';
+import 'dart:async';
 
 class EVSearchField extends StatefulWidget {
   final String hintText;
@@ -24,6 +25,7 @@ class EVSearchField extends StatefulWidget {
 class _EVSearchFieldState extends State<EVSearchField> {
   late final TextEditingController _controller;
   final EVComparisonController controller = Get.find();
+  Timer? _debounceTimer;
 
   List<Map<String, dynamic>> _results = [];
   bool _isLoading = false;
@@ -34,19 +36,45 @@ class _EVSearchFieldState extends State<EVSearchField> {
     _controller = widget.externalController ?? TextEditingController();
   }
 
-  void _searchVehicles(String query) async {
-    if (query.isEmpty) return;
-    setState(() => _isLoading = true);
-    try {
-      final data = await controller.searchVehicles(query);
+  @override
+  void dispose() {
+    _debounceTimer?.cancel(); // Cancel timer when disposing
+    super.dispose();
+  }
+
+  void _searchVehicles(String query) {
+    // Cancel previous timer if exists
+    _debounceTimer?.cancel();
+
+    if (query.isEmpty) {
       setState(() {
-        _results = data;
+        _results = [];
+        _isLoading = false;
       });
-    } catch (e) {
-      setState(() => _results = []);
-    } finally {
-      setState(() => _isLoading = false);
+      return;
     }
+
+    setState(() => _isLoading = true);
+
+    // Create new timer with 500ms delay
+    _debounceTimer = Timer(const Duration(milliseconds: 800), () async {
+      try {
+        final data = await controller.searchVehicles(query);
+        if (mounted) {
+          setState(() {
+            _results = data;
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() => _results = []);
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+      }
+    });
   }
 
   void _selectVehicle(Map<String, dynamic> vehicle) {

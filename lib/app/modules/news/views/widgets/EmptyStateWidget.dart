@@ -23,7 +23,7 @@ class EmptyStateWidget extends StatelessWidget {
           Icon(
             Icons.info_outline_rounded,
             size: 80,
-            color: AppColors.primaryColor,
+            color: AppColors.secondaryColor,
           ),
           const SizedBox(height: 16),
           Text(
@@ -40,8 +40,8 @@ class EmptyStateWidget extends StatelessWidget {
             ElevatedButton(
               onPressed: onRetry,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.secondaryColor,
-                foregroundColor: AppColors.textColor,
+                backgroundColor: AppColors.primaryColor,
+                foregroundColor: AppColors.textOnPrimary,
               ),
               child: Text(buttonText!),
             ),

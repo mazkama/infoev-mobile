@@ -17,6 +17,9 @@ class NewsController extends GetxController {
   RxBool isError = false.obs; // Menambahkan status error
   var searchQuery = ''.obs;
 
+  // Add new variables for filter
+  RxString currentFilter = ''.obs;
+
   int currentPage = 1;
 
   @override
@@ -39,10 +42,13 @@ class NewsController extends GetxController {
   // Di dalam NewsController
   Future<void> refreshNews() async {
     isLoading.value = true;
+    isError.value = false; // Reset error state
     searchQuery.value = ''; // Kosongkan pencarian
     allNewsList.clear(); // Kosongkan list sebelumnya
     try {
-      await getAllNews(reset: true); // Misalnya kamu punya fungsi ini
+      await getAllNews(reset: true);
+    } catch (e) {
+      isError.value = true;
     } finally {
       isLoading.value = false;
     }
@@ -76,11 +82,15 @@ class NewsController extends GetxController {
     }
   }
 
-  Future<void> getAllNews({bool reset = false}) async {
+  Future<void> getAllNews({bool reset = false, String? type}) async {
     if (reset) {
       currentPage = 1;
       hasMoreNews.value = true;
       allNewsList.clear();
+      // Only update currentFilter if type is provided during reset
+      if (type != null) {
+        currentFilter.value = type;
+      }
     }
 
     if (!hasMoreNews.value || isLoadingMore.value) return;
@@ -88,9 +98,19 @@ class NewsController extends GetxController {
     isLoadingMore.value = true;
 
     try {
-      final response = await http.get(
-        Uri.parse("${baseUrlDev}/berita?page=$currentPage"),
-      );
+      // Build base URL
+      String url = "${baseUrlDev}/berita?page=$currentPage";
+
+      // Use existing filter if type is not provided
+      final activeFilter = type ?? currentFilter.value;
+
+      // Add filter to URL if exists
+      if (activeFilter.isNotEmpty) {
+        url += "&type=$activeFilter";
+      }
+
+      final response = await http.get(Uri.parse(url));
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final List<dynamic> newsData = data['posts']['data'];
@@ -145,6 +165,7 @@ class NewsController extends GetxController {
   Future<void> searchNews(String query) async {
     isLoading.value = true;
     searchQuery.value = query;
+    currentFilter.value = '';
 
     try {
       final response = await http.get(
@@ -165,6 +186,21 @@ class NewsController extends GetxController {
       isError.value = true;
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  // Add method to change filter
+  Future<void> changeFilter(String type) async {
+    // Only proceed if filter actually changes
+    if (currentFilter.value != type) {
+      isLoading.value = true;
+      try {
+        await getAllNews(reset: true, type: type.isEmpty ? null : type);
+      } catch (e) {
+        isError.value = true;
+      } finally {
+        isLoading.value = false;
+      }
     }
   }
 }

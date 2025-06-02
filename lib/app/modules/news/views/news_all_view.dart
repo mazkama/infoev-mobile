@@ -118,7 +118,7 @@ class _ArticalPageState extends State<ArticalPage> {
                         ),
                       const SizedBox(height: 15),
                       Row(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -132,6 +132,12 @@ class _ArticalPageState extends State<ArticalPage> {
                             child: Text(
                               query.isNotEmpty
                                   ? 'Hasil cari "$query"'
+                                  : newsController.currentFilter.value ==
+                                      'tips_and_tricks'
+                                  ? 'Tips & Trik'
+                                  : newsController.currentFilter.value ==
+                                      'sticky'
+                                  ? 'Untukmu' // Changed from 'Berita Penting'
                                   : 'Semua Berita',
                               style: TextStyle(
                                 fontSize: 16,
@@ -139,6 +145,124 @@ class _ArticalPageState extends State<ArticalPage> {
                                 color: AppColors.secondaryColor,
                               ),
                             ),
+                          ),
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  if (newsController.currentFilter.value ==
+                                      'sticky') {
+                                    newsController.changeFilter('');
+                                  } else {
+                                    newsController.changeFilter('sticky');
+                                  }
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 5,
+                                  ),
+                                  margin: const EdgeInsets.only(right: 8),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        newsController.currentFilter.value ==
+                                                'sticky'
+                                            ? AppColors.secondaryColor
+                                            : AppColors.secondaryColor
+                                                .withAlpha(25),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons
+                                            .favorite_rounded, // Changed from Icons.push_pin
+                                        size: 16,
+                                        color:
+                                            newsController
+                                                        .currentFilter
+                                                        .value ==
+                                                    'sticky'
+                                                ? Colors.white
+                                                : AppColors.secondaryColor,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Untukmu', // Changed from 'Penting'
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color:
+                                              newsController
+                                                          .currentFilter
+                                                          .value ==
+                                                      'sticky'
+                                                  ? Colors.white
+                                                  : AppColors.secondaryColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  if (newsController.currentFilter.value ==
+                                      'tips_and_tricks') {
+                                    newsController.changeFilter('');
+                                  } else {
+                                    newsController.changeFilter(
+                                      'tips_and_tricks',
+                                    );
+                                  }
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        newsController.currentFilter.value ==
+                                                'tips_and_tricks'
+                                            ? AppColors.secondaryColor
+                                            : AppColors.secondaryColor
+                                                .withAlpha(25),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.tips_and_updates,
+                                        size: 16,
+                                        color:
+                                            newsController
+                                                        .currentFilter
+                                                        .value ==
+                                                    'tips_and_tricks'
+                                                ? Colors.white
+                                                : AppColors.secondaryColor,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Tips & Trik',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color:
+                                              newsController
+                                                          .currentFilter
+                                                          .value ==
+                                                      'tips_and_tricks'
+                                                  ? Colors.white
+                                                  : AppColors.secondaryColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
