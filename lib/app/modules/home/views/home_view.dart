@@ -552,7 +552,7 @@ class _HomePageState extends State<HomePage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "Kendaaran Terbaru",
+                                "Kendaaran Populer",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 20,
@@ -567,14 +567,14 @@ class _HomePageState extends State<HomePage> {
                           // Shimmer untuk "Hottest News"
                           Obx(() {
                             if (newsController.isLoading.value) {
-                              return const ShimmerVehicleNew();
+                              return const ShimmerVehiclePopuler();
                             } else {
                               return SingleChildScrollView(
                                 physics: const BouncingScrollPhysics(),
                                 scrollDirection: Axis.horizontal,
                                 child: Row(
                                   children:
-                                      newsController.newVehiclesList
+                                      newsController.popularVehiclesList
                                           .map(
                                             (e) => VehicleNewCard(
                                               onTap: () {
@@ -602,7 +602,7 @@ class _HomePageState extends State<HomePage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "Kendaaran Populer",
+                                "Kendaraan Terbaru",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 20,
@@ -617,14 +617,14 @@ class _HomePageState extends State<HomePage> {
                           // Shimmer untuk "Hottest News"
                           Obx(() {
                             if (newsController.isLoading.value) {
-                              return const ShimmerVehiclePopuler();
+                              return const ShimmerVehicleNew();
                             } else {
                               return SingleChildScrollView(
                                 physics: const BouncingScrollPhysics(),
                                 scrollDirection: Axis.horizontal,
                                 child: Row(
                                   children:
-                                      newsController.popularVehiclesList
+                                      newsController.newVehiclesList
                                           .map(
                                             (e) => VehiclePopulerCard(
                                               onTap: () {
@@ -669,20 +669,41 @@ class _HomePageState extends State<HomePage> {
                                     vertical: 5,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: AppColors.primaryColor.withOpacity(
-                                      0.1,
-                                    ), // Background oranye tipis
-                                    borderRadius: BorderRadius.circular(
-                                      8,
-                                    ), // Rounded corner
-                                  ),
-                                  child: Text(
-                                    "Lihat Semua",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: AppColors.primaryColor,
-                                      fontWeight: FontWeight.w600,
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        AppColors.primaryColor.withOpacity(0.1),
+                                        AppColors.secondaryColor.withOpacity(
+                                          0.05,
+                                        ),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
                                     ),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: AppColors.primaryColor.withOpacity(
+                                        0.2,
+                                      ),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Lihat Semua",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: AppColors.primaryColor,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.arrow_forward_ios_rounded, // Ikon panah kanan
+                                        color: AppColors.primaryColor,
+                                        size: 16, // Sesuaikan ukuran ikon
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
