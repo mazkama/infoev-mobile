@@ -263,7 +263,7 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                 controller: _draggableController,
                 initialChildSize: 0.50,
                 minChildSize: 0.1,
-                maxChildSize: 0.6,
+                maxChildSize: 0.52,
                 builder: (context, scrollController) {
                   return GestureDetector(
                     onPanUpdate: (details) {
