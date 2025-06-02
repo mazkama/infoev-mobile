@@ -6,11 +6,13 @@ class EmptyStationsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView( // Tambahan penting untuk jaga-jaga
+    return SingleChildScrollView(
+      // Tambahan penting untuk jaga-jaga
       child: Padding(
         padding: const EdgeInsets.all(50),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, // Bisa diubah ke start jika masih error
+          mainAxisAlignment:
+              MainAxisAlignment.center, // Bisa diubah ke start jika masih error
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(
@@ -30,10 +32,7 @@ class EmptyStationsWidget extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'Coba cari lokasi lain',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.textTertiary,
-              ),
+              style: TextStyle(fontSize: 14, color: AppColors.textTertiary),
             ),
             const SizedBox(height: 24),
             Container(

@@ -13,11 +13,7 @@ class EmptyComparisonView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(
-              Icons.search_off,
-              size: 80,
-              color: AppColors.secondaryColor,
-            ),
+            Icon(Icons.search_off, size: 80, color: AppColors.secondaryColor),
             const SizedBox(height: 16),
             Text(
               'Belum ada kendaraan yang dibandingkan',
@@ -31,10 +27,7 @@ class EmptyComparisonView extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'Silakan pilih kendaraan untuk memulai perbandingan.',
-              style: TextStyle(
-                color: AppColors.textTertiary,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: AppColors.textTertiary, fontSize: 14),
               textAlign: TextAlign.center,
             ),
           ],

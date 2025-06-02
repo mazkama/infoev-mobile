@@ -1,4 +1,3 @@
-
 part of 'app_pages.dart';
 
 abstract class Routes {
@@ -14,7 +13,7 @@ abstract class Routes {
   static const SEARCH_RESULTS = Path.SEARCH_RESULTS;
   static const BRAND = Path.BRAND;
   static const VEHICLE = Path.VEHICLE;
-  static const NEWS = Path.NEWS; 
+  static const NEWS = Path.NEWS;
   static const CHARGER_STATION = Path.CHARGER_STATION;
   static const EV_COMPARISON = Path.EV_COMPARISON;
   static const CALCULATOR = Path.CALCULATOR;
@@ -28,11 +27,11 @@ abstract class Path {
   static const NAVBAR = '/navbar';
 
   static const HOME = '/beranda';
-  static const JELAJAH = '/jelajah'; 
+  static const JELAJAH = '/jelajah';
   static const SEARCH_RESULTS = '/search-results';
   static const BRAND = '/brand/:brandId';
   static const VEHICLE = '/kendaraan/:slug';
-  static const NEWS = '/news'; 
+  static const NEWS = '/news';
   static const CHARGER_STATION = '/charger_station';
   static const EV_COMPARISON = '/ev_comparison';
   static const PROFIL = '/profil';

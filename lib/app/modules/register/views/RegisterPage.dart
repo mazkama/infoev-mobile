@@ -63,10 +63,7 @@ class RegisterPage extends StatelessWidget {
                   // Name Field
                   TextFormField(
                     controller: controller.nameC,
-                    style: TextStyle(
-                      color: AppColors.textColor,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(color: AppColors.textColor, fontSize: 16),
                     decoration: InputDecoration(
                       labelText: 'Nama Lengkap',
                       labelStyle: TextStyle(
@@ -89,19 +86,21 @@ class RegisterPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: AppColors.primaryColor),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 16,
+                      ),
                     ),
-                    validator: (val) => val == null || val.isEmpty ? 'Wajib diisi' : null,
+                    validator:
+                        (val) =>
+                            val == null || val.isEmpty ? 'Wajib diisi' : null,
                   ),
                   const SizedBox(height: 16),
 
                   // Email Field
                   TextFormField(
                     controller: controller.emailC,
-                    style: TextStyle(
-                      color: AppColors.textColor,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(color: AppColors.textColor, fontSize: 16),
                     decoration: InputDecoration(
                       labelText: 'Email',
                       labelStyle: TextStyle(
@@ -124,11 +123,15 @@ class RegisterPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: AppColors.primaryColor),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 16,
+                      ),
                     ),
                     validator: (val) {
                       if (val == null || val.isEmpty) return 'Wajib diisi';
-                      if (!GetUtils.isEmail(val)) return 'Format email tidak valid';
+                      if (!GetUtils.isEmail(val))
+                        return 'Format email tidak valid';
                       return null;
                     },
                   ),
@@ -174,9 +177,16 @@ class RegisterPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(color: AppColors.primaryColor),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 16,
+                        ),
                       ),
-                      validator: (val) => val == null || val.length < 6 ? 'Minimal 6 karakter' : null,
+                      validator:
+                          (val) =>
+                              val == null || val.length < 6
+                                  ? 'Minimal 6 karakter'
+                                  : null,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -207,7 +217,8 @@ class RegisterPage extends StatelessWidget {
                                 : Icons.visibility,
                             color: AppColors.primaryColor,
                           ),
-                          onPressed: () => controller.obscureConfirmPassword.toggle(),
+                          onPressed:
+                              () => controller.obscureConfirmPassword.toggle(),
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -221,9 +232,16 @@ class RegisterPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(color: AppColors.primaryColor),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 16,
+                        ),
                       ),
-                      validator: (val) => val != controller.passC.text ? 'Password tidak sama' : null,
+                      validator:
+                          (val) =>
+                              val != controller.passC.text
+                                  ? 'Password tidak sama'
+                                  : null,
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -233,13 +251,15 @@ class RegisterPage extends StatelessWidget {
                     () => SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: controller.isLoading.value
-                            ? null
-                            : () {
-                                if (controller.formKey.currentState!.validate()) {
-                                  controller.registerUser();
-                                }
-                              },
+                        onPressed:
+                            controller.isLoading.value
+                                ? null
+                                : () {
+                                  if (controller.formKey.currentState!
+                                      .validate()) {
+                                    controller.registerUser();
+                                  }
+                                },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryColor,
                           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -247,18 +267,19 @@ class RegisterPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: controller.isLoading.value
-                            ? CircularProgressIndicator(
-                                color: AppColors.accentColor,
-                              )
-                            : Text(
-                                'Daftar',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.backgroundColor,
+                        child:
+                            controller.isLoading.value
+                                ? CircularProgressIndicator(
+                                  color: AppColors.accentColor,
+                                )
+                                : Text(
+                                  'Daftar',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.backgroundColor,
+                                  ),
                                 ),
-                              ),
                       ),
                     ),
                   ),
@@ -270,23 +291,25 @@ class RegisterPage extends StatelessWidget {
                     width: double.infinity,
                     child: Obx(
                       () => ElevatedButton.icon(
-                        onPressed: controllerLogin.isGoogleLoading.value
-                            ? null
-                            : () => controllerLogin.loginWithGoogle(),
-                        icon: controllerLogin.isGoogleLoading.value
-                            ? SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: AppColors.accentColor,
+                        onPressed:
+                            controllerLogin.isGoogleLoading.value
+                                ? null
+                                : () => controllerLogin.loginWithGoogle(),
+                        icon:
+                            controllerLogin.isGoogleLoading.value
+                                ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: AppColors.accentColor,
+                                  ),
+                                )
+                                : Image.asset(
+                                  'assets/images/icon_google.png',
+                                  height: 24,
+                                  width: 24,
                                 ),
-                              )
-                            : Image.asset(
-                                'assets/images/icon_google.png',
-                                height: 24,
-                                width: 24,
-                              ),
                         label: Text(
                           controllerLogin.isGoogleLoading.value
                               ? 'Signing in...'
@@ -315,11 +338,12 @@ class RegisterPage extends StatelessWidget {
                   // Back to Login
                   Center(
                     child: GestureDetector(
-                      onTap: () => Get.offAll(
-                        () => LoginPage(),
-                        transition: Transition.downToUp,
-                        duration: const Duration(milliseconds: 400),
-                      ),
+                      onTap:
+                          () => Get.offAll(
+                            () => LoginPage(),
+                            transition: Transition.downToUp,
+                            duration: const Duration(milliseconds: 400),
+                          ),
                       child: Text.rich(
                         TextSpan(
                           children: [

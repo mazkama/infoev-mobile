@@ -33,10 +33,7 @@ class MerekModel {
     };
   }
 
-  MerekModel copyWith({
-    String? banner,
-    int? vehiclesCount,
-  }) {
+  MerekModel copyWith({String? banner, int? vehiclesCount}) {
     return MerekModel(
       id: id,
       name: name,

@@ -20,11 +20,7 @@ class ErrorDisplayWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 70,
-              color: AppColors.errorColor,
-            ),
+            Icon(Icons.error_outline, size: 70, color: AppColors.errorColor),
             const SizedBox(height: 16),
             Text(
               'Terjadi Kesalahan',
@@ -40,10 +36,7 @@ class ErrorDisplayWidget extends StatelessWidget {
               child: Text(
                 message,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
-                ),
+                style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
               ),
             ),
             const SizedBox(height: 24),

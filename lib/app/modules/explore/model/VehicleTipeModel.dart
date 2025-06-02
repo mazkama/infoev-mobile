@@ -40,4 +40,4 @@ class VehicleTypeModel {
   static List<VehicleTypeModel> fromJsonList(List<dynamic> jsonList) {
     return jsonList.map((json) => VehicleTypeModel.fromJson(json)).toList();
   }
-} 
+}

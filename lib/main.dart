@@ -6,7 +6,7 @@ import 'package:infoev/app/routes/app_pages.dart';
 import 'package:infoev/app/styles/app_colors.dart';
 import 'package:infoev/core/local_db.dart';
 
-void main() async { 
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LocalDB.init();
   Get.lazyPut(() => MerekController(), fenix: true);
@@ -23,7 +23,8 @@ class MyApp extends StatelessWidget {
       onTap: () {
         // Menutup keyboard jika area di luar TextField disentuh
         FocusScope.of(context).unfocus();
-      },      child: GetMaterialApp(
+      },
+      child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: AppColors.lightColorScheme,
@@ -47,9 +48,7 @@ class MyApp extends StatelessWidget {
           ),
           // TextButton theme
           textButtonTheme: TextButtonThemeData(
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.linkColor,
-            ),
+            style: TextButton.styleFrom(foregroundColor: AppColors.linkColor),
           ),
         ),
         initialRoute: AppPages.INITIAL,

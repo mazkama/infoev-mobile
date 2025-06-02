@@ -71,9 +71,7 @@ class EVComparisonController extends GetxController {
     isSearching.value = true;
 
     try {
-      final encodedQuery = Uri.encodeComponent(
-        query,
-      );  
+      final encodedQuery = Uri.encodeComponent(query);
       final url = Uri.parse('${baseUrlDev}/cari?q=$encodedQuery');
       final res = await http.get(url);
 

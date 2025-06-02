@@ -19,9 +19,8 @@ import 'package:infoev/app/modules/register/controllers/RegisterController.dart'
 import 'package:infoev/app/modules/register/views/RegisterPage.dart';
 import 'package:infoev/app/modules/splash/controllers/splash_controller.dart';
 import 'package:infoev/app/modules/news/controllers/news_controller.dart';
-import 'package:infoev/app/modules/splash/views/splash_view.dart'; 
+import 'package:infoev/app/modules/splash/views/splash_view.dart';
 part 'app_routes.dart';
-
 
 class AppPages {
   AppPages._();
@@ -50,10 +49,7 @@ class AppPages {
         Get.put(RegisterController());
       }),
     ),
-    GetPage(
-      name: Path.NAVBAR,
-      page: () => BottomNavView() 
-    ),
+    GetPage(name: Path.NAVBAR, page: () => BottomNavView()),
     GetPage(
       name: Path.HOME,
       page: () => HomePage(),
@@ -86,8 +82,8 @@ class AppPages {
     ),
     GetPage(
       name: Path.VEHICLE,
-      page: () => const VehicleDetailPage(), 
-      transition: Transition.rightToLeft, 
+      page: () => const VehicleDetailPage(),
+      transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
@@ -98,7 +94,7 @@ class AppPages {
         Get.put(NewsController());
       }),
       transitionDuration: const Duration(milliseconds: 300),
-    ), 
+    ),
     GetPage(
       name: Path.CHARGER_STATION,
       page: () => ChargerStationPage(),
@@ -118,7 +114,7 @@ class AppPages {
     GetPage(
       name: Path.PROFIL,
       transition: Transition.rightToLeft,
-      page: () => ProfilePage()
+      page: () => ProfilePage(),
     ),
     GetPage(
       name: Path.CALCULATOR,

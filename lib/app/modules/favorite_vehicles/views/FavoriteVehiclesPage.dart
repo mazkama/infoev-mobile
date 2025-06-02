@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:infoev/app/modules/favorite_vehicles/controllers/FavoriteVehiclesController.dart';
 import 'package:infoev/app/modules/favorite_vehicles/model/favoriteVehicleModel.dart';
+import 'package:infoev/app/styles/app_colors.dart';
 
 class FavoritVehiclesPage extends StatelessWidget {
   const FavoritVehiclesPage({super.key});
@@ -66,18 +67,21 @@ class FavoritVehiclesPage extends StatelessWidget {
     );
   }
 
-  Widget _buildVehicleCard(FavoriteVehicle vehicle, FavoriteVehicleController controller) {
+  Widget _buildVehicleCard(
+    FavoriteVehicle vehicle,
+    FavoriteVehicleController controller,
+  ) {
     return GestureDetector(
       onTap: () {
         Get.toNamed('/kendaraan/${vehicle.slug}');
       },
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF212121),
+          color: AppColors.primaryColor,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: AppColors.shadowMedium.withValues(alpha: 0.2),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -109,7 +113,7 @@ class FavoritVehiclesPage extends StatelessWidget {
                                 child: const Center(
                                   child: Icon(
                                     Icons.broken_image,
-                                    color: Colors.white,
+                                    color: AppColors.secondaryColor,
                                     size: 32,
                                   ),
                                 ),
@@ -125,17 +129,17 @@ class FavoritVehiclesPage extends StatelessWidget {
                         onTap: () {
                           // TODO: panggil fungsi hapus favorite di controller
                           print('Hapus kendaraan: ${vehicle.name}');
-                          controller.removeFavorite(vehicle.id); 
+                          controller.removeFavorite(vehicle.id);
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.8),
+                            color: Colors.red.withValues(alpha: 0.8),
                             shape: BoxShape.circle,
                           ),
                           padding: const EdgeInsets.all(6),
                           child: const Icon(
                             Icons.favorite_border_rounded,
-                            color: Colors.white,
+                            color: AppColors.textOnPrimary,
                             size: 20,
                           ),
                         ),
@@ -146,7 +150,7 @@ class FavoritVehiclesPage extends StatelessWidget {
               ),
               // Info
               Container(
-                color: const Color(0xFF212121), // Background hitam untuk info
+                color: AppColors.primaryColor, // Background hitam untuk info
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,7 +158,7 @@ class FavoritVehiclesPage extends StatelessWidget {
                     Text(
                       vehicle.name,
                       style: GoogleFonts.poppins(
-                        color: Colors.white,
+                        color: AppColors.textOnPrimary,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),

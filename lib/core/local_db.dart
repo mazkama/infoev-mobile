@@ -57,7 +57,8 @@ class LocalDB {
     if (userData != null) {
       try {
         final user = jsonDecode(userData);
-        if (user['email'] != null && user['email'].toString().trim().isNotEmpty) {
+        if (user['email'] != null &&
+            user['email'].toString().trim().isNotEmpty) {
           return user['email'];
         } else {
           return null;

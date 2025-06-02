@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
 import 'package:infoev/app/services/AuthService.dart'; // Impor AuthService
 
 class LogoutPage extends StatelessWidget {

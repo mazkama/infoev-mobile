@@ -34,15 +34,16 @@ class SearchWidget extends StatelessWidget {
           hintText: "Cari berita...",
           hintStyle: TextStyle(color: AppColors.textTertiary),
           prefixIcon: const Icon(Icons.search, color: AppColors.primaryColor),
-          suffixIcon: controller.text.isNotEmpty
-              ? IconButton(
-                  icon: Icon(Icons.clear, color: AppColors.primaryColor),
-                  onPressed: () {
-                    controller.clear();
-                    onSearch('');
-                  },
-                )
-              : null,
+          suffixIcon:
+              controller.text.isNotEmpty
+                  ? IconButton(
+                    icon: Icon(Icons.clear, color: AppColors.primaryColor),
+                    onPressed: () {
+                      controller.clear();
+                      onSearch('');
+                    },
+                  )
+                  : null,
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 15),
         ),

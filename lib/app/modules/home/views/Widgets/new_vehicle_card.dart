@@ -45,21 +45,26 @@ class VehicleNewCard extends StatelessWidget {
                 height: 170,
                 width: double.infinity,
                 fit: BoxFit.cover,
-                placeholder: (context, url) => Shimmer.fromColors(
-                  baseColor: AppColors.shimmerBase,
-                  highlightColor: AppColors.shimmerHighlight,
-                  child: Container(
-                    height: 150,
-                    width: double.infinity,
-                    color: AppColors.shimmerBase,
-                  ),
-                ),
-                errorWidget: (context, url, error) => Container(
-                  height: 150,
-                  width: double.infinity,
-                  color: AppColors.shimmerBase,
-                  child: const Icon(Icons.error, color: AppColors.errorColor),
-                ),
+                placeholder:
+                    (context, url) => Shimmer.fromColors(
+                      baseColor: AppColors.shimmerBase,
+                      highlightColor: AppColors.shimmerHighlight,
+                      child: Container(
+                        height: 150,
+                        width: double.infinity,
+                        color: AppColors.shimmerBase,
+                      ),
+                    ),
+                errorWidget:
+                    (context, url, error) => Container(
+                      height: 150,
+                      width: double.infinity,
+                      color: AppColors.shimmerBase,
+                      child: const Icon(
+                        Icons.error,
+                        color: AppColors.errorColor,
+                      ),
+                    ),
               ),
 
               // Overlay teks nama dan brand
@@ -84,7 +89,7 @@ class VehicleNewCard extends StatelessWidget {
                           fontSize: 15,
                           color: AppColors.textOnPrimary,
                         ),
-                      ), 
+                      ),
                       Text(
                         name,
                         maxLines: 2,

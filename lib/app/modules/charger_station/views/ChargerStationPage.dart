@@ -205,8 +205,9 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
         ),
         actions: [
           IconButton(
-            icon: Icon(_showSearch ? Icons.search_off : Icons.search,
-            color: AppColors.primaryColor,
+            icon: Icon(
+              _showSearch ? Icons.search_off : Icons.search,
+              color: AppColors.primaryColor,
             ),
             onPressed: () {
               setState(() {
@@ -253,12 +254,14 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                   _showSearch
                       ? SearchBarWidget(controller: controller)
                       : Container(),
-            ),            DraggableScrollableSheet(
+            ),
+            DraggableScrollableSheet(
               controller: _draggableController,
               initialChildSize: 0.50,
               minChildSize: 0.1,
               maxChildSize: 0.6,
-              builder: (context, scrollController) {                return GestureDetector(
+              builder: (context, scrollController) {
+                return GestureDetector(
                   onPanUpdate: (details) {
                     // Deteksi swipe down (delta y positif)
                     if (details.delta.dy > 5) {
@@ -278,78 +281,79 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                     }
                   },
                   child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.backgroundColor,
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(20),
-                    ),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 10,
-                        spreadRadius: 2,
+                    decoration: BoxDecoration(
+                      color: AppColors.backgroundColor,
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(20),
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 5,
-                        margin: const EdgeInsets.only(top: 10),
-                        decoration: BoxDecoration(
-                          color: AppColors.textTertiary,
-                          borderRadius: BorderRadius.circular(10),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10,
+                          spreadRadius: 2,
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            controller.wilayah.isEmpty
-                                ? "Stasiun Pengisian"
-                                : "Stasiun di ${controller.wilayah}",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textColor,
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 50,
+                          height: 5,
+                          margin: const EdgeInsets.only(top: 10),
+                          decoration: BoxDecoration(
+                            color: AppColors.textTertiary,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              controller.wilayah.isEmpty
+                                  ? "Stasiun Pengisian"
+                                  : "Stasiun di ${controller.wilayah}",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textColor,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      Expanded(
-                        child:
-                            controller.isLoading.value
-                                ? ShimmerLoadingStations()
-                                : controller.filteredStations.isEmpty
-                                ? const EmptyStationsWidget()
-                                : ChargerStationsList(
-                                  stations: controller.filteredStations,
-                                  scrollController: scrollController,
-                                  onStationTap: (station) {
-                                    mapController.animateCamera(
-                                      CameraUpdate.newCameraPosition(
-                                        CameraPosition(
-                                          target: LatLng(
-                                            station.lat ??
-                                                _defaultCenter.latitude,
-                                            station.lng ??
-                                                _defaultCenter.longitude,
+                        const SizedBox(height: 10),
+                        Expanded(
+                          child:
+                              controller.isLoading.value
+                                  ? ShimmerLoadingStations()
+                                  : controller.filteredStations.isEmpty
+                                  ? const EmptyStationsWidget()
+                                  : ChargerStationsList(
+                                    stations: controller.filteredStations,
+                                    scrollController: scrollController,
+                                    onStationTap: (station) {
+                                      mapController.animateCamera(
+                                        CameraUpdate.newCameraPosition(
+                                          CameraPosition(
+                                            target: LatLng(
+                                              station.lat ??
+                                                  _defaultCenter.latitude,
+                                              station.lng ??
+                                                  _defaultCenter.longitude,
+                                            ),
+                                            zoom: 16,
                                           ),
-                                          zoom: 16,
                                         ),
-                                      ),
-                                    );
-                                    mapController.showMarkerInfoWindow(
-                                      MarkerId(station.placeId),
-                                    );
-                                  },                                ),
-                      ),
-                    ],
-                  ),
+                                      );
+                                      mapController.showMarkerInfoWindow(
+                                        MarkerId(station.placeId),
+                                      );
+                                    },
+                                  ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },

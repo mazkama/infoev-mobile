@@ -24,7 +24,7 @@ class FavoriteVehicleController extends GetxController {
 
   @override
   void onReady() {
-    super.onReady(); 
+    super.onReady();
     fetchFavoriteVehicles(); // Ini akan dipanggil ulang setiap kali halaman aktif
   }
 

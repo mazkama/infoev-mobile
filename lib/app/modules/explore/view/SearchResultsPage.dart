@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:infoev/app/modules/explore/controllers/MerekController.dart';
 import 'package:infoev/app/modules/explore/model/MerekModel.dart';
 import 'package:infoev/app/styles/app_colors.dart';
@@ -13,7 +12,7 @@ class SearchCacheItem {
   final String query;
   final Map<String, List<dynamic>> results;
   final DateTime timestamp;
-  
+
   SearchCacheItem({
     required this.query,
     required this.results,
@@ -37,7 +36,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
   Timer? _debounceTimer;
   bool _isSearching = false;
   String _currentQuery = ''; // Track current query for AppBar display
-  
+
   // Advanced cache system for search history
   List<SearchCacheItem> _searchHistory = [];
   int _currentHistoryIndex = -1;
@@ -48,7 +47,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
     // Set initial search query
     _searchController.text = searchQuery;
     _currentQuery = searchQuery; // Initialize current query
-    
+
     // Perform search when page loads and cache it
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (searchQuery.isNotEmpty) {
@@ -61,29 +60,36 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
 
     _searchFocusNode.addListener(_onFocusChange);
   }
-  
+
   // Advanced cache management
   void _performSearchWithCache(String query) async {
     try {
       // Update current query for AppBar display
       _currentQuery = query;
-      
+
       // Check if we already have this query in cache
-      final existingIndex = _searchHistory.indexWhere((item) => item.query == query);
-      
+      final existingIndex = _searchHistory.indexWhere(
+        (item) => item.query == query,
+      );
+
       if (existingIndex != -1) {
         // Use cached results
         _currentHistoryIndex = existingIndex;
-        controller.searchResults.value = Map<String, List<dynamic>>.from(_searchHistory[existingIndex].results);
+        controller.searchResults.value = Map<String, List<dynamic>>.from(
+          _searchHistory[existingIndex].results,
+        );
         controller.isSearchLoading.value = false;
       } else {
         // Perform new search
         controller.isSearchLoading.value = true;
         await controller.performSearch(query);
-        
+
         // Cache the results
         if (controller.searchResults.isNotEmpty || query.isEmpty) {
-          _addToSearchCache(query, Map<String, List<dynamic>>.from(controller.searchResults));
+          _addToSearchCache(
+            query,
+            Map<String, List<dynamic>>.from(controller.searchResults),
+          );
         }
       }
     } catch (e) {
@@ -92,43 +98,45 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
       controller.searchResults.clear();
     }
   }
-  
+
   void _addToSearchCache(String query, Map<String, List<dynamic>> results) {
     // Remove existing entry if it exists
     _searchHistory.removeWhere((item) => item.query == query);
-    
+
     // Add new entry
     final cacheItem = SearchCacheItem(
       query: query,
       results: results,
       timestamp: DateTime.now(),
     );
-    
+
     _searchHistory.add(cacheItem);
     _currentHistoryIndex = _searchHistory.length - 1;
-    
+
     // Limit cache size to prevent memory issues (keep last 20 searches)
     if (_searchHistory.length > 20) {
       _searchHistory.removeAt(0);
       _currentHistoryIndex = _searchHistory.length - 1;
     }
   }
-  
+
   bool _canGoBack() {
     return _currentHistoryIndex > 0;
   }
-  
+
   void _goBackInHistory() {
     if (_canGoBack()) {
       _currentHistoryIndex--;
       final previousSearch = _searchHistory[_currentHistoryIndex];
-      
+
       // Update UI without triggering new search
       _searchController.text = previousSearch.query;
       _currentQuery = previousSearch.query; // Update current query for AppBar
-      
+
       // Restore cached results
-      controller.searchResults.value = Map<String, List<dynamic>>.from(previousSearch.results);
+      controller.searchResults.value = Map<String, List<dynamic>>.from(
+        previousSearch.results,
+      );
       controller.isSearchLoading.value = false;
     }
   }
@@ -145,7 +153,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
     _searchController.dispose();
     _searchFocusNode.removeListener(_onFocusChange);
     _searchFocusNode.dispose();
-    
+
     // Handle different navigation types
     if (isFromManualSearch) {
       // If came from manual search, ensure JelajahPage stays in search mode
@@ -160,7 +168,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
       // Only clear search results to prevent stale data
       controller.searchResults.clear();
     }
-    
+
     super.dispose();
   }
 
@@ -170,7 +178,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
       canPop: false,
       onPopInvokedWithResult: (bool didPop, dynamic result) async {
         if (didPop) return;
-        
+
         if (_searchFocusNode.hasFocus) {
           _debounceTimer?.cancel();
           FocusScope.of(context).unfocus();
@@ -221,7 +229,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
       backgroundColor: AppColors.cardBackgroundColor,
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: AppColors.primaryColor),
+        icon: const Icon(Icons.arrow_back, color: AppColors.textColor),
         onPressed: () => Get.back(),
       ),
       title: Text(
@@ -288,7 +296,10 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
                   builder: (context, value, child) {
                     return value.text.isNotEmpty
                         ? IconButton(
-                          icon: const Icon(Icons.close, color: AppColors.primaryColor),
+                          icon: const Icon(
+                            Icons.close,
+                            color: AppColors.primaryColor,
+                          ),
                           onPressed: () {
                             _searchController.clear();
                             _performSearchWithCache('');
@@ -332,11 +343,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.search_off,
-            size: 64,
-            color: AppColors.textTertiary,
-          ),
+          Icon(Icons.search_off, size: 64, color: AppColors.textTertiary),
           const SizedBox(height: 16),
           Text(
             'Tidak ditemukan hasil',
@@ -378,7 +385,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
 
   Widget _buildBrandsSection() {
     final brands = controller.searchResults['MEREK'] as List<MerekModel>;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -422,8 +429,11 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
             itemBuilder: (context, index) {
               final brand = brands[index];
               return Container(
-                width: 150, // Match JelajahPage brand card width calculation (aspect ratio 1.2 with height ~125)
-                margin: EdgeInsets.only(right: index < brands.length - 1 ? 16 : 0), // Match JelajahPage spacing
+                width:
+                    150, // Match JelajahPage brand card width calculation (aspect ratio 1.2 with height ~125)
+                margin: EdgeInsets.only(
+                  right: index < brands.length - 1 ? 16 : 0,
+                ), // Match JelajahPage spacing
                 child: _buildBrandCard(brand),
               );
             },
@@ -457,97 +467,166 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: Stack(
-            children: [
-              // Background color
-              Positioned.fill(
-                child: Container(
-                  color: backgroundColor,
-                ),
-              ),
-              // Brand logo
-              Center(
-                child: Hero(
-                  tag: 'brand-${brand.id}',
-                  child: AspectRatio(
-                    aspectRatio: 16 / 9,
-                    child: brand.banner != null
-                        ? CachedNetworkImage(
-                            imageUrl: brand.banner!,
-                            fit: BoxFit.contain,
-                            placeholder: (context, url) => Shimmer.fromColors(
-                              baseColor: AppColors.shimmerBase,
-                              highlightColor: AppColors.shimmerHighlight,
-                              child: Container(color: backgroundColor),
-                            ),
-                            errorWidget: (context, url, error) => Icon(
-                              Icons.electric_car,
-                              color: AppColors.textSecondary,
-                              size: 32,
-                            ),
-                          )
-                        : Icon(
-                            Icons.electric_car,
-                            color: AppColors.textSecondary,
-                            size: 32,
-                          ),
-                  ),
-                ),
-              ),
-              // Bottom gradient overlay (like JelajahPage)
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Colors.black.withAlpha(0), Colors.black.withAlpha(179)],
-                      stops: const [0.5, 1.0],
-                    ),
-                  ),
-                ),
-              ),
-              // Brand info (like JelajahPage)
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        brand.name,
-                        style: GoogleFonts.poppins(
-                          color: AppColors.textOnPrimary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        '${brand.vehiclesCount} kendaraan',
-                        style: GoogleFonts.poppins(
-                          color: AppColors.textOnPrimary,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+          child:
+              brand.banner != null
+                  ? _buildCardWithBanner(brand, backgroundColor)
+                  : _buildCardWithoutBanner(brand, backgroundColor),
         ),
       ),
     );
   }
 
+  Widget _buildCardWithBanner(MerekModel brand, Color backgroundColor) {
+    return Stack(
+      children: [
+        // Background color - always visible immediately
+        Positioned.fill(child: Container(color: backgroundColor)),
+        // Brand banner with optimized loading
+        Center(
+          child: Hero(
+            tag: 'brand-${brand.id}',
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: CachedNetworkImage(
+                imageUrl: brand.banner!,
+                fit: BoxFit.contain,
+                // Remove placeholder to prevent background flicker
+                placeholder: (context, url) => const SizedBox.shrink(),
+                errorWidget:
+                    (context, url, error) => Icon(
+                      Icons.electric_car,
+                      color: AppColors.textSecondary,
+                      size: 32,
+                    ),
+                // Optimize fade transitions
+                fadeInDuration: const Duration(milliseconds: 150),
+                fadeOutDuration: const Duration(milliseconds: 0),
+                // Use memory cache aggressively
+                memCacheWidth: 300,
+                memCacheHeight: 169, // 16:9 ratio
+              ),
+            ),
+          ),
+        ),
+        // Bottom gradient overlay
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withAlpha(0),
+                  Colors.black.withAlpha(179),
+                ],
+                stops: const [0.5, 1.0],
+              ),
+            ),
+          ),
+        ),
+        // Brand info
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  brand.name,
+                  style: GoogleFonts.poppins(
+                    color: AppColors.textOnPrimary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  '${brand.vehiclesCount} kendaraan',
+                  style: GoogleFonts.poppins(
+                    color: AppColors.textOnPrimary,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCardWithoutBanner(MerekModel brand, Color backgroundColor) {
+    return Stack(
+      children: [
+        // Background color
+        Positioned.fill(child: Container(color: backgroundColor)),
+        // Placeholder icon
+        Center(
+          child: Icon(
+            Icons.electric_car,
+            color: AppColors.secondaryColor,
+            size: 32,
+          ),
+        ),
+        // Bottom gradient overlay
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withAlpha(0),
+                  Colors.black.withAlpha(179),
+                ],
+                stops: const [0.5, 1.0],
+              ),
+            ),
+          ),
+        ),
+        // Brand info
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  brand.name,
+                  style: GoogleFonts.poppins(
+                    color: AppColors.textOnPrimary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  '${brand.vehiclesCount} kendaraan',
+                  style: GoogleFonts.poppins(
+                    color: AppColors.textOnPrimary,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildVehiclesSection() {
-    final vehicles = controller.searchResults['KENDARAAN'] as List<Map<String, dynamic>>;
-    
+    final vehicles =
+        controller.searchResults['KENDARAAN'] as List<Map<String, dynamic>>;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -630,11 +709,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
                 child: Stack(
                   children: [
                     // Background putih untuk semua gambar
-                    Positioned.fill(
-                      child: Container(
-                        color: Colors.white,
-                      ),
-                    ),
+                    Positioned.fill(child: Container(color: Colors.white)),
                     // Thumbnail image
                     Center(
                       child: Padding(
@@ -642,19 +717,19 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
                         child: CachedNetworkImage(
                           imageUrl: vehicle['thumbnail_url'] ?? '',
                           fit: BoxFit.contain,
-                          placeholder: (context, url) => Container(
-                            color: Colors.white,
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            color: AppColors.backgroundColor,
-                            child: const Center(
-                              child: Icon(
-                                Icons.broken_image,
-                                color: AppColors.textSecondary,
-                                size: 32,
+                          placeholder:
+                              (context, url) => Container(color: Colors.white),
+                          errorWidget:
+                              (context, url, error) => Container(
+                                color: AppColors.backgroundColor,
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.broken_image,
+                                    color: AppColors.secondaryColor,
+                                    size: 32,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
                         ),
                       ),
                     ),

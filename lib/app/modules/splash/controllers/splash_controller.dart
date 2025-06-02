@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart'; 
+import 'package:get/get.dart';
 import '../../../routes/app_pages.dart';
 
 class SplashController extends GetxController {
@@ -10,7 +10,7 @@ class SplashController extends GetxController {
   }
 
   void initialiazed() async {
-    WidgetsFlutterBinding.ensureInitialized();  
+    WidgetsFlutterBinding.ensureInitialized();
 
     await Future.delayed(Duration(milliseconds: 1850));
     // if (!isLoggedIn) {
@@ -21,4 +21,3 @@ class SplashController extends GetxController {
     Get.offAllNamed(Routes.NAVBAR);
   }
 }
-

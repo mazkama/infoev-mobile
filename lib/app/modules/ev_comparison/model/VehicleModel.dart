@@ -18,7 +18,6 @@ T cast<T>(dynamic value, String fieldName) {
   return value as T;
 }
 
-
 class VehicleModel {
   final int id;
   final String name;
@@ -101,7 +100,10 @@ class SpecCategory {
     return SpecCategory(
       id: cast<int>(json['id'], 'id'),
       name: cast<String>(json['name'], 'name'),
-      priority: cast<String>(json['priority'], 'priority'),  // Will convert int to String if needed
+      priority: cast<String>(
+        json['priority'],
+        'priority',
+      ), // Will convert int to String if needed
       specs:
           (json['specs'] as List)
               .map((e) => SpecItem.fromJson(e))
@@ -172,9 +174,12 @@ class SpecVehicleValue {
     // final rawBool = pivot['value_bool'];
 
     // Use cast for vehicle_id as int
-    final vehicleId = cast<int>(pivot['vehicle_id'], 'vehicle_id');  // cast to int
+    final vehicleId = cast<int>(
+      pivot['vehicle_id'],
+      'vehicle_id',
+    ); // cast to int
     final vehicleSlug = cast<String>(json['slug'], 'slug');
-    
+
     return SpecVehicleValue(
       vehicleId: vehicleId,
       vehicleSlug: vehicleSlug,
@@ -183,7 +188,6 @@ class SpecVehicleValue {
       valueBool: _parseBool(pivot['value_bool']),
     );
   }
-
 
   String? getDisplayWithUnit({String? itemUnit, String? itemType}) {
     if (valueBool != null) return valueBool! ? '✓' : '✗';

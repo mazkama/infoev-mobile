@@ -137,7 +137,8 @@ class ChargerStationCard extends StatelessWidget {
                               const SizedBox(width: 8),
                               InfoChip(
                                 label: "★ ${station.rating}",
-                                backgroundColor: AppColors.secondaryColor.withOpacity(0.2),
+                                backgroundColor: AppColors.secondaryColor
+                                    .withOpacity(0.2),
                                 textColor: AppColors.secondaryColor,
                               ),
                             ],

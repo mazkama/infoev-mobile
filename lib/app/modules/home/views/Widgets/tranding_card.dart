@@ -64,7 +64,10 @@ class TrandingCard extends StatelessWidget {
                     (context, url, error) => Container(
                       height: 160,
                       color: AppColors.shimmerBase,
-                      child: const Icon(Icons.error, color: AppColors.errorColor),
+                      child: const Icon(
+                        Icons.error,
+                        color: AppColors.errorColor,
+                      ),
                     ),
                 height: 160,
                 width: double.infinity,

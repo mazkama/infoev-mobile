@@ -16,9 +16,11 @@ class SpecCategory {
       id: json['id'] as int,
       name: json['name'] as String,
       priority: json['priority'] as int? ?? 0,
-      specs: (json['specs'] as List<dynamic>?)
-          ?.map((spec) => SpecItem.fromJson(spec))
-          .toList() ?? [],
+      specs:
+          (json['specs'] as List<dynamic>?)
+              ?.map((spec) => SpecItem.fromJson(spec))
+              .toList() ??
+          [],
     );
   }
 }
@@ -47,7 +49,7 @@ class SpecItem {
     String? value;
     String? valueDesc;
     bool? valueBool;
-    
+
     if (json['vehicles'] != null && (json['vehicles'] as List).isNotEmpty) {
       final vehicle = json['vehicles'][0];
       if (vehicle['pivot'] != null) {
@@ -73,26 +75,28 @@ class SpecItem {
     if (type == 'availability') {
       return valueBool == true ? 'Ya' : 'Tidak';
     }
-    
+
     // Khusus untuk Pengisian Daya AC, tampilkan value dan valueDesc
     if (name == 'Pengisian Daya AC' && value != null && valueDesc != null) {
       return '$value jam ($valueDesc)';
     }
-    
+
     if (valueDesc != null && valueDesc!.isNotEmpty) {
       return valueDesc;
     }
-    
+
     if (value == null) return null;
     if (unit != null && unit!.isNotEmpty) {
       if (type == 'price') {
         // Format nilai harga
         try {
           final price = double.parse(value!);
-          final formatted = price.toStringAsFixed(0).replaceAllMapped(
-            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-            (match) => '${match[1]}.',
-          );
+          final formatted = price
+              .toStringAsFixed(0)
+              .replaceAllMapped(
+                RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                (match) => '${match[1]}.',
+              );
           return '$unit $formatted';
         } catch (e) {
           return '$unit $value';

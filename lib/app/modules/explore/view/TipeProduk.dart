@@ -6,7 +6,7 @@ import 'package:infoev/app/modules/explore/controllers/BrandDetailController.dar
 import 'package:infoev/app/modules/explore/controllers/MerekController.dart';
 import 'package:infoev/app/modules/explore/model/VehicleModel.dart';
 import 'package:infoev/app/styles/app_colors.dart';
-import 'package:shimmer/shimmer.dart'; 
+import 'package:shimmer/shimmer.dart';
 
 class TipeProdukPage extends StatefulWidget {
   const TipeProdukPage({super.key});
@@ -19,26 +19,26 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   late BrandDetailController controller;
-  
+
   @override
   void initState() {
     super.initState();
     controller = Get.put(BrandDetailController());
-    
+
     // Get brandId from parameters
     final String brandIdStr = Get.parameters['brandId'] ?? '';
     final int brandId = int.tryParse(brandIdStr) ?? 0;
-    
+
     if (brandId == 0) {
       debugPrint('Error: Invalid brand ID');
       return;
     }
-    
+
     // Mengambil data merek saat halaman dibuka
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.fetchBrandDetail(brandId);
       controller.loadFilterSettings();
-      
+
       // Listener untuk mengupdate search controller ketika nilai search berubah dari controller
       controller.searchQuery.listen((query) {
         if (_searchController.text != query) {
@@ -66,12 +66,15 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
         child: Column(
           children: [
             _buildAppBar(context),
-            Obx(() => controller.isSearching.value 
-              ? _buildSearchBar()
-              : const SizedBox.shrink()
+            Obx(
+              () =>
+                  controller.isSearching.value
+                      ? _buildSearchBar()
+                      : const SizedBox.shrink(),
             ),
             Obx(() {
-              if (controller.isLoading.value && controller.brandDetail.value == null) {
+              if (controller.isLoading.value &&
+                  controller.brandDetail.value == null) {
                 return Expanded(child: _buildShimmer(screenWidth));
               }
 
@@ -90,16 +93,20 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                 );
               }
 
-              return Expanded(
-                child: _buildContent(context, screenWidth),
-              );
+              return Expanded(child: _buildContent(context, screenWidth));
             }),
-            Obx(() => controller.isLoading.value && controller.brandDetail.value != null
-                ? const LinearProgressIndicator(
-                    backgroundColor: AppColors.backgroundColor,
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.secondaryColor),
-                  )
-                : const SizedBox.shrink()),
+            Obx(
+              () =>
+                  controller.isLoading.value &&
+                          controller.brandDetail.value != null
+                      ? const LinearProgressIndicator(
+                        backgroundColor: AppColors.backgroundColor,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.secondaryColor,
+                        ),
+                      )
+                      : const SizedBox.shrink(),
+            ),
           ],
         ),
       ),
@@ -128,7 +135,10 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back_ios, color: AppColors.textColor),
+                    icon: const Icon(
+                      Icons.arrow_back_ios,
+                      color: AppColors.textColor,
+                    ),
                     onPressed: () {
                       Get.back();
                     },
@@ -136,20 +146,25 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                     constraints: const BoxConstraints(),
                   ),
                   const SizedBox(width: 16),
-                  Obx(() => Text(
-                    controller.brandDetail.value?.nameBrand ?? 'Detail Merek',
-                    style: GoogleFonts.poppins(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textColor,
+                  Obx(
+                    () => Text(
+                      controller.brandDetail.value?.nameBrand ?? 'Detail Merek',
+                      style: GoogleFonts.poppins(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textColor,
+                      ),
                     ),
-                  )),
+                  ),
                 ],
               ),
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.search, color: AppColors.primaryColor),
+                    icon: const Icon(
+                      Icons.search,
+                      color: AppColors.primaryColor,
+                    ),
                     onPressed: () {
                       controller.toggleSearch();
                       // Give focus to search field after layout update
@@ -161,7 +176,10 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.filter_list, color: AppColors.primaryColor),
+                    icon: const Icon(
+                      Icons.filter_list,
+                      color: AppColors.primaryColor,
+                    ),
                     onPressed: () {
                       _showFilterDialog(context);
                     },
@@ -171,48 +189,61 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
             ],
           ),
           const SizedBox(height: 8),
-          Obx(() => Visibility(
-            visible: controller.filterByTypeId.value > 0 || 
-                    controller.sortBy.value != 'name' || controller.sortOrder.value != 'asc',
-            child: Container(
-              margin: const EdgeInsets.only(top: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppColors.backgroundSecondary,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      _buildFilterInfoText(),
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
+          Obx(
+            () => Visibility(
+              visible:
+                  controller.filterByTypeId.value > 0 ||
+                  controller.sortBy.value != 'name' ||
+                  controller.sortOrder.value != 'asc',
+              child: Container(
+                margin: const EdgeInsets.only(top: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.backgroundSecondary,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _buildFilterInfoText(),
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                     ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      controller.resetFilters();
-                    },
-                    child: const Padding(
-                      padding: EdgeInsets.all(4.0),
-                      child: Icon(Icons.close, color: AppColors.textSecondary, size: 16),
+                    InkWell(
+                      onTap: () {
+                        controller.resetFilters();
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.all(4.0),
+                        child: Icon(
+                          Icons.close,
+                          color: AppColors.textSecondary,
+                          size: 16,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          )),
+          ),
           const SizedBox(height: 8),
-          Obx(() => Text(
-            'Menampilkan ${controller.filteredVehicles.length} dari ${controller.brandDetail.value?.vehicles.length ?? 0} kendaraan',
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: AppColors.textSecondary,
+          Obx(
+            () => Text(
+              'Menampilkan ${controller.filteredVehicles.length} dari ${controller.brandDetail.value?.vehicles.length ?? 0} kendaraan',
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: AppColors.textSecondary,
+              ),
             ),
-          )),
+          ),
         ],
       ),
     );
@@ -238,7 +269,10 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
           hintText: 'Cari kendaraan...',
           hintStyle: GoogleFonts.poppins(color: AppColors.textTertiary),
           prefixIcon: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: AppColors.textSecondary),
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: AppColors.textSecondary,
+            ),
             onPressed: () {
               controller.isSearching.value = false;
               _searchController.clear();
@@ -249,22 +283,30 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
             valueListenable: _searchController,
             builder: (context, value, child) {
               return value.text.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(Icons.close, color: AppColors.textSecondary),
+                  ? IconButton(
+                    icon: const Icon(
+                      Icons.close,
+                      color: AppColors.textSecondary,
+                    ),
                     onPressed: () {
                       _searchController.clear();
                       controller.searchVehicles('');
                       // Reapply current type filter after clearing search
                       if (controller.filterByTypeId.value != 0) {
-                        controller.filterByType(controller.filterByTypeId.value);
+                        controller.filterByType(
+                          controller.filterByTypeId.value,
+                        );
                       }
                     },
                   )
-                : const SizedBox.shrink();
+                  : const SizedBox.shrink();
             },
           ),
           filled: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 10,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide.none,
@@ -275,7 +317,10 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: AppColors.borderMedium, width: 1),
+            borderSide: const BorderSide(
+              color: AppColors.borderMedium,
+              width: 1,
+            ),
           ),
         ),
       ),
@@ -284,17 +329,20 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
 
   String _buildFilterInfoText() {
     List<String> parts = [];
-    
+
     if (controller.filterByTypeId.value > 0) {
-      parts.add('Tipe: ${controller.getTypeName(controller.filterByTypeId.value)}');
+      parts.add(
+        'Tipe: ${controller.getTypeName(controller.filterByTypeId.value)}',
+      );
     }
-    
-    if (controller.sortBy.value != 'name' || controller.sortOrder.value != 'asc') {
+
+    if (controller.sortBy.value != 'name' ||
+        controller.sortOrder.value != 'asc') {
       String sortName = controller.sortBy.value == 'name' ? 'Nama' : 'Tahun';
       String sortDirection = controller.sortOrder.value == 'asc' ? '↑' : '↓';
       parts.add('Urut: $sortName $sortDirection');
     }
-    
+
     return parts.join(' • ');
   }
 
@@ -306,19 +354,16 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
       child: CustomScrollView(
         slivers: [
           // Banner merek
-          SliverToBoxAdapter(
-            child: _buildBanner(),
-          ),
-          
+          SliverToBoxAdapter(child: _buildBanner()),
+
           // Chip filter tipe
-          SliverToBoxAdapter(
-            child: _buildTypeFilterChips(),
-          ),
-          
+          SliverToBoxAdapter(child: _buildTypeFilterChips()),
+
           // Grid produk
           Obx(() {
             // Show loading indicator when loading and no data available yet
-            if (controller.isLoading.value && controller.brandDetail.value == null) {
+            if (controller.isLoading.value &&
+                controller.brandDetail.value == null) {
               return SliverFillRemaining(
                 child: Center(
                   child: Column(
@@ -340,34 +385,30 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                 ),
               );
             }
-            
+
             // Show empty filter results only if:
-            // 1. Not loading AND 
-            // 2. Brand detail exists AND 
+            // 1. Not loading AND
+            // 2. Brand detail exists AND
             // 3. Filtered vehicles is empty
-            if (!controller.isLoading.value && 
-                controller.brandDetail.value != null && 
+            if (!controller.isLoading.value &&
+                controller.brandDetail.value != null &&
                 controller.filteredVehicles.isEmpty) {
-              return SliverFillRemaining(
-                child: _buildEmptyFilterResults(),
-              );
+              return SliverFillRemaining(child: _buildEmptyFilterResults());
             }
-            
+
             // If no brand detail available or no vehicles after loading
-            if (controller.brandDetail.value == null || 
+            if (controller.brandDetail.value == null ||
                 controller.filteredVehicles.isEmpty) {
-              return const SliverFillRemaining(
-                child: SizedBox.shrink(),
-              );
+              return const SliverFillRemaining(child: SizedBox.shrink());
             }
-            
+
             // Pre-cache harga untuk semua kendaraan yang ditampilkan
             WidgetsBinding.instance.addPostFrameCallback((_) {
               controller.precacheVehiclePrices(
-                controller.filteredVehicles.map((v) => v.slug).toList()
+                controller.filteredVehicles.map((v) => v.slug).toList(),
               );
             });
-            
+
             return SliverPadding(
               padding: const EdgeInsets.all(12),
               sliver: SliverGrid(
@@ -377,13 +418,10 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                   mainAxisSpacing: 12,
                   childAspectRatio: 0.7,
                 ),
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final vehicle = controller.filteredVehicles[index];
-                    return _buildVehicleCard(vehicle);
-                  },
-                  childCount: controller.filteredVehicles.length,
-                ),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final vehicle = controller.filteredVehicles[index];
+                  return _buildVehicleCard(vehicle);
+                }, childCount: controller.filteredVehicles.length),
               ),
             );
           }),
@@ -391,19 +429,21 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
       ),
     );
   }
-  
+
   Widget _buildBanner() {
     final detail = controller.brandDetail.value;
     if (detail == null) return const SizedBox.shrink();
-    
+
     final bannerUrl = detail.banner;
     final brandName = detail.nameBrand.toLowerCase();
-    
+
     if (bannerUrl.isEmpty) return const SizedBox.shrink();
-    
+
     // Get background color from MerekController
-    Color backgroundColor = Get.find<MerekController>().getBrandBackgroundColor(brandName);
-    
+    Color backgroundColor = Get.find<MerekController>().getBrandBackgroundColor(
+      brandName,
+    );
+
     return Container(
       height: 180,
       width: double.infinity,
@@ -425,28 +465,25 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
           fit: StackFit.expand,
           children: [
             // Background color for banner
-            Container(
-              color: backgroundColor,
-            ),
+            Container(color: backgroundColor),
             // Banner image without fade animation
             CachedNetworkImage(
               imageUrl: bannerUrl,
               fit: BoxFit.contain,
               fadeInDuration: const Duration(milliseconds: 0),
               fadeOutDuration: const Duration(milliseconds: 0),
-              placeholder: (context, url) => Container(
-                color: backgroundColor,
-              ),
-              errorWidget: (context, url, error) => Container(
-                color: AppColors.backgroundColor,
-                child: const Center(
-                  child: Icon(
-                    Icons.broken_image,
-                    color: AppColors.textSecondary,
-                    size: 48,
+              placeholder: (context, url) => Container(color: backgroundColor),
+              errorWidget:
+                  (context, url, error) => Container(
+                    color: AppColors.backgroundColor,
+                    child: const Center(
+                      child: Icon(
+                        Icons.broken_image,
+                        color: AppColors.textSecondary,
+                        size: 48,
+                      ),
+                    ),
                   ),
-                ),
-              ),
             ),
             // Gradient overlay
             Container(
@@ -474,10 +511,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
                   shadows: [
-                    Shadow(
-                      blurRadius: 10,
-                      color: AppColors.shadowMedium,
-                    ),
+                    Shadow(blurRadius: 10, color: AppColors.shadowMedium),
                   ],
                 ),
               ),
@@ -487,7 +521,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
       ),
     );
   }
-  
+
   Widget _buildTypeFilterChips() {
     return Container(
       height: 40,
@@ -504,72 +538,88 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
           final searchQuery = controller.searchQuery.value.toLowerCase();
           for (var vehicle in controller.brandDetail.value!.vehicles) {
             if (vehicle.typeId != null) {
-              if (searchQuery.isEmpty || 
+              if (searchQuery.isEmpty ||
                   vehicle.name.toLowerCase().contains(searchQuery)) {
-                typeCounts[vehicle.typeId!] = (typeCounts[vehicle.typeId!] ?? 0) + 1;
+                typeCounts[vehicle.typeId!] =
+                    (typeCounts[vehicle.typeId!] ?? 0) + 1;
               }
             }
           }
         }
-        
+
         // Fixed order for vehicle types
         final fixedTypeOrder = [
-          {'id': 0, 'name': 'Semua', 'count': controller.filteredVehicles.length},
+          {
+            'id': 0,
+            'name': 'Semua',
+            'count': controller.filteredVehicles.length,
+          },
           {'id': 1, 'name': 'Mobil', 'count': typeCounts[1] ?? 0},
           {'id': 2, 'name': 'Sepeda Motor', 'count': typeCounts[2] ?? 0},
           {'id': 3, 'name': 'Sepeda', 'count': typeCounts[3] ?? 0},
           {'id': 5, 'name': 'Skuter', 'count': typeCounts[5] ?? 0},
         ];
-        
+
         return ListView(
           scrollDirection: Axis.horizontal,
           children: [
-            ...fixedTypeOrder.where((type) => type['id'] == 0 || (type['count'] as int) > 0).map((type) {
-              final id = type['id'] as int;
-              final name = type['name'] as String;
-              final count = type['count'] as int;
-              
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    await controller.filterByType(id);
-                    // Reapply current search after changing type filter
-                    if (controller.searchQuery.value.isNotEmpty) {
-                      controller.searchVehicles(controller.searchQuery.value);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: controller.filterByTypeId.value == id
-                        ? AppColors.secondaryColor.withAlpha(45)
-                        : AppColors.backgroundSecondary,
-                    foregroundColor: controller.filterByTypeId.value == id
-                        ? AppColors.secondaryColor
-                        : AppColors.textColor,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+            ...fixedTypeOrder
+                .where((type) => type['id'] == 0 || (type['count'] as int) > 0)
+                .map((type) {
+                  final id = type['id'] as int;
+                  final name = type['name'] as String;
+                  final count = type['count'] as int;
+
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        await controller.filterByType(id);
+                        // Reapply current search after changing type filter
+                        if (controller.searchQuery.value.isNotEmpty) {
+                          controller.searchVehicles(
+                            controller.searchQuery.value,
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            controller.filterByTypeId.value == id
+                                ? AppColors.secondaryColor.withAlpha(45)
+                                : AppColors.backgroundSecondary,
+                        foregroundColor:
+                            controller.filterByTypeId.value == id
+                                ? AppColors.secondaryColor
+                                : AppColors.textColor,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        id == 0 ? name : '$name ($count)',
+                        style: GoogleFonts.poppins(
+                          fontWeight:
+                              controller.filterByTypeId.value == id
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                          fontSize: 12,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    id == 0 ? name : '$name ($count)',
-                    style: GoogleFonts.poppins(
-                      fontWeight: controller.filterByTypeId.value == id
-                          ? FontWeight.bold
-                          : FontWeight.normal,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
+                  );
+                })
+                .toList(),
           ],
         );
       }),
     );
   }
-  
+
   Widget _buildTypeChipsShimmer() {
     return ListView.builder(
       scrollDirection: Axis.horizontal,
@@ -593,16 +643,20 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
       },
     );
   }
-  
+
   Widget _buildVehicleCard(VehicleModel vehicle) {
-    final typeName = vehicle.typeId != null ? controller.getTypeName(vehicle.typeId!) : '';
+    final typeName =
+        vehicle.typeId != null ? controller.getTypeName(vehicle.typeId!) : '';
     final year = controller.getVehicleYear(vehicle);
-    
+
     return _buildVehicleCardContent(vehicle, typeName, year);
   }
 
-  Widget _buildVehicleCardContent(VehicleModel vehicle, String typeName, String year) {
-    
+  Widget _buildVehicleCardContent(
+    VehicleModel vehicle,
+    String typeName,
+    String year,
+  ) {
     return GestureDetector(
       onTap: () {
         Get.toNamed('/kendaraan/${vehicle.slug}');
@@ -629,11 +683,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                 child: Stack(
                   children: [
                     // Background putih untuk semua gambar
-                    Positioned.fill(
-                      child: Container(
-                        color: Colors.white,
-                      ),
-                    ),
+                    Positioned.fill(child: Container(color: Colors.white)),
                     // Thumbnail image
                     Center(
                       child: Padding(
@@ -641,19 +691,19 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                         child: CachedNetworkImage(
                           imageUrl: vehicle.thumbnailUrl,
                           fit: BoxFit.contain,
-                          placeholder: (context, url) => Container(
-                            color: Colors.white,
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            color: AppColors.backgroundColor,
-                            child: const Center(
-                              child: Icon(
-                                Icons.broken_image,
-                                color: AppColors.textSecondary,
-                                size: 32,
+                          placeholder:
+                              (context, url) => Container(color: Colors.white),
+                          errorWidget:
+                              (context, url, error) => Container(
+                                color: AppColors.backgroundColor,
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.broken_image,
+                                    color: AppColors.textSecondary,
+                                    size: 32,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
                         ),
                       ),
                     ),
@@ -663,7 +713,10 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                         top: 8,
                         right: 8,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.primaryColor.withAlpha(179),
                             borderRadius: BorderRadius.circular(4),
@@ -715,7 +768,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
       ),
     );
   }
-  
+
   Widget _buildEmptyFilterResults() {
     return Center(
       child: Column(
@@ -760,16 +813,14 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
             ),
             child: Text(
               'Reset Filter',
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w600,
-              ),
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
             ),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildErrorState() {
     return Center(
       child: Column(
@@ -812,16 +863,14 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
             ),
             child: Text(
               'Coba Lagi',
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w600,
-              ),
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
             ),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildShimmer(double screenWidth) {
     return CustomScrollView(
       physics: const NeverScrollableScrollPhysics(),
@@ -831,9 +880,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
           child: Container(
             height: 180,
             margin: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
             child: Shimmer.fromColors(
               baseColor: AppColors.shimmerBase,
               highlightColor: AppColors.shimmerHighlight,
@@ -846,7 +893,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
             ),
           ),
         ),
-        
+
         // Chip filter shimmer
         SliverToBoxAdapter(
           child: Container(
@@ -855,7 +902,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
             child: _buildTypeChipsShimmer(),
           ),
         ),
-        
+
         // Grid shimmer
         SliverPadding(
           padding: const EdgeInsets.all(12),
@@ -866,31 +913,28 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
               mainAxisSpacing: 12,
               childAspectRatio: 0.7,
             ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                return Shimmer.fromColors(
-                  baseColor: AppColors.shimmerBase,
-                  highlightColor: AppColors.shimmerHighlight,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.shimmerBase,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              return Shimmer.fromColors(
+                baseColor: AppColors.shimmerBase,
+                highlightColor: AppColors.shimmerHighlight,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.shimmerBase,
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                );
-              },
-              childCount: 6,
-            ),
+                ),
+              );
+            }, childCount: 6),
           ),
         ),
       ],
     );
   }
-  
+
   void _showFilterDialog(BuildContext context) {
     String sortBy = controller.sortBy.value;
     String sortOrder = controller.sortOrder.value;
-    
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -911,16 +955,14 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                 children: [
                   Text(
                     'Urutkan Berdasarkan',
-                    style: GoogleFonts.poppins(
-                      color: AppColors.textColor,
-                    ),
+                    style: GoogleFonts.poppins(color: AppColors.textColor),
                   ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
                       _buildSortOption(
-                        'Nama', 
-                        sortBy == 'name', 
+                        'Nama',
+                        sortBy == 'name',
                         () => setState(() => sortBy = 'name'),
                       ),
                       const SizedBox(width: 16),
@@ -934,16 +976,14 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                   const SizedBox(height: 16),
                   Text(
                     'Arah Urutan',
-                    style: GoogleFonts.poppins(
-                      color: AppColors.textColor,
-                    ),
+                    style: GoogleFonts.poppins(color: AppColors.textColor),
                   ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
                       _buildSortOption(
-                        'Naik ↑', 
-                        sortOrder == 'asc', 
+                        'Naik ↑',
+                        sortOrder == 'asc',
                         () => setState(() => sortOrder = 'asc'),
                       ),
                       const SizedBox(width: 16),
@@ -985,19 +1025,22 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                 ),
               ],
             );
-          }
+          },
         );
       },
     );
   }
-  
+
   Widget _buildSortOption(String label, bool isSelected, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryColor : AppColors.backgroundSecondary,
+          color:
+              isSelected
+                  ? AppColors.primaryColor
+                  : AppColors.backgroundSecondary,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(

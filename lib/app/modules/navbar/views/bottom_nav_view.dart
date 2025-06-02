@@ -10,7 +10,6 @@ import 'package:infoev/app/modules/ev_comparison/views/EvComparePage.dart';
 import 'package:infoev/app/modules/profil/views/ProfilePage.dart';
 import 'package:infoev/app/styles/app_colors.dart'; // Import palet warna
 
-
 // Static mapping for tab items (unselected)
 const tabBarItem = {
   "Beranda": Icons.home_outlined,
@@ -85,8 +84,8 @@ class BottomNavView extends GetView<BottomNavController> {
   Widget buildItemBotNav(int index) {
     return Obx(
       () => InkWell(
-        onTap: () { 
-          FocusManager.instance.primaryFocus?.unfocus(); 
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
           controller.changemenuselection(index);
         },
         overlayColor: const WidgetStatePropertyAll(Colors.transparent),

@@ -30,9 +30,12 @@ class VehicleModel {
       spec: json['spec'] != null ? SpecModel.fromJson(json['spec']) : null,
       brandId: json['brand_id'],
       typeId: json['type_id'],
-      pictures: json['pictures'] != null
-          ? List<PictureModel>.from(json['pictures'].map((x) => PictureModel.fromJson(x)))
-          : null,
+      pictures:
+          json['pictures'] != null
+              ? List<PictureModel>.from(
+                json['pictures'].map((x) => PictureModel.fromJson(x)),
+              )
+              : null,
       brand: json['brand'] != null ? BrandModel.fromJson(json['brand']) : null,
     );
   }
@@ -60,23 +63,14 @@ class SpecModel {
   final int specId;
   final String value;
 
-  SpecModel({
-    required this.specId,
-    required this.value,
-  });
+  SpecModel({required this.specId, required this.value});
 
   factory SpecModel.fromJson(Map<String, dynamic> json) {
-    return SpecModel(
-      specId: json['spec_id'],
-      value: json['value'],
-    );
+    return SpecModel(specId: json['spec_id'], value: json['value']);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'spec_id': specId,
-      'value': value,
-    };
+    return {'spec_id': specId, 'value': value};
   }
 }
 
@@ -85,11 +79,7 @@ class PictureModel {
   final String path;
   final int thumbnail;
 
-  PictureModel({
-    required this.id,
-    required this.path,
-    required this.thumbnail,
-  });
+  PictureModel({required this.id, required this.path, required this.thumbnail});
 
   factory PictureModel.fromJson(Map<String, dynamic> json) {
     return PictureModel(
@@ -100,11 +90,7 @@ class PictureModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'path': path,
-      'thumbnail': thumbnail,
-    };
+    return {'id': id, 'path': path, 'thumbnail': thumbnail};
   }
 }
 
@@ -131,11 +117,6 @@ class BrandModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'slug': slug,
-      'banner': banner,
-    };
+    return {'id': id, 'name': name, 'slug': slug, 'banner': banner};
   }
 }

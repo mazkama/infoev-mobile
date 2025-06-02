@@ -125,5 +125,4 @@ class LoginController extends GetxController {
     emailController.clear();
     passwordController.clear();
   }
- 
 }

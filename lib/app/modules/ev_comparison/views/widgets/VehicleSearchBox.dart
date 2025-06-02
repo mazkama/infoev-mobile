@@ -95,7 +95,10 @@ class _EVSearchFieldState extends State<EVSearchField> {
                     )
                     : (_controller.text.isNotEmpty
                         ? IconButton(
-                          icon: const Icon(Icons.clear, color: AppColors.textColor),
+                          icon: const Icon(
+                            Icons.clear,
+                            color: AppColors.textColor,
+                          ),
                           onPressed: () {
                             setState(() {
                               _controller.clear();
@@ -143,25 +146,30 @@ class _EVSearchFieldState extends State<EVSearchField> {
                     leading: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: CachedNetworkImage(
-                      imageUrl: vehicle['thumbnail_url'],
-                      placeholder: (context, url) => Shimmer.fromColors(
-                        baseColor: AppColors.shimmerBase,
-                        highlightColor: AppColors.shimmerHighlight,
-                        child: Container(
+                        imageUrl: vehicle['thumbnail_url'],
+                        placeholder:
+                            (context, url) => Shimmer.fromColors(
+                              baseColor: AppColors.shimmerBase,
+                              highlightColor: AppColors.shimmerHighlight,
+                              child: Container(
+                                height: 48,
+                                width: 48,
+                                color: AppColors.shimmerBase,
+                              ),
+                            ),
+                        errorWidget:
+                            (context, url, error) => Container(
+                              height: 48,
+                              width: 48,
+                              color: AppColors.cardBackgroundColor,
+                              child: const Icon(
+                                Icons.error,
+                                color: AppColors.errorColor,
+                              ),
+                            ),
                         height: 48,
                         width: 48,
-                        color: AppColors.shimmerBase,
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        height: 48,
-                        width: 48,
-                        color: AppColors.cardBackgroundColor,
-                        child: const Icon(Icons.error, color: AppColors.errorColor),
-                      ),
-                      height: 48,
-                      width: 48,
-                      fit: BoxFit.cover,
+                        fit: BoxFit.cover,
                       ),
                     ),
                     title: Text(
@@ -173,7 +181,10 @@ class _EVSearchFieldState extends State<EVSearchField> {
                     ),
                     subtitle: Text(
                       'Tahun ${double.parse(vehicle['pivot']['value'].toString()).toStringAsFixed(0)}',
-                      style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 12,
+                      ),
                     ),
                     onTap:
                         () => {

@@ -126,7 +126,10 @@ class EVCard extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+        Text(
+          label,
+          style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+        ),
       ],
     );
   }

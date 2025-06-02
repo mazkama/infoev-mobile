@@ -37,8 +37,7 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
           child: CustomScrollView(
             slivers: [
               SliverAppBar(
-                backgroundColor:
-                    AppColors.backgroundColor,
+                backgroundColor: AppColors.backgroundColor,
                 expandedHeight: 250,
                 scrolledUnderElevation: 0, // Bayangan tetap saat scroll
                 pinned: true,
@@ -52,13 +51,13 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                           (context, url) => Shimmer.fromColors(
                             baseColor: AppColors.shimmerBase,
                             highlightColor: AppColors.shimmerHighlight,
-                            child: Container(
-                              color: AppColors.shimmerBase,
-                            ),
+                            child: Container(color: AppColors.shimmerBase),
                           ),
                       errorWidget:
-                          (context, url, error) =>
-                              const Icon(Icons.error, color: AppColors.errorColor),
+                          (context, url, error) => const Icon(
+                            Icons.error,
+                            color: AppColors.errorColor,
+                          ),
                     ),
                   ),
                 ),

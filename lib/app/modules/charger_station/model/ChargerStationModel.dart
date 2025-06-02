@@ -10,7 +10,7 @@ class ChargerStationModel {
   final List<String>? weekdayText;
   final double? rating;
   final int? userRatingsTotal;
-  
+
   ChargerStationModel({
     required this.placeId,
     required this.name,
@@ -29,18 +29,21 @@ class ChargerStationModel {
     // Handle locations that might be missing geometry data
     double? latitude;
     double? longitude;
-    
+
     if (json['geometry'] != null && json['geometry']['location'] != null) {
       latitude = json['geometry']['location']['lat']?.toDouble();
       longitude = json['geometry']['location']['lng']?.toDouble();
     }
-    
+
     // Handle weekday_text which might be in nested structure
     List<String>? weekdayTextList;
-    if (json['opening_hours'] != null && json['opening_hours']['weekday_text'] != null) {
-      weekdayTextList = List<String>.from(json['opening_hours']['weekday_text']);
+    if (json['opening_hours'] != null &&
+        json['opening_hours']['weekday_text'] != null) {
+      weekdayTextList = List<String>.from(
+        json['opening_hours']['weekday_text'],
+      );
     }
-    
+
     return ChargerStationModel(
       placeId: json['place_id'] ?? '',
       name: json['name'] ?? '',
@@ -48,18 +51,20 @@ class ChargerStationModel {
       businessStatus: json['business_status'] ?? '',
       lat: latitude,
       lng: longitude,
-      photoReference: json['photos'] != null && json['photos'].isNotEmpty 
-          ? json['photos'][0]['photo_reference'] 
-          : null,
-      openNow: json['opening_hours'] != null 
-          ? json['opening_hours']['open_now'] 
-          : null,
+      photoReference:
+          json['photos'] != null && json['photos'].isNotEmpty
+              ? json['photos'][0]['photo_reference']
+              : null,
+      openNow:
+          json['opening_hours'] != null
+              ? json['opening_hours']['open_now']
+              : null,
       weekdayText: weekdayTextList,
       rating: json['rating']?.toDouble(),
       userRatingsTotal: json['user_ratings_total'],
     );
   }
-  
+
   // Check if station is operational
   bool isOperational() {
     return businessStatus == 'OPERATIONAL';
@@ -71,20 +76,21 @@ class ChargerStationResponse {
   final String wilayah;
   final bool cached;
   final List<ChargerStationModel> places;
-  
+
   ChargerStationResponse({
     required this.success,
     required this.wilayah,
     required this.cached,
     required this.places,
   });
-  
+
   factory ChargerStationResponse.fromJson(Map<String, dynamic> json) {
     var placesJson = json['places'] as List;
-    List<ChargerStationModel> stationsList = placesJson
-        .map((placeJson) => ChargerStationModel.fromJson(placeJson))
-        .toList();
-        
+    List<ChargerStationModel> stationsList =
+        placesJson
+            .map((placeJson) => ChargerStationModel.fromJson(placeJson))
+            .toList();
+
     return ChargerStationResponse(
       success: json['success'] ?? false,
       wilayah: json['wilayah'] ?? '',
@@ -92,5 +98,4 @@ class ChargerStationResponse {
       places: stationsList,
     );
   }
-  
 }

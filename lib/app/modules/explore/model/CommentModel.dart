@@ -38,7 +38,8 @@ class Comment {
 
   factory Comment.fromJson(Map<String, dynamic> json) {
     var repliesJson = json['replies'] as List? ?? [];
-    List<Reply> repliesList = repliesJson.map((e) => Reply.fromJson(e)).toList();
+    List<Reply> repliesList =
+        repliesJson.map((e) => Reply.fromJson(e)).toList();
 
     return Comment(
       id: json['id'],

@@ -34,7 +34,9 @@ class ShimmerVehiclePopuler extends StatelessWidget {
                       width: double.infinity,
                       decoration: const BoxDecoration(
                         color: AppColors.shimmerBase,
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(12),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -43,9 +45,17 @@ class ShimmerVehiclePopuler extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(width: 90, height: 12, color: AppColors.textOnPrimary), // Nama kendaraan
+                          Container(
+                            width: 90,
+                            height: 12,
+                            color: AppColors.textOnPrimary,
+                          ), // Nama kendaraan
                           const SizedBox(height: 4),
-                          Container(width: 60, height: 8, color: AppColors.textOnPrimary),  // Brand
+                          Container(
+                            width: 60,
+                            height: 8,
+                            color: AppColors.textOnPrimary,
+                          ), // Brand
                         ],
                       ),
                     ),

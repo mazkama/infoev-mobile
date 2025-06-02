@@ -50,19 +50,24 @@ class VehiclePopulerCard extends StatelessWidget {
                     height: 90,
                     width: double.infinity,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) => Shimmer.fromColors(
-                      baseColor: AppColors.shimmerBase,
-                      highlightColor: AppColors.shimmerHighlight,
-                      child: Container(
-                        height: 140,
-                        color: AppColors.shimmerBase,
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => Container(
-                      height: 140,
-                      color: AppColors.shimmerBase,
-                      child: const Icon(Icons.error, color: AppColors.errorColor),
-                    ),
+                    placeholder:
+                        (context, url) => Shimmer.fromColors(
+                          baseColor: AppColors.shimmerBase,
+                          highlightColor: AppColors.shimmerHighlight,
+                          child: Container(
+                            height: 140,
+                            color: AppColors.shimmerBase,
+                          ),
+                        ),
+                    errorWidget:
+                        (context, url, error) => Container(
+                          height: 140,
+                          color: AppColors.shimmerBase,
+                          child: const Icon(
+                            Icons.error,
+                            color: AppColors.errorColor,
+                          ),
+                        ),
                   ),
                 ),
 
@@ -72,9 +77,14 @@ class VehiclePopulerCard extends StatelessWidget {
                   left: 0,
                   right: 0,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
-                        color: AppColors.secondaryDark.withAlpha(153), // ✅ Latar gelap hanya untuk info kendaraan, alpha 50%
+                      color: AppColors.secondaryDark.withAlpha(
+                        153,
+                      ), // ✅ Latar gelap hanya untuk info kendaraan, alpha 50%
                       borderRadius: const BorderRadius.only(
                         bottomLeft: Radius.circular(16),
                         bottomRight: Radius.circular(16),

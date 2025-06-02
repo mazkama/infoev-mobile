@@ -30,12 +30,14 @@ class NewsModel {
       summary: json['summary'],
       content: json['content'],
       slug: json['slug'],
-      published: json['published'] is int
-        ? json['published']
-        : int.tryParse(json['published'].toString()) ?? 0,
-      featured: json['featured'] is int
-        ? json['featured']
-        : int.tryParse(json['featured'].toString()) ?? 0,
+      published:
+          json['published'] is int
+              ? json['published']
+              : int.tryParse(json['published'].toString()) ?? 0,
+      featured:
+          json['featured'] is int
+              ? json['featured']
+              : int.tryParse(json['featured'].toString()) ?? 0,
       thumbnailUrl: json['thumbnail_url'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),

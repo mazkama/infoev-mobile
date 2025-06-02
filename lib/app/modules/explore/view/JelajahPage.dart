@@ -35,7 +35,7 @@ class _JelajahPageState extends State<JelajahPage> {
       if (controller.merekList.isEmpty && !controller.isLoading.value) {
         await controller.refreshData();
       }
-      
+
       // Ensure focus is not active when returning from other pages
       if (_searchFocusNode.hasFocus) {
         _searchFocusNode.unfocus();
@@ -92,10 +92,10 @@ class _JelajahPageState extends State<JelajahPage> {
     _searchController.dispose();
     _searchFocusNode.removeListener(_onFocusChange);
     _searchFocusNode.dispose();
-    
+
     // Clear search state when leaving JelajahPage
     controller.resetSearch();
-    
+
     super.dispose();
   }
 
@@ -179,7 +179,10 @@ class _JelajahPageState extends State<JelajahPage> {
                   builder: (context, value, child) {
                     return value.text.isNotEmpty
                         ? IconButton(
-                          icon: const Icon(Icons.close, color: AppColors.primaryColor),
+                          icon: const Icon(
+                            Icons.close,
+                            color: AppColors.primaryColor,
+                          ),
                           onPressed: () {
                             _searchController.clear();
                             controller.searchBrands('');
@@ -204,14 +207,14 @@ class _JelajahPageState extends State<JelajahPage> {
                   // Clear search field before navigation
                   _searchController.clear();
                   _lastSearchQuery = '';
-                  
+
                   // Navigate to search results page when user presses enter
                   // Mark this as manual search (not from history)
                   Get.toNamed(
                     '/search-results',
                     parameters: {
                       'query': value.trim(),
-                      'fromManualSearch': 'true'
+                      'fromManualSearch': 'true',
                     },
                   );
                 }
@@ -253,7 +256,10 @@ class _JelajahPageState extends State<JelajahPage> {
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.search, color: AppColors.primaryColor),
+                    icon: const Icon(
+                      Icons.search,
+                      color: AppColors.primaryColor,
+                    ),
                     onPressed: () {
                       controller.toggleSearch();
                       Future.delayed(const Duration(milliseconds: 100), () {
@@ -295,7 +301,10 @@ class _JelajahPageState extends State<JelajahPage> {
           const SizedBox(height: 8),
           Text(
             'Temukan berbagai kendaraan listrik favorit Anda',
-            style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+            ),
           ),
         ],
       ),
@@ -311,7 +320,10 @@ class _JelajahPageState extends State<JelajahPage> {
           decoration: BoxDecoration(
             color: AppColors.cardBackgroundColor,
             border: Border(
-              bottom: BorderSide(color: AppColors.borderMedium.withOpacity(0.1), width: 1),
+              bottom: BorderSide(
+                color: AppColors.borderMedium.withOpacity(0.1),
+                width: 1,
+              ),
             ),
           ),
           child: Obx(() {
@@ -336,59 +348,69 @@ class _JelajahPageState extends State<JelajahPage> {
 
             return ListView(
               scrollDirection: Axis.horizontal,
-              children: fixedTypeOrder.asMap().entries.map((entry) {
-                final idx = entry.key;
-                final type = entry.value;
-                final id = type['id'] as int;
-                final name = type['name'] as String;
-                final count = id == 0
-                    ? controller.merekList.length
-                    : type['count'] as int;
-                final isSelected = id == 0
-                    ? controller.filterOptions['typeId'] == null ||
-                        controller.filterOptions['typeId'] == 0
-                    : controller.filterOptions['typeId'] == id;
+              children:
+                  fixedTypeOrder.asMap().entries.map((entry) {
+                    final idx = entry.key;
+                    final type = entry.value;
+                    final id = type['id'] as int;
+                    final name = type['name'] as String;
+                    final count =
+                        id == 0
+                            ? controller.merekList.length
+                            : type['count'] as int;
+                    final isSelected =
+                        id == 0
+                            ? controller.filterOptions['typeId'] == null ||
+                                controller.filterOptions['typeId'] == 0
+                            : controller.filterOptions['typeId'] == id;
 
-                // Only add left margin for the first chip ("Semua")
-                final chipPadding = idx == 0
-                    ? const EdgeInsets.only(left: 16, right: 8)
-                    : const EdgeInsets.only(right: 8);
+                    // Only add left margin for the first chip ("Semua")
+                    final chipPadding =
+                        idx == 0
+                            ? const EdgeInsets.only(left: 16, right: 8)
+                            : const EdgeInsets.only(right: 8);
 
-                return Padding(
-                  padding: chipPadding,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (id == 0) {
-                        controller.resetFilters();
-                      } else {
-                        controller.filterBrandsByType(id);
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isSelected
-                          ? AppColors.secondaryColor.withAlpha(45)
-                          : AppColors.backgroundSecondary,
-                      foregroundColor:
-                          isSelected ? AppColors.secondaryColor : AppColors.textColor,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                    return Padding(
+                      padding: chipPadding,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (id == 0) {
+                            controller.resetFilters();
+                          } else {
+                            controller.filterBrandsByType(id);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              isSelected
+                                  ? AppColors.secondaryColor.withAlpha(45)
+                                  : AppColors.backgroundSecondary,
+                          foregroundColor:
+                              isSelected
+                                  ? AppColors.secondaryColor
+                                  : AppColors.textColor,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text(
+                          id == 0 ? name : '$name ($count)',
+                          style: GoogleFonts.poppins(
+                            fontWeight:
+                                isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                            fontSize: 12,
+                          ),
+                        ),
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      id == 0 ? name : '$name ($count)',
-                      style: GoogleFonts.poppins(
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
+                    );
+                  }).toList(),
             );
           }),
         ),
@@ -415,7 +437,10 @@ class _JelajahPageState extends State<JelajahPage> {
         return Center(
           child: Text(
             'Tidak ditemukan hasil',
-            style: GoogleFonts.poppins(color: AppColors.textTertiary, fontSize: 16),
+            style: GoogleFonts.poppins(
+              color: AppColors.textTertiary,
+              fontSize: 16,
+            ),
           ),
         );
       }
@@ -464,7 +489,10 @@ class _JelajahPageState extends State<JelajahPage> {
         return Center(
           child: Text(
             'Belum ada riwayat pencarian',
-            style: GoogleFonts.poppins(color: AppColors.textTertiary, fontSize: 16),
+            style: GoogleFonts.poppins(
+              color: AppColors.textTertiary,
+              fontSize: 16,
+            ),
           ),
         );
       }
@@ -505,7 +533,10 @@ class _JelajahPageState extends State<JelajahPage> {
                 final query = controller.searchHistory[index];
                 return ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                  leading: const Icon(Icons.history, color: AppColors.textSecondary),
+                  leading: const Icon(
+                    Icons.history,
+                    color: AppColors.textSecondary,
+                  ),
                   title: Text(
                     query,
                     style: GoogleFonts.poppins(
@@ -514,27 +545,28 @@ class _JelajahPageState extends State<JelajahPage> {
                     ),
                   ),
                   trailing: IconButton(
-                    icon: const Icon(Icons.close, color: AppColors.textSecondary, size: 20),
+                    icon: const Icon(
+                      Icons.close,
+                      color: AppColors.textSecondary,
+                      size: 20,
+                    ),
                     onPressed: () => controller.removeFromSearchHistory(query),
                   ),
                   onTap: () {
                     // Dismiss keyboard before navigation
                     FocusScope.of(context).unfocus();
-                    
+
                     // Set flag to prevent autofocus when returning
                     _shouldAutoFocus = false;
-                    
+
                     // Clear search field and navigate to SearchResultsPage
                     _searchController.clear();
                     _lastSearchQuery = '';
-                    
+
                     // Navigate to SearchResultsPage when selecting from search history
                     Get.toNamed(
                       '/search-results',
-                      parameters: {
-                        'query': query,
-                        'fromManualSearch': 'false'
-                      },
+                      parameters: {'query': query, 'fromManualSearch': 'false'},
                     );
                   },
                 );
@@ -582,8 +614,10 @@ class _JelajahPageState extends State<JelajahPage> {
                           child: Container(color: backgroundColor),
                         ),
                     errorWidget:
-                        (context, url, error) =>
-                            const Icon(Icons.error_outline, color: AppColors.primaryColor),
+                        (context, url, error) => const Icon(
+                          Icons.error_outline,
+                          color: AppColors.primaryColor,
+                        ),
                   ),
                 ),
               )
@@ -596,7 +630,10 @@ class _JelajahPageState extends State<JelajahPage> {
                   color: AppColors.textSecondary,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.electric_car, color: AppColors.textSecondary),
+                child: const Icon(
+                  Icons.electric_car,
+                  color: AppColors.textSecondary,
+                ),
               ),
             Expanded(
               child: Column(
@@ -656,8 +693,10 @@ class _JelajahPageState extends State<JelajahPage> {
                         child: Container(color: Colors.white),
                       ),
                   errorWidget:
-                      (context, url, error) =>
-                          const Icon(Icons.error_outline, color: AppColors.textSecondary),
+                      (context, url, error) => const Icon(
+                        Icons.error_outline,
+                        color: AppColors.textSecondary,
+                      ),
                 ),
               ),
             ),
@@ -823,7 +862,10 @@ class _JelajahPageState extends State<JelajahPage> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Colors.black.withAlpha(0), Colors.black.withAlpha(179)],
+                colors: [
+                  Colors.black.withAlpha(0),
+                  Colors.black.withAlpha(179),
+                ],
                 stops: const [0.5, 1.0],
               ),
             ),
@@ -901,7 +943,10 @@ class _JelajahPageState extends State<JelajahPage> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.black.withAlpha(0), Colors.black.withAlpha(179)],
+                  colors: [
+                    Colors.black.withAlpha(0),
+                    Colors.black.withAlpha(179),
+                  ],
                 ),
               ),
               child: Shimmer.fromColors(
@@ -970,7 +1015,11 @@ class _JelajahPageState extends State<JelajahPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.filter_alt_off, size: 64, color: AppColors.primaryColor),
+          const Icon(
+            Icons.filter_alt_off,
+            size: 64,
+            color: AppColors.primaryColor,
+          ),
           const SizedBox(height: 16),
           Text(
             'Tidak ada merek yang sesuai',
@@ -985,7 +1034,10 @@ class _JelajahPageState extends State<JelajahPage> {
           Text(
             'Coba ubah kriteria pencarian atau filter Anda',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(color: AppColors.textTertiary, fontSize: 14),
+            style: GoogleFonts.poppins(
+              color: AppColors.textTertiary,
+              fontSize: 14,
+            ),
           ),
           const SizedBox(height: 24),
           ElevatedButton(
@@ -1030,7 +1082,10 @@ class _JelajahPageState extends State<JelajahPage> {
           Text(
             'Periksa koneksi internet Anda\ndan coba lagi',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(color: AppColors.textTertiary, fontSize: 14),
+            style: GoogleFonts.poppins(
+              color: AppColors.textTertiary,
+              fontSize: 14,
+            ),
           ),
           const SizedBox(height: 24),
           ElevatedButton(
@@ -1116,9 +1171,13 @@ class _JelajahPageState extends State<JelajahPage> {
                   const SizedBox(height: 8),
                   Theme(
                     data: Theme.of(context).copyWith(
-                      unselectedWidgetColor: AppColors.primaryColor.withAlpha(128),
+                      unselectedWidgetColor: AppColors.primaryColor.withAlpha(
+                        128,
+                      ),
                       radioTheme: RadioThemeData(
-                        fillColor: MaterialStateProperty.all(AppColors.primaryColor),
+                        fillColor: MaterialStateProperty.all(
+                          AppColors.primaryColor,
+                        ),
                       ),
                     ),
                     child: Column(
@@ -1127,7 +1186,9 @@ class _JelajahPageState extends State<JelajahPage> {
                           contentPadding: EdgeInsets.zero,
                           title: Text(
                             'Nama',
-                            style: GoogleFonts.poppins(color: AppColors.textColor),
+                            style: GoogleFonts.poppins(
+                              color: AppColors.textColor,
+                            ),
                           ),
                           leading: Radio<String>(
                             value: 'name',
@@ -1143,7 +1204,9 @@ class _JelajahPageState extends State<JelajahPage> {
                           contentPadding: EdgeInsets.zero,
                           title: Text(
                             'Jumlah Kendaraan',
-                            style: GoogleFonts.poppins(color: AppColors.textColor),
+                            style: GoogleFonts.poppins(
+                              color: AppColors.textColor,
+                            ),
                           ),
                           leading: Radio<String>(
                             value: 'vehicles_count',

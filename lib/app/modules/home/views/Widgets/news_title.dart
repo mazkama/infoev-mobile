@@ -27,10 +27,14 @@ class NewsTitle extends StatelessWidget {
       onTap: ontap,
       child: Container(
         padding: const EdgeInsets.all(10),
-        margin: const EdgeInsets.only(bottom: 12), // Margin konsisten dengan TrandingCard
+        margin: const EdgeInsets.only(
+          bottom: 12,
+        ), // Margin konsisten dengan TrandingCard
         decoration: BoxDecoration(
           color: AppColors.cardBackgroundColor, // Abu-abu terang dari palet
-          borderRadius: BorderRadius.circular(12), // Sudut lebih halus, konsisten dengan TrandingCard
+          borderRadius: BorderRadius.circular(
+            12,
+          ), // Sudut lebih halus, konsisten dengan TrandingCard
           boxShadow: [
             BoxShadow(
               color: AppColors.shadowLight.withAlpha(33), // Bayangan halus
@@ -46,34 +50,45 @@ class NewsTitle extends StatelessWidget {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12), // Sesuaikan dengan borderRadius container
-                color: AppColors.cardBackgroundColor, // Putih untuk latar belakang gambar
+                borderRadius: BorderRadius.circular(
+                  12,
+                ), // Sesuaikan dengan borderRadius container
+                color:
+                    AppColors
+                        .cardBackgroundColor, // Putih untuk latar belakang gambar
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: CachedNetworkImage(
                   imageUrl: imageUrl,
-                  placeholder: (context, url) => Shimmer.fromColors(
-                    baseColor: AppColors.shimmerBase,
-                    highlightColor: AppColors.shimmerHighlight,
-                    child: Container(
-                      height: 120,
-                      width: double.infinity,
-                      color: AppColors.shimmerBase,
-                    ),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    height: 120,
-                    color: AppColors.shimmerBase,
-                    child: const Icon(Icons.error, color: AppColors.errorColor),
-                  ),
+                  placeholder:
+                      (context, url) => Shimmer.fromColors(
+                        baseColor: AppColors.shimmerBase,
+                        highlightColor: AppColors.shimmerHighlight,
+                        child: Container(
+                          height: 120,
+                          width: double.infinity,
+                          color: AppColors.shimmerBase,
+                        ),
+                      ),
+                  errorWidget:
+                      (context, url, error) => Container(
+                        height: 120,
+                        color: AppColors.shimmerBase,
+                        child: const Icon(
+                          Icons.error,
+                          color: AppColors.errorColor,
+                        ),
+                      ),
                   height: 120,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
               ),
             ),
-            const SizedBox(width: 12), // Spacing sedikit lebih besar untuk kejelasan
+            const SizedBox(
+              width: 12,
+            ), // Spacing sedikit lebih besar untuk kejelasan
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 2),
@@ -92,7 +107,8 @@ class NewsTitle extends StatelessWidget {
                       title,
                       style: TextStyle(
                         color: AppColors.textColor, // Hitam untuk kontras
-                        fontWeight: FontWeight.w600, // Sesuaikan dengan TrandingCard
+                        fontWeight:
+                            FontWeight.w600, // Sesuaikan dengan TrandingCard
                         fontSize: 18,
                       ),
                       maxLines: 3,
@@ -110,7 +126,7 @@ class NewsTitle extends StatelessWidget {
                           child: Text(
                             author,
                             style: TextStyle(
-                              color: AppColors.primaryColor,  
+                              color: AppColors.primaryColor,
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
@@ -120,7 +136,8 @@ class NewsTitle extends StatelessWidget {
                         Text(
                           time,
                           style: TextStyle(
-                            color: AppColors.secondaryTextColor, // Abu-abu gelap
+                            color:
+                                AppColors.secondaryTextColor, // Abu-abu gelap
                             fontSize: 12,
                           ),
                         ),

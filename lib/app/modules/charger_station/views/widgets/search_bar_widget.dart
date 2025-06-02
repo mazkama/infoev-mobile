@@ -85,10 +85,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
               suffixIcon:
                   textController.text.isNotEmpty
                       ? IconButton(
-                        icon: Icon(
-                          Icons.clear,
-                          color: AppColors.textColor,
-                        ),
+                        icon: Icon(Icons.clear, color: AppColors.textColor),
                         onPressed: () {
                           textController.clear();
                           widget.controller.citySuggestions.clear();
@@ -125,7 +122,9 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                     ? const Center(
                       child: Padding(
                         padding: EdgeInsets.all(12.0),
-                        child: CircularProgressIndicator(color: AppColors.secondaryColor),
+                        child: CircularProgressIndicator(
+                          color: AppColors.secondaryColor,
+                        ),
                       ),
                     )
                     : ListView.builder(
@@ -163,7 +162,9 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             return const Padding(
               padding: EdgeInsets.all(16.0),
               child: Center(
-                child: CircularProgressIndicator(color: AppColors.secondaryColor),
+                child: CircularProgressIndicator(
+                  color: AppColors.secondaryColor,
+                ),
               ),
             );
           } else if (widget.controller.hasError.value) {

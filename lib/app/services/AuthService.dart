@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:google_sign_in/google_sign_in.dart'; 
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
-import 'package:infoev/app/modules/login/views/LoginPage.dart'; 
+import 'package:infoev/app/modules/login/views/LoginPage.dart';
 
 class AuthService {
-  static final GoogleSignIn _googleSignIn = GoogleSignIn(); 
+  static final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   // Fungsi logout dari Google
   static Future<void> logoutFromGoogle() async {
@@ -125,13 +125,16 @@ class AuthService {
   }
 
   // Endpoint logout pada backend
-  static const String logoutUrl = "https://infoev.mazkama.web.id/api/auth/logout";
+  static const String logoutUrl =
+      "https://infoev.mazkama.web.id/api/auth/logout";
 
   // Fungsi logout untuk menghapus data dan mengarahkan ke halaman login
   static Future<void> logout(BuildContext context) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token'); // Mendapatkan token dari SharedPreferences
+      final token = prefs.getString(
+        'token',
+      ); // Mendapatkan token dari SharedPreferences
 
       if (token == null) {
         // Jika tidak ada token, langsung logout tanpa melakukan request ke backend

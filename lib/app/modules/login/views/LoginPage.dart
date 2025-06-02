@@ -175,7 +175,8 @@ class LoginPage extends StatelessWidget {
                             controller.isLoading.value
                                 ? CircularProgressIndicator(
                                   color:
-                                      AppColors.backgroundColor, // Putih untuk loading
+                                      AppColors
+                                          .backgroundColor, // Putih untuk loading
                                 )
                                 : Text(
                                   'Login',

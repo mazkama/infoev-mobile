@@ -30,4 +30,4 @@ class BrandDetailModel {
       'brand_id': brandId,
     };
   }
-} 
+}

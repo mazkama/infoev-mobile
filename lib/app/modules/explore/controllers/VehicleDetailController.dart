@@ -40,7 +40,7 @@ class VehicleDetailController extends GetxController {
 
   Future<bool> postComment({
     required String type, // misal: 'vehicle'
-    required int id, // id kendaraan atau lainnya 
+    required int id, // id kendaraan atau lainnya
     required String comment, // isi komentar
     int? parent, // id comment induk jika balasan, boleh null
   }) async {
@@ -52,9 +52,7 @@ class VehicleDetailController extends GetxController {
       return false;
     }
 
-    final url = Uri.parse(
-      '${baseUrlDev}/comment/store',
-    ); 
+    final url = Uri.parse('${baseUrlDev}/comment/store');
 
     final body = jsonEncode({
       'type': type,
@@ -64,14 +62,13 @@ class VehicleDetailController extends GetxController {
       'parent': parent,
     });
 
-
     print('Posting comment: $body');
 
     try {
       final response = await http.post(
         url,
         headers: {
-          'Content-Type': 'application/json', 
+          'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
         body: body,

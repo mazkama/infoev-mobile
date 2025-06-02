@@ -1,12 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http; 
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:infoev/app/modules/explore/model/MerekModel.dart'; 
+import 'package:infoev/app/modules/explore/model/MerekModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
- 
 
 class MerekController extends GetxController {
   var merekList = <MerekModel>[].obs;
@@ -17,14 +16,14 @@ class MerekController extends GetxController {
   var currentPage = 1;
   final int pageSize = 10;
   final Duration cacheValidity = const Duration(hours: 2);
-  
+
   // Search and filter state
   var isSearching = false.obs;
   var searchQuery = ''.obs;
   var sortBy = 'name'.obs;
   var sortOrder = 'asc'.obs;
   var filterOptions = <String, dynamic>{}.obs;
-  
+
   // Mapping untuk ukuran gambar berdasarkan merek
   final Map<String, double> brandImageScales = {
     'alva': 0.7,
@@ -63,7 +62,7 @@ class MerekController extends GetxController {
     'xiaomi': 0.8,
     'yadea': 0.7,
   };
-  
+
   // Mapping untuk warna background berdasarkan merek
   // * Catatan: Merek dengan logo/banner transparan PNG mungkin perlu background tertentu
   // * Contoh:
@@ -76,10 +75,8 @@ class MerekController extends GetxController {
     'byd': 0xFF000000, // Hitam
     'davigo': 0xFF000000, // Hitam
     'niu': 0xFF000000, // Hitam
-    
     // Contoh merek dengan logo hitam (butuh background terang)
-    'benelli': 0xFFFFFFFF,  // Putih
-    
+    'benelli': 0xFFFFFFFF, // Putih
     // Tambahkan kustomisasi warna background sesuai kebutuhan
   };
 
@@ -101,7 +98,7 @@ class MerekController extends GetxController {
     try {
       // Load cached type counts first
       await _loadTypeCountsFromCache();
-      
+
       // Load brands and other data
       await Future.wait([
         _loadCachedDataFirst(),
@@ -111,7 +108,8 @@ class MerekController extends GetxController {
       ]);
 
       // If no cached type counts, fetch them
-      if ((filterOptions['brandCounts'] as Map<dynamic, dynamic>?)?.isEmpty ?? true) {
+      if ((filterOptions['brandCounts'] as Map<dynamic, dynamic>?)?.isEmpty ??
+          true) {
         await _fetchTypeCountsFromApi();
       }
     } catch (e) {
@@ -143,23 +141,25 @@ class MerekController extends GetxController {
     try {
       Map<int, int> counts = {};
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Fetch counts for all types
       for (var typeId in [1, 2, 3, 5]) {
         final typeSlug = getTypeSlug(typeId);
         if (typeSlug != null) {
-          final response = await http.get(Uri.parse('https://infoev.mazkama.web.id/api/tipe/$typeSlug'));
+          final response = await http.get(
+            Uri.parse('https://infoev.mazkama.web.id/api/tipe/$typeSlug'),
+          );
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
             final List<dynamic> vehicles = data['vehicles'] ?? [];
-            
+
             final Set<int> uniqueBrandIds = {};
             for (var vehicle in vehicles) {
               if (vehicle['brand_id'] != null) {
                 uniqueBrandIds.add(vehicle['brand_id'] as int);
               }
             }
-            
+
             counts[typeId] = uniqueBrandIds.length;
           }
         }
@@ -168,11 +168,14 @@ class MerekController extends GetxController {
       if (counts.isNotEmpty) {
         // Update state
         filterOptions['brandCounts'] = counts;
-        
+
         // Save to cache
         await prefs.setString('type_counts', jsonEncode(counts));
-        await prefs.setInt('type_counts_timestamp', DateTime.now().millisecondsSinceEpoch);
-        
+        await prefs.setInt(
+          'type_counts_timestamp',
+          DateTime.now().millisecondsSinceEpoch,
+        );
+
         update();
       }
     } catch (e) {
@@ -184,7 +187,7 @@ class MerekController extends GetxController {
     try {
       final prefs = await SharedPreferences.getInstance();
       final filterJson = prefs.getString('filter_settings');
-      
+
       if (filterJson != null) {
         final Map<String, dynamic> settings = jsonDecode(filterJson);
         if (settings.containsKey('searchQuery')) {
@@ -197,14 +200,16 @@ class MerekController extends GetxController {
           sortOrder.value = settings['sortOrder'] as String;
         }
         if (settings.containsKey('filterOptions')) {
-          filterOptions.value = Map<String, dynamic>.from(settings['filterOptions']);
+          filterOptions.value = Map<String, dynamic>.from(
+            settings['filterOptions'],
+          );
         }
       }
     } catch (e) {
       debugPrint('Error loading filter settings: $e');
     }
   }
-  
+
   Future<void> _saveFilterSettings() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -214,7 +219,7 @@ class MerekController extends GetxController {
         'sortOrder': sortOrder.value,
         'filterOptions': filterOptions,
       };
-      
+
       await prefs.setString('filter_settings', jsonEncode(settings));
     } catch (e) {
       debugPrint('Error saving filter settings: $e');
@@ -226,13 +231,13 @@ class MerekController extends GetxController {
     final String lowerName = brandName.toLowerCase();
     return brandImageScales[lowerName] ?? 1.0;
   }
-  
+
   // Set ukuran gambar untuk merek tertentu
   void setImageScale(String brandName, double scale) {
     brandImageScales[brandName.toLowerCase()] = scale;
     _saveBrandImageScales();
   }
-  
+
   Future<void> _saveBrandImageScales() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -241,12 +246,12 @@ class MerekController extends GetxController {
       debugPrint('Error saving brand image scales: $e');
     }
   }
-  
+
   Future<void> _loadBrandImageScales() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final scales = prefs.getString('brand_image_scales');
-      
+
       if (scales != null) {
         final Map<String, dynamic> savedScales = jsonDecode(scales);
         savedScales.forEach((key, value) {
@@ -265,27 +270,30 @@ class MerekController extends GetxController {
     final int colorValue = brandBackgroundColors[lowerName] ?? 0xFFFFFFFF;
     return Color(colorValue);
   }
-  
+
   // Set warna background untuk merek tertentu
   void setBrandBackgroundColor(String brandName, Color color) {
     brandBackgroundColors[brandName.toLowerCase()] = color.value;
     _saveBrandBackgroundColors();
   }
-  
+
   Future<void> _saveBrandBackgroundColors() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('brand_background_colors', jsonEncode(brandBackgroundColors));
+      await prefs.setString(
+        'brand_background_colors',
+        jsonEncode(brandBackgroundColors),
+      );
     } catch (e) {
       debugPrint('Error saving brand background colors: $e');
     }
   }
-  
+
   Future<void> _loadBrandBackgroundColors() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final colors = prefs.getString('brand_background_colors');
-      
+
       if (colors != null) {
         final Map<String, dynamic> savedColors = jsonDecode(colors);
         savedColors.forEach((key, value) {
@@ -299,23 +307,26 @@ class MerekController extends GetxController {
 
   Future<void> _loadCachedDataFirst() async {
     isLoading.value = true;
-    
+
     try {
       bool dataLoaded = false;
-      
+
       // Coba load dari file JSON dulu
       final file = await _getLocalFile('merek_data.json');
       if (await file.exists()) {
         final String contents = await file.readAsString();
         final Map<String, dynamic> data = jsonDecode(contents);
-        
+
         // Verifikasi waktu cache
         final int? timestamp = data['timestamp'];
         if (timestamp != null) {
-          final DateTime cacheTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+          final DateTime cacheTime = DateTime.fromMillisecondsSinceEpoch(
+            timestamp,
+          );
           if (DateTime.now().difference(cacheTime) < cacheValidity) {
             final List<dynamic> items = data['items'];
-            final List<MerekModel> list = items.map((item) => MerekModel.fromJson(item)).toList();
+            final List<MerekModel> list =
+                items.map((item) => MerekModel.fromJson(item)).toList();
             merekList.value = list;
             _applyFilters();
             await _loadBrandImageScales();
@@ -323,25 +334,28 @@ class MerekController extends GetxController {
           }
         }
       }
-      
+
       // Jika tidak ada data dari file, coba dari SharedPreferences
       if (!dataLoaded) {
         final prefs = await SharedPreferences.getInstance();
         final cacheTime = prefs.getInt('merek_cache_time');
         final cacheData = prefs.getString('merek_data');
-        
+
         if (cacheTime != null && cacheData != null) {
-          final DateTime cacheDateTime = DateTime.fromMillisecondsSinceEpoch(cacheTime);
+          final DateTime cacheDateTime = DateTime.fromMillisecondsSinceEpoch(
+            cacheTime,
+          );
           if (DateTime.now().difference(cacheDateTime) < cacheValidity) {
             final List<dynamic> data = jsonDecode(cacheData);
-            final List<MerekModel> list = data.map((item) => MerekModel.fromJson(item)).toList();
+            final List<MerekModel> list =
+                data.map((item) => MerekModel.fromJson(item)).toList();
             merekList.value = list;
             _applyFilters();
             dataLoaded = true;
           }
         }
       }
-      
+
       // Jika tidak ada data tersimpan, load dari API
       if (!dataLoaded) {
         await fetchMerek(isRefresh: true);
@@ -374,32 +388,34 @@ class MerekController extends GetxController {
 
   Future<void> fetchMerek({bool isRefresh = false}) async {
     if (isLoading.value && !isRefresh) return;
-    
+
     isLoading.value = true;
-    
+
     try {
-      final response = await http.get(Uri.parse('https://infoev.mazkama.web.id/api/merek'));
-      
+      final response = await http.get(
+        Uri.parse('https://infoev.mazkama.web.id/api/merek'),
+      );
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final List<dynamic> items = data['items'] ?? [];
-        
+
         // Proses item merek untuk mendapatkan banner
         final processedItems = await _processMerekItems(items);
-        
+
         if (isRefresh) {
           merekList.value = processedItems;
         } else {
           merekList.addAll(processedItems);
         }
-        
+
         _applyFilters();
-        
+
         if (isRefresh) {
           // Simpan data ke cache dan file lokal
           _updateCache(items);
         }
-        
+
         hasMoreData.value = false; // Tidak ada paging di API
       } else {
         debugPrint('API Error: ${response.statusCode}');
@@ -415,18 +431,18 @@ class MerekController extends GetxController {
   Future<List<MerekModel>> _processMerekItems(List<dynamic> items) async {
     try {
       final List<MerekModel> result = [];
-      
+
       for (var item in items) {
         MerekModel merek = MerekModel.fromJson(item);
-        
+
         try {
           // Dapatkan banner untuk merek ini
           final String? banner = await fetchBanner(merek.slug);
-          
+
           if (banner != null) {
             merek = merek.copyWith(banner: banner);
           }
-          
+
           result.add(merek);
         } catch (e) {
           // Jika gagal mengambil banner, tetap tambahkan merek tanpa banner
@@ -434,7 +450,7 @@ class MerekController extends GetxController {
           result.add(merek);
         }
       }
-      
+
       return result;
     } catch (e) {
       debugPrint('Error in _processMerekItems: $e');
@@ -446,7 +462,10 @@ class MerekController extends GetxController {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('merek_data', jsonEncode(items));
-      await prefs.setInt('merek_cache_time', DateTime.now().millisecondsSinceEpoch);
+      await prefs.setInt(
+        'merek_cache_time',
+        DateTime.now().millisecondsSinceEpoch,
+      );
     } catch (e) {
       debugPrint('Error updating cache: $e');
     }
@@ -458,7 +477,7 @@ class MerekController extends GetxController {
     _applyFilters();
     _saveFilterSettings();
   }
-  
+
   // Fungsi untuk mengurutkan merek
   void sortBrands(String by, String order) {
     sortBy.value = by;
@@ -466,29 +485,29 @@ class MerekController extends GetxController {
     _applyFilters();
     _saveFilterSettings();
   }
-  
+
   // Fungsi untuk filter merek berdasarkan kriteria
   void filterBrands(Map<String, dynamic> options) {
     // Simpan brandCounts sebelum update filterOptions
     Map<dynamic, dynamic>? brandCounts = filterOptions['brandCounts'];
-    
+
     // Update filterOptions dengan options baru
     for (var entry in options.entries) {
       filterOptions[entry.key] = entry.value;
     }
-    
+
     // Kembalikan brandCounts
     if (brandCounts != null) {
       filterOptions['brandCounts'] = brandCounts;
     }
-    
+
     _applyFilters();
     _saveFilterSettings();
   }
-  
+
   Future<void> filterBrandsByType(int typeId) async {
     filterOptions['typeId'] = typeId;
-    
+
     if (typeId == 0) {
       filteredMerekList.clear();
       return;
@@ -502,46 +521,52 @@ class MerekController extends GetxController {
         final cacheKey = 'type_brands_$typeId';
         final cacheStr = prefs.getString(cacheKey);
         final cacheTime = prefs.getInt('${cacheKey}_timestamp');
-        
+
         Set<int> brandIds = {};
-        
+
         if (cacheStr != null && cacheTime != null) {
           final cacheAge = DateTime.now().millisecondsSinceEpoch - cacheTime;
           if (cacheAge < cacheValidity.inMilliseconds) {
-            brandIds = (jsonDecode(cacheStr) as List<dynamic>)
-                .map((id) => id as int)
-                .toSet();
+            brandIds =
+                (jsonDecode(cacheStr) as List<dynamic>)
+                    .map((id) => id as int)
+                    .toSet();
           }
         }
-        
+
         if (brandIds.isEmpty) {
-          final response = await http.get(Uri.parse('https://infoev.mazkama.web.id/api/tipe/$typeSlug'));
+          final response = await http.get(
+            Uri.parse('https://infoev.mazkama.web.id/api/tipe/$typeSlug'),
+          );
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
             final List<dynamic> vehicles = data['vehicles'] ?? [];
-            
+
             for (var vehicle in vehicles) {
               if (vehicle['brand_id'] != null) {
                 brandIds.add(vehicle['brand_id'] as int);
               }
             }
-            
+
             // Save to cache
             await prefs.setString(cacheKey, jsonEncode(brandIds.toList()));
-            await prefs.setInt('${cacheKey}_timestamp', DateTime.now().millisecondsSinceEpoch);
+            await prefs.setInt(
+              '${cacheKey}_timestamp',
+              DateTime.now().millisecondsSinceEpoch,
+            );
           }
         }
-        
+
         // Filter merek list
-        filteredMerekList.value = merekList
-            .where((brand) => brandIds.contains(brand.id))
-            .toList();
-            
+        filteredMerekList.value =
+            merekList.where((brand) => brandIds.contains(brand.id)).toList();
+
         // Update count in brandCounts
-        final counts = (filterOptions['brandCounts'] ?? {}) as Map<dynamic, dynamic>;
+        final counts =
+            (filterOptions['brandCounts'] ?? {}) as Map<dynamic, dynamic>;
         counts[typeId] = brandIds.length;
         filterOptions['brandCounts'] = counts;
-        
+
         update();
       } catch (e) {
         debugPrint('Error filtering brands by type: $e');
@@ -570,54 +595,60 @@ class MerekController extends GetxController {
     searchQuery.value = '';
     // Simpan brandCounts sebelum mereset filterOptions
     Map<dynamic, dynamic>? brandCounts = filterOptions['brandCounts'];
-    
+
     filterOptions.clear();
-    
+
     // Kembalikan brandCounts setelah clear
     if (brandCounts != null) {
       filterOptions['brandCounts'] = brandCounts;
     }
-    
+
     sortBy.value = 'name';
     sortOrder.value = 'asc';
-    isSearching.value = false;  // Tutup mode pencarian
+    isSearching.value = false; // Tutup mode pencarian
     filteredMerekList.clear();
     _applyFilters();
     _saveFilterSettings();
   }
-  
+
   // Apply all active filters
   void _applyFilters() {
     List<MerekModel> filtered = List<MerekModel>.from(merekList);
-    
+
     // Apply search filter
     if (searchQuery.value.isNotEmpty) {
-      filtered = filtered.where((brand) => 
-        brand.name.toLowerCase().contains(searchQuery.value.toLowerCase())
-      ).toList();
+      filtered =
+          filtered
+              .where(
+                (brand) => brand.name.toLowerCase().contains(
+                  searchQuery.value.toLowerCase(),
+                ),
+              )
+              .toList();
     }
-    
+
     // Apply minimum vehicle count filter
     if (filterOptions.containsKey('minProductCount')) {
       final int minCount = filterOptions['minProductCount'];
       if (minCount > 0) {
-        filtered = filtered.where((brand) => 
-          brand.vehiclesCount >= minCount
-        ).toList();
+        filtered =
+            filtered.where((brand) => brand.vehiclesCount >= minCount).toList();
       }
     }
-    
+
     // Apply sorting
     filtered.sort((a, b) {
       int result;
       if (sortBy.value == 'vehicles_count') {
-        result = b.vehiclesCount.compareTo(a.vehiclesCount); // Descending for count
+        result = b.vehiclesCount.compareTo(
+          a.vehiclesCount,
+        ); // Descending for count
       } else {
         result = a.name.compareTo(b.name);
       }
       return sortOrder.value == 'asc' ? result : -result;
     });
-    
+
     filteredMerekList.value = filtered;
   }
 
@@ -627,51 +658,60 @@ class MerekController extends GetxController {
       final prefs = await SharedPreferences.getInstance();
       final cachedBanner = prefs.getString('banner_$slug');
       final cacheTime = prefs.getInt('banner_${slug}_time');
-      
+
       if (cachedBanner != null && cacheTime != null) {
-        final DateTime cacheDateTime = DateTime.fromMillisecondsSinceEpoch(cacheTime);
+        final DateTime cacheDateTime = DateTime.fromMillisecondsSinceEpoch(
+          cacheTime,
+        );
         if (DateTime.now().difference(cacheDateTime) < cacheValidity) {
           return cachedBanner;
         }
       }
-      
+
       // Coba ambil dari file lokal
       final file = await _getLocalFile('banner_$slug.json');
       if (await file.exists()) {
         final String contents = await file.readAsString();
         final Map<String, dynamic> data = jsonDecode(contents);
-        
+
         final int? timestamp = data['timestamp'];
         final String? banner = data['banner'];
-        
+
         if (timestamp != null && banner != null) {
-          final DateTime cacheTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+          final DateTime cacheTime = DateTime.fromMillisecondsSinceEpoch(
+            timestamp,
+          );
           if (DateTime.now().difference(cacheTime) < cacheValidity) {
             return banner;
           }
         }
       }
-      
+
       // Ambil dari API jika cache tidak ada atau sudah expired
-      final response = await http.get(Uri.parse('https://infoev.mazkama.web.id/api/merek/$slug'));
-      
+      final response = await http.get(
+        Uri.parse('https://infoev.mazkama.web.id/api/merek/$slug'),
+      );
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        
+
         // API mengembalikan banner dalam field banner
         final banner = data['banner'] as String?;
-        
+
         if (banner != null) {
           // Simpan ke cache dan file lokal
           await prefs.setString('banner_$slug', banner);
-          await prefs.setInt('banner_${slug}_time', DateTime.now().millisecondsSinceEpoch);
-          
+          await prefs.setInt(
+            'banner_${slug}_time',
+            DateTime.now().millisecondsSinceEpoch,
+          );
+
           final Map<String, dynamic> fileData = {
             'timestamp': DateTime.now().millisecondsSinceEpoch,
             'banner': banner,
           };
           await file.writeAsString(jsonEncode(fileData));
-          
+
           return banner;
         }
       } else {
@@ -681,7 +721,7 @@ class MerekController extends GetxController {
     } catch (e) {
       debugPrint('Error in fetchBanner for $slug: $e');
     }
-    
+
     return null;
   }
 
@@ -695,7 +735,7 @@ class MerekController extends GetxController {
     if (!isSearching.value) {
       searchQuery.value = '';
       searchResults.clear();
-      _applyFilters();  // Reset tampilan ketika search ditutup
+      _applyFilters(); // Reset tampilan ketika search ditutup
     }
   }
 
@@ -718,9 +758,13 @@ class MerekController extends GetxController {
       addToSearchHistory(query);
 
       // Search in brands
-      final brandResults = merekList.where((brand) =>
-        brand.name.toLowerCase().contains(query.toLowerCase())
-      ).toList();
+      final brandResults =
+          merekList
+              .where(
+                (brand) =>
+                    brand.name.toLowerCase().contains(query.toLowerCase()),
+              )
+              .toList();
 
       Map<String, List<dynamic>> results = {};
       if (brandResults.isNotEmpty) {
@@ -731,14 +775,21 @@ class MerekController extends GetxController {
       final vehicleResults = <Map<String, dynamic>>[];
       for (var endpoint in typeEndpoints.entries) {
         try {
-          final response = await http.get(Uri.parse('${endpoint.value}?search=$query'));
+          final response = await http.get(
+            Uri.parse('${endpoint.value}?search=$query'),
+          );
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
             if (data['vehicles'] != null) {
-              final vehicles = (data['vehicles'] as List)
-                .where((v) => v['name'].toString().toLowerCase().contains(query.toLowerCase()))
-                .map((v) => v as Map<String, dynamic>)
-                .toList();
+              final vehicles =
+                  (data['vehicles'] as List)
+                      .where(
+                        (v) => v['name'].toString().toLowerCase().contains(
+                          query.toLowerCase(),
+                        ),
+                      )
+                      .map((v) => v as Map<String, dynamic>)
+                      .toList();
               if (vehicles.isNotEmpty) {
                 vehicleResults.addAll(vehicles);
               }
@@ -795,18 +846,18 @@ class MerekController extends GetxController {
   // Add to search history
   void addToSearchHistory(String query) {
     if (query.isEmpty) return;
-    
+
     // Remove if exists (to move to top)
     searchHistory.remove(query);
-    
+
     // Add to beginning of list
     searchHistory.insert(0, query);
-    
+
     // Keep only maxHistoryItems
     if (searchHistory.length > maxHistoryItems) {
       searchHistory.removeRange(maxHistoryItems, searchHistory.length);
     }
-    
+
     _saveSearchHistory();
   }
 
@@ -830,17 +881,18 @@ class MerekController extends GetxController {
     'mobil': 'https://infoev.mazkama.web.id/api/tipe/mobil',
     'sepeda-motor': 'https://infoev.mazkama.web.id/api/tipe/sepeda-motor',
     'sepeda': 'https://infoev.mazkama.web.id/api/tipe/sepeda',
-    'skuter': 'https://infoev.mazkama.web.id/api/tipe/skuter'
+    'skuter': 'https://infoev.mazkama.web.id/api/tipe/skuter',
   };
-  
+
   // Method untuk load data tipe yang dipanggil dari jelajah.dart
   Future<void> loadTypeData() async {
     try {
       // Load type counts dari cache dulu
       await _loadTypeCountsFromCache();
-      
+
       // Jika tidak ada di cache atau sudah kadaluarsa, ambil dari API
-      if ((filterOptions['brandCounts'] as Map<dynamic, dynamic>?)?.isEmpty ?? true) {
+      if ((filterOptions['brandCounts'] as Map<dynamic, dynamic>?)?.isEmpty ??
+          true) {
         await _fetchTypeCountsFromApi();
       }
     } catch (e) {

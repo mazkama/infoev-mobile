@@ -4,7 +4,7 @@ class InfoChip extends StatelessWidget {
   final String label;
   final Color backgroundColor;
   final Color textColor;
-  
+
   const InfoChip({
     super.key,
     required this.label,
@@ -19,10 +19,7 @@ class InfoChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: textColor.withOpacity(0.3),
-          width: 1,
-        ),
+        border: Border.all(color: textColor.withOpacity(0.3), width: 1),
       ),
       child: Text(
         label,

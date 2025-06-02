@@ -15,13 +15,13 @@ class NewsController extends GetxController {
   RxBool isLoadingMore = false.obs;
   RxBool hasMoreNews = true.obs;
   RxBool isError = false.obs; // Menambahkan status error
-  var searchQuery = ''.obs;  
+  var searchQuery = ''.obs;
 
   int currentPage = 1;
 
   @override
   void onInit() {
-    super.onInit(); 
+    super.onInit();
     loadAllData();
   }
 
