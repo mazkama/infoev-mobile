@@ -80,23 +80,29 @@ class EVCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _specColumn(
-                        Icons.speed,
-                        "Kecepatan",
-                        getHighlightValue("maxSpeed"),
-                        iconColor: AppColors.secondaryColor,
+                      Expanded(
+                        child: _specColumn(
+                          Icons.speed,
+                          "Kecepatan",
+                          getHighlightValue("maxSpeed"),
+                          iconColor: AppColors.secondaryColor,
+                        ),
                       ),
-                      _specColumn(
-                        Icons.ev_station,
-                        "Jarak",
-                        getHighlightValue("range"),
-                        iconColor: AppColors.secondaryColor,
+                      Expanded(
+                        child: _specColumn(
+                          Icons.ev_station,
+                          "Jarak",
+                          getHighlightValue("range"),
+                          iconColor: AppColors.secondaryColor,
+                        ),
                       ),
-                      _specColumn(
-                        Icons.bolt,
-                        "Isi Ulang",
-                        getHighlightValue("charge"),
-                        iconColor: AppColors.secondaryColor,
+                      Expanded(
+                        child: _specColumn(
+                          Icons.bolt,
+                          "Isi Ulang",
+                          getHighlightValue("charge"),
+                          iconColor: AppColors.secondaryColor,
+                        ),
                       ),
                     ],
                   ),
@@ -115,22 +121,40 @@ class EVCard extends StatelessWidget {
     String? value, {
     Color? iconColor,
   }) {
-    return Column(
-      children: [
-        Icon(icon, color: iconColor ?? AppColors.secondaryColor, size: 24),
-        const SizedBox(height: 4),
-        Text(
-          value ?? "-",
-          style: const TextStyle(
-            color: AppColors.textColor,
-            fontWeight: FontWeight.w600,
+    return Container(
+      constraints: const BoxConstraints(minHeight: 70),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(icon, color: iconColor ?? AppColors.secondaryColor, size: 26),
+          const SizedBox(height: 6),
+          Text(
+            value ?? "-",
+            style: const TextStyle(
+              color: AppColors.textColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
           ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
-        ),
-      ],
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.1,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }

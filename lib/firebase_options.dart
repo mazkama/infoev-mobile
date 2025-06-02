@@ -63,7 +63,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '972401900948',
     projectId: 'infoev-456907',
     storageBucket: 'infoev-456907.firebasestorage.app',
-    androidClientId: '972401900948-1bf48oentfq96pmtuq32hc44mbdio66e.apps.googleusercontent.com',
+    androidClientId:
+        '972401900948-1bf48oentfq96pmtuq32hc44mbdio66e.apps.googleusercontent.com',
     iosBundleId: 'id.ginio.infoev',
   );
 
@@ -73,7 +74,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '972401900948',
     projectId: 'infoev-456907',
     storageBucket: 'infoev-456907.firebasestorage.app',
-    androidClientId: '972401900948-1bf48oentfq96pmtuq32hc44mbdio66e.apps.googleusercontent.com',
+    androidClientId:
+        '972401900948-1bf48oentfq96pmtuq32hc44mbdio66e.apps.googleusercontent.com',
     iosBundleId: 'com.example.infoev',
   );
 
