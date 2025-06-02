@@ -5,9 +5,27 @@ import 'package:infoev/app/modules/login/controllers/LoginController.dart';
 import 'package:infoev/app/routes/app_pages.dart';
 import 'package:infoev/app/styles/app_colors.dart';
 import 'package:infoev/core/local_db.dart';
+import 'package:firebase_core/firebase_core.dart'; 
+import 'firebase_options.dart';
+import 'package:infoev/app/services/NotificationService.dart'; 
 
 void main() async { 
   WidgetsFlutterBinding.ensureInitialized();
+
+    // Initialize Firebase
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform); 
+
+  // Initialize Notification Service
+  await NotificationService().init();
+
+  // Subscribe to topics (customize these based on your needs)
+  await NotificationService().subscribeToTopic('infoev_news');
+  await NotificationService().subscribeToTopic('infoev_vehicle');
+
+  // Get FCM token for device
+  String? token = await NotificationService().getToken();
+  print('FCM Token: $token'); // You can send this token to your backend
+
   await LocalDB.init();
   Get.lazyPut(() => MerekController(), fenix: true);
   Get.lazyPut(() => LoginController(), fenix: true);
