@@ -116,45 +116,105 @@ class _ArticalPageState extends State<ArticalPage> {
                           onSearch: _onSearchChanged,
                           controller: searchController,
                         ),
+                      const SizedBox(height: 10),
+                      if (query.trim().isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.secondaryColor.withAlpha(25),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            'Hasil cari "$query"',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.secondaryColor,
+                            ),
+                          ),
+                        ),
                       const SizedBox(height: 15),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.secondaryColor.withAlpha(25),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              query.isNotEmpty
-                                  ? 'Hasil cari "$query"'
-                                  : newsController.currentFilter.value ==
-                                      'tips_and_tricks'
-                                  ? 'Tips & Trik'
-                                  : newsController.currentFilter.value ==
-                                      'sticky'
-                                  ? 'Untukmu' // Changed from 'Berita Penting'
-                                  : 'Semua Berita',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.secondaryColor,
-                              ),
-                            ),
-                          ),
                           Row(
                             children: [
+                              // Semua button
+                              GestureDetector(
+                                onTap: () {
+                                  if (newsController.currentFilter.value ==
+                                      'all') {
+                                    newsController.changeFilter(
+                                      '',
+                                    ); // Reset if already showing all
+                                  } else {
+                                    newsController.changeFilter(
+                                      'all',
+                                    ); // Set to all
+                                  }
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 5,
+                                  ),
+                                  margin: const EdgeInsets.only(right: 8),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        newsController.currentFilter.value ==
+                                                'all'
+                                            ? AppColors.secondaryColor
+                                            : AppColors.secondaryColor
+                                                .withAlpha(25),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.article_rounded,
+                                        size: 16,
+                                        color:
+                                            newsController
+                                                        .currentFilter
+                                                        .value ==
+                                                    'all'
+                                                ? Colors.white
+                                                : AppColors.secondaryColor,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Semua',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color:
+                                              newsController
+                                                          .currentFilter
+                                                          .value ==
+                                                      'all'
+                                                  ? Colors.white
+                                                  : AppColors.secondaryColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              // Untukmu button
                               GestureDetector(
                                 onTap: () {
                                   if (newsController.currentFilter.value ==
                                       'sticky') {
-                                    newsController.changeFilter('');
+                                    newsController.changeFilter(
+                                      '',
+                                    ); // Reset if already selected
                                   } else {
-                                    newsController.changeFilter('sticky');
+                                    newsController.changeFilter(
+                                      'sticky',
+                                    ); // Select this filter
                                   }
                                 },
                                 child: Container(
@@ -205,15 +265,18 @@ class _ArticalPageState extends State<ArticalPage> {
                                   ),
                                 ),
                               ),
+                              // Tips & Trik button
                               GestureDetector(
                                 onTap: () {
                                   if (newsController.currentFilter.value ==
                                       'tips_and_tricks') {
-                                    newsController.changeFilter('');
+                                    newsController.changeFilter(
+                                      '',
+                                    ); // Reset if already selected
                                   } else {
                                     newsController.changeFilter(
                                       'tips_and_tricks',
-                                    );
+                                    ); // Select this filter
                                   }
                                 },
                                 child: Container(

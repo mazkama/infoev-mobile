@@ -17,8 +17,8 @@ class NewsController extends GetxController {
   RxBool isError = false.obs; // Menambahkan status error
   var searchQuery = ''.obs;
 
-  // Add new variables for filter
-  RxString currentFilter = ''.obs;
+  // Change the currentFilter initialization
+  RxString currentFilter = 'all'.obs;
 
   int currentPage = 1;
 
@@ -103,9 +103,9 @@ class NewsController extends GetxController {
 
       // Use existing filter if type is not provided
       final activeFilter = type ?? currentFilter.value;
-
-      // Add filter to URL if exists
-      if (activeFilter.isNotEmpty) {
+      
+      // Add filter to URL if exists and not 'all'
+      if (activeFilter.isNotEmpty && activeFilter != 'all') {
         url += "&type=$activeFilter";
       }
 
@@ -189,13 +189,12 @@ class NewsController extends GetxController {
     }
   }
 
-  // Add method to change filter
+  // Update the changeFilter method
   Future<void> changeFilter(String type) async {
-    // Only proceed if filter actually changes
     if (currentFilter.value != type) {
       isLoading.value = true;
       try {
-        await getAllNews(reset: true, type: type.isEmpty ? null : type);
+        await getAllNews(reset: true, type: type);
       } catch (e) {
         isError.value = true;
       } finally {
