@@ -7,12 +7,17 @@ import 'package:infoev/core/local_db.dart';
 
 class FavoriteVehicleController extends GetxController {
   var favoriteVehicles = <FavoriteVehicle>[].obs;
+  var filteredVehicles = <FavoriteVehicle>[].obs; // For search results
   var isLoading = false.obs;
   var errorMessage = ''.obs;
 
   var isLoadingMore = false.obs;
   var isError = false.obs;
   var hasMoreFavorites = true.obs;
+  
+  // Search state
+  var isSearching = false.obs;
+  var searchQuery = "".obs;
 
   int currentPage = 1;
 
@@ -28,6 +33,43 @@ class FavoriteVehicleController extends GetxController {
     fetchFavoriteVehicles(); // Ini akan dipanggil ulang setiap kali halaman aktif
   }
 
+  // Toggle search mode
+  void toggleSearch() {
+    isSearching.value = !isSearching.value;
+    if (!isSearching.value) {
+      searchQuery.value = "";
+      applyFilters();
+    }
+  }
+
+  // Search vehicles by name or brand
+  void searchVehicles(String query) {
+    searchQuery.value = query;
+    applyFilters();
+  }
+
+  // Apply filters (currently just search)
+  void applyFilters() {
+    if (searchQuery.value.isEmpty) {
+      filteredVehicles.value = List<FavoriteVehicle>.from(favoriteVehicles);
+      return;
+    }
+
+    final query = searchQuery.value.toLowerCase();
+    filteredVehicles.value = favoriteVehicles
+        .where((vehicle) => 
+          vehicle.name.toLowerCase().contains(query) || 
+          vehicle.brandName.toLowerCase().contains(query))
+        .toList();
+  }
+
+  // Reset all filters
+  void resetFilters() {
+    searchQuery.value = "";
+    isSearching.value = false;
+    applyFilters();
+  }
+
   Future<void> refreshFavorites() async {
     await fetchFavoriteVehicles(reset: true);
   }
@@ -35,12 +77,15 @@ class FavoriteVehicleController extends GetxController {
   Future<void> clearAndRefreshData() async {
     // Clear existing data
     favoriteVehicles.clear();
+    filteredVehicles.clear();
     currentPage = 1;
     hasMoreFavorites.value = true;
     errorMessage.value = '';
     isLoading.value = false;
     isLoadingMore.value = false;
     isError.value = false;
+    searchQuery.value = '';
+    isSearching.value = false;
 
     // Fetch new data
     await fetchFavoriteVehicles(reset: true);
@@ -55,6 +100,7 @@ class FavoriteVehicleController extends GetxController {
       currentPage = 1;
       hasMoreFavorites.value = true;
       favoriteVehicles.clear();
+      filteredVehicles.clear();
       errorMessage.value = '';
       isLoading.value = true;
     } else {
@@ -67,6 +113,7 @@ class FavoriteVehicleController extends GetxController {
 
       if (token == null || token.isEmpty) {
         favoriteVehicles.clear(); // Hapus data lama jika token tidak valid
+        filteredVehicles.clear();
         errorMessage.value = 'Token tidak tersedia. Silakan login kembali.';
         return;
       }
@@ -87,11 +134,13 @@ class FavoriteVehicleController extends GetxController {
           hasMoreFavorites.value = false;
         } else {
           // Jika reset, clear sudah dilakukan di atas, jadi ini tinggal addAll saja
-          favoriteVehicles.addAll(
-            vehiclesJson.map((e) => FavoriteVehicle.fromJson(e)).toList(),
-          );
+          final newVehicles = vehiclesJson.map((e) => FavoriteVehicle.fromJson(e)).toList();
+          favoriteVehicles.addAll(newVehicles);
           currentPage++;
           errorMessage.value = '';
+          
+          // Apply any active filters to update filtered list
+          applyFilters();
         }
       } else {
         errorMessage.value =
