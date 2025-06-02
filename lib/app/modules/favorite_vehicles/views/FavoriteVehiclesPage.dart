@@ -154,8 +154,8 @@ class FavoritVehiclesPage extends StatelessWidget {
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
+                  children: [ 
+                     Text(
                       vehicle.name,
                       style: GoogleFonts.poppins(
                         color: AppColors.textOnPrimary,
@@ -165,6 +165,16 @@ class FavoritVehiclesPage extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    if (vehicle.brandName.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        vehicle.brandName,
+                        style: GoogleFonts.poppins(
+                          color: AppColors.textOnPrimary,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
