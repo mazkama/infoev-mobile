@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:infoev/app/styles/app_colors.dart';
 
 class EmptyStateWidget extends StatelessWidget {
@@ -28,7 +29,7 @@ class EmptyStateWidget extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             message,
-            style: TextStyle(
+            style: GoogleFonts.poppins(
               color: AppColors.textTertiary,
               fontSize: 16,
               fontWeight: FontWeight.w500,
@@ -42,8 +43,18 @@ class EmptyStateWidget extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryColor,
                 foregroundColor: AppColors.textOnPrimary,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
               ),
-              child: Text(buttonText!),
+              child: Text(
+                buttonText!,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ],
         ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:infoev/app/styles/app_colors.dart';
 
 class SearchWidget extends StatelessWidget {
@@ -29,15 +30,31 @@ class SearchWidget extends StatelessWidget {
       child: TextField(
         controller: controller,
         onChanged: onSearch,
-        style: const TextStyle(color: AppColors.textColor),
+        style: GoogleFonts.poppins(
+          color: AppColors.textColor,
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+        ),
         decoration: InputDecoration(
           hintText: "Cari berita...",
-          hintStyle: TextStyle(color: AppColors.textTertiary),
-          prefixIcon: const Icon(Icons.search, color: AppColors.primaryColor),
+          hintStyle: GoogleFonts.poppins(
+            color: AppColors.textTertiary,
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
+          ),
+          prefixIcon: const Icon(
+            Icons.search,
+            color: AppColors.primaryColor,
+            size: 20,
+          ),
           suffixIcon:
               controller.text.isNotEmpty
                   ? IconButton(
-                    icon: Icon(Icons.clear, color: AppColors.primaryColor),
+                    icon: const Icon(
+                      Icons.clear,
+                      color: AppColors.primaryColor,
+                      size: 20,
+                    ),
                     onPressed: () {
                       controller.clear();
                       onSearch('');

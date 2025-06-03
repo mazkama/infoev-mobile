@@ -7,6 +7,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:infoev/app/styles/app_colors.dart'; // Import palet warna
+import 'package:google_fonts/google_fonts.dart';
 
 class NewsDetailsPage extends StatefulWidget {
   final NewsModel news;
@@ -32,7 +33,7 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                 context,
               ).unfocus(), // Tutup keyboard saat tap area kosong
       child: Scaffold(
-        backgroundColor: AppColors.backgroundColor, // Latar belakang putih
+        backgroundColor: AppColors.backgroundColor,
         body: SafeArea(
           child: CustomScrollView(
             slivers: [
@@ -91,19 +92,14 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                     children: [
                       Row(
                         children: [
-                          // CircleAvatar(
-                          //   radius: 10,
-                          //   backgroundColor: AppColors.accentColor, // Oranye sebagai aksen
-                          // ),
-                          // const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               "InfoEV.id",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
                                 color: AppColors.primaryColor,
-                              ), // Abu-abu gelap
+                              ),
                             ),
                           ),
                           Text(
@@ -111,10 +107,11 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                               "EEEE, dd MMM yyyy HH:mm 'WIB'",
                               'id_ID',
                             ).format(widget.news.createdAt),
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: AppColors.secondaryTextColor,
-                            ), // Abu
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              fontWeight: FontWeight.normal,
+                              color: AppColors.textTertiary,
+                            ),
                           ),
                         ],
                       ),
@@ -123,23 +120,37 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
 
                       Text(
                         widget.news.title,
-                        style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textColor, // Hitam untuk keterbacaan
+                        style: GoogleFonts.poppins(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textColor,
+                          height: 1.3,
                         ),
                       ),
 
                       const SizedBox(height: 20),
                       HtmlWidget(
                         widget.news.content,
-                        textStyle: const TextStyle(
-                          fontSize: 18,
-                          height: 1.5,
+                        textStyle: GoogleFonts.poppins(
+                          fontSize: 16,
+                          height: 1.6,
                           color: AppColors.textColor,
+                          fontWeight: FontWeight.normal,
                         ),
                         customStylesBuilder: (element) {
-                          return {'text-align': 'justify'};
+                          if (element.localName == 'h1' ||
+                              element.localName == 'h2' ||
+                              element.localName == 'h3') {
+                            return {
+                              'font-family': 'Poppins',
+                              'font-weight': '600',
+                              'margin': '16px 0 8px 0',
+                            };
+                          }
+                          return {
+                            'font-family': 'Poppins',
+                            'text-align': 'justify',
+                          };
                         },
                       ),
                     ],

@@ -9,6 +9,7 @@ import 'package:infoev/app/modules/home/views/Widgets/shimmer_loading.dart';
 import 'package:infoev/app/modules/news/views/news_detail_view.dart';
 import 'package:infoev/app/styles/app_colors.dart';
 import 'package:infoev/app/modules/news/views/widgets/EmptyStateWidget.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ArticalPage extends StatefulWidget {
   const ArticalPage({super.key});
@@ -73,10 +74,11 @@ class _ArticalPageState extends State<ArticalPage> {
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.textColor),
           onPressed: () => Get.back(),
         ),
-        title: const Text(
+        title: Text(
           "Berita EV",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
             color: AppColors.textColor,
           ),
         ),
@@ -129,13 +131,14 @@ class _ArticalPageState extends State<ArticalPage> {
                           ),
                           child: Text(
                             'Hasil cari "$query"',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
                               color: AppColors.primaryColor,
                             ),
                           ),
                         ),
+
                       const SizedBox(height: 15),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -187,9 +190,9 @@ class _ArticalPageState extends State<ArticalPage> {
                                       const SizedBox(width: 4),
                                       Text(
                                         'Semua',
-                                        style: TextStyle(
+                                        style: GoogleFonts.poppins(
                                           fontSize: 12,
-                                          fontWeight: FontWeight.bold,
+                                          fontWeight: FontWeight.w600,
                                           color:
                                               newsController
                                                           .currentFilter
@@ -235,8 +238,7 @@ class _ArticalPageState extends State<ArticalPage> {
                                   child: Row(
                                     children: [
                                       Icon(
-                                        Icons
-                                            .favorite_rounded, // Changed from Icons.push_pin
+                                        Icons.favorite_rounded,
                                         size: 16,
                                         color:
                                             newsController
@@ -248,10 +250,10 @@ class _ArticalPageState extends State<ArticalPage> {
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
-                                        'Untukmu', // Changed from 'Penting'
-                                        style: TextStyle(
+                                        'Untukmu',
+                                        style: GoogleFonts.poppins(
                                           fontSize: 12,
-                                          fontWeight: FontWeight.bold,
+                                          fontWeight: FontWeight.w600,
                                           color:
                                               newsController
                                                           .currentFilter
@@ -309,9 +311,9 @@ class _ArticalPageState extends State<ArticalPage> {
                                       const SizedBox(width: 4),
                                       Text(
                                         'Tips & Trik',
-                                        style: TextStyle(
+                                        style: GoogleFonts.poppins(
                                           fontSize: 12,
-                                          fontWeight: FontWeight.bold,
+                                          fontWeight: FontWeight.w600,
                                           color:
                                               newsController
                                                           .currentFilter
@@ -348,7 +350,7 @@ class _ArticalPageState extends State<ArticalPage> {
                     child: EmptyStateWidget(
                       message: 'Pencarian tidak ditemukan.',
                     ),
-                  ), 
+                  ),
                 if (isLoading)
                   const SliverFillRemaining(
                     hasScrollBody: false,

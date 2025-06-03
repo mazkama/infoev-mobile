@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:infoev/app/styles/app_colors.dart'; // Import palet warna
 
@@ -91,43 +92,30 @@ class NewsTitle extends StatelessWidget {
             ), // Spacing sedikit lebih besar untuk kejelasan
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
+                padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Text(
-                    //   tag,
-                    //   style: TextStyle(
-                    //     color: AppColors.secondaryTextColor, // Abu-abu gelap
-                    //     fontSize: 12,
-                    //   ),
-                    // ),
-                    const SizedBox(height: 4),
                     Text(
                       title,
-                      style: TextStyle(
-                        color: AppColors.textColor, // Hitam untuk kontras
-                        fontWeight:
-                            FontWeight.w600, // Sesuaikan dengan TrandingCard
-                        fontSize: 18,
+                      style: GoogleFonts.poppins(
+                        color: AppColors.textColor,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        height: 1.3,
                       ),
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 20),
                     Row(
                       children: [
-                        // CircleAvatar(
-                        //   radius: 10,
-                        //   backgroundColor: AppColors.accentColor, // Oranye sebagai aksen
-                        // ),
-                        // const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             author,
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               color: AppColors.primaryColor,
-                              fontSize: 14,
+                              fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),
                             overflow: TextOverflow.ellipsis,
@@ -135,10 +123,10 @@ class NewsTitle extends StatelessWidget {
                         ),
                         Text(
                           time,
-                          style: TextStyle(
-                            color:
-                                AppColors.secondaryTextColor, // Abu-abu gelap
+                          style: GoogleFonts.poppins(
+                            color: AppColors.textTertiary,
                             fontSize: 12,
+                            fontWeight: FontWeight.normal,
                           ),
                         ),
                       ],
