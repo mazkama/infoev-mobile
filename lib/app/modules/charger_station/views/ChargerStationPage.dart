@@ -81,86 +81,223 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
   void _showDialog(station) {
     showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          backgroundColor: AppColors.backgroundColor,
-          title: Row(
-            children: [
-              const Icon(Icons.ev_station, color: AppColors.primaryColor),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  station.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: AppColors.primaryColor,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(20),
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 400),
+            decoration: BoxDecoration(
+              color: AppColors.backgroundColor,
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 20,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 8),
                 ),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Icon(
-                    Icons.location_on,
-                    color: AppColors.textColor,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 5),
-                  Expanded(
-                    child: Text(
-                      station.vicinity,
-                      maxLines: 2,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textColor,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header with gradient background
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.primaryColor.withOpacity(0.1),
+                        AppColors.secondaryColor.withOpacity(0.05),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(28),
+                      topRight: Radius.circular(28),
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                FocusManager.instance.primaryFocus?.unfocus();
-                FocusScope.of(context).unfocus();
-                Navigator.of(context).pop();
-              },
-              child: const Text(
-                "Tutup",
-                style: TextStyle(
-                  color: AppColors.textColor,
-                  fontWeight: FontWeight.bold,
+                  child: Column(
+                    children: [
+                      // Icon with modern design
+                      Container(
+                        width: 64,
+                        height: 64,
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: AppColors.primaryColor.withOpacity(0.2),
+                            width: 2,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.ev_station_rounded,
+                          color: AppColors.primaryColor,
+                          size: 32,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Station name
+                      Text(
+                        station.name,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: AppColors.textColor,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+                
+                // Content section
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      // Location info with better styling
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppColors.backgroundColor,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: AppColors.primaryColor.withOpacity(0.1),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: AppColors.secondaryColor.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.location_on_rounded,
+                                color: AppColors.secondaryColor,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Lokasi',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.textSecondary,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    station.vicinity,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: AppColors.textColor,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 24),
+                      
+                      // Action buttons with modern design
+                      Row(
+                        children: [
+                          // Cancel button
+                          Expanded(
+                            child: TextButton(
+                              onPressed: () {
+                                FocusManager.instance.primaryFocus?.unfocus();
+                                FocusScope.of(context).unfocus();
+                                Navigator.of(context).pop();
+                              },
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  side: BorderSide(
+                                    color: AppColors.primaryColor.withOpacity(0.2),
+                                    width: 1.5,
+                                  ),
+                                ),
+                                backgroundColor: Colors.transparent,
+                              ),
+                              child: const Text(
+                                'Tutup',
+                                style: TextStyle(
+                                  color: AppColors.textColor,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                          
+                          const SizedBox(width: 12),
+                          
+                          // Maps button
+                          Expanded(
+                            flex: 2,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                _launchMapsUrl(station);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primaryColor,
+                                foregroundColor: AppColors.textOnPrimary,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                elevation: 0,
+                                shadowColor: Colors.transparent,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.directions_rounded,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    'Buka Maps',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            ElevatedButton.icon(
-              onPressed: () {
-                _launchMapsUrl(station);
-              },
-              icon: const Icon(Icons.directions),
-              label: Text('Rute Maps'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amber[400],
-                foregroundColor: Colors.black,
-                textStyle: TextStyle(fontWeight: FontWeight.w500),
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                minimumSize: Size(0, 30),
-              ),
-            ),
-          ],
+          ),
         );
       },
     );
@@ -250,10 +387,16 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
               top: 16,
               left: 16,
               right: 16,
-              child:
-                  _showSearch
-                      ? SearchBarWidget(controller: controller)
-                      : Container(),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                height: _showSearch ? null : 0,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 250),
+                  opacity: _showSearch ? 1.0 : 0.0,
+                  child: SearchBarWidget(controller: controller),
+                ),
+              ),
             ),
             AnimatedPadding(
               duration: const Duration(milliseconds: 200),
