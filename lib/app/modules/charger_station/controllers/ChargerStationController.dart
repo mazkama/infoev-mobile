@@ -114,17 +114,24 @@ class ChargerStationController extends GetxController {
         wilayah.value = stationsResponse.wilayah;
 
         print("Loaded ${chargerStations.length} stations for $wilayah");
-
-        if (chargerStations.isEmpty) {
-          errorMessage.value =
-              "Tidak ada stasiun pengisian ditemukan di $location";
-        }
       } else {
+        isLoading(false);
         hasError(true);
-        errorMessage.value =
-            "Gagal memuat data. Status: ${response.statusCode}";
+        print("API Response status: ${response.statusCode}");
+        chargerStations.clear();
+
+        print(
+          "Failed to load charger stations. Status: ${response.statusCode}",
+        );
+        if (response.statusCode == 404) {
+          errorMessage.value = "Stasiun tidak ditemukan untuk lokasi ini.";
+        } else {
+          errorMessage.value =
+              "Terjadi kesalahan saat memuat data stasiun. Coba lagi nanti.";
+        }
       }
     } catch (e) {
+      isLoading(false);
       hasError(true);
       errorMessage.value = "Terjadi kesalahan: $e";
       print("Exception during fetchChargerStations: $e");
@@ -186,9 +193,15 @@ class ChargerStationController extends GetxController {
                 )
                 .toList();
 
-        if (filteredSuggestions.isNotEmpty) {
-          citySuggestions.assignAll(filteredSuggestions);
-          suggestionSource.value = "cache"; // Track cache source
+        // Hilangkan duplikat berdasarkan id
+        final uniqueFiltered =
+            {
+              for (var city in filteredSuggestions) city.id: city,
+            }.values.toList();
+
+        if (uniqueFiltered.isNotEmpty) {
+          citySuggestions.assignAll(uniqueFiltered);
+          suggestionSource.value = "cache";
           print("City suggestions loaded from cache");
           return;
         }
@@ -214,7 +227,11 @@ class ChargerStationController extends GetxController {
         final suggestions =
             data.map((item) => CitySuggestion.fromJson(item)).toList();
 
-        citySuggestions.assignAll(suggestions);
+        // Hilangkan duplikat berdasarkan id
+        final uniqueSuggestions =
+            {for (var city in suggestions) city.id: city}.values.toList();
+
+        citySuggestions.assignAll(uniqueSuggestions);
         suggestionSource.value = "api"; // Track API source
 
         // Save to cache

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infoev/app/modules/charger_station/views/widgets/empty_stations_widget.dart';
+import 'package:infoev/app/modules/charger_station/views/widgets/error_stations_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:core';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -156,7 +157,7 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                     ],
                   ),
                 ),
-                
+
                 // Content section
                 Padding(
                   padding: const EdgeInsets.all(24),
@@ -179,7 +180,9 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                               width: 40,
                               height: 40,
                               decoration: BoxDecoration(
-                                color: AppColors.secondaryColor.withOpacity(0.1),
+                                color: AppColors.secondaryColor.withOpacity(
+                                  0.1,
+                                ),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: const Icon(
@@ -216,9 +219,9 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                           ],
                         ),
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // Action buttons with modern design
                       Row(
                         children: [
@@ -231,11 +234,15 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                                 Navigator.of(context).pop();
                               },
                               style: TextButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
                                   side: BorderSide(
-                                    color: AppColors.primaryColor.withOpacity(0.2),
+                                    color: AppColors.primaryColor.withOpacity(
+                                      0.2,
+                                    ),
                                     width: 1.5,
                                   ),
                                 ),
@@ -251,9 +258,9 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                               ),
                             ),
                           ),
-                          
+
                           const SizedBox(width: 12),
-                          
+
                           // Maps button
                           Expanded(
                             flex: 2,
@@ -264,7 +271,9 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primaryColor,
                                 foregroundColor: AppColors.textOnPrimary,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
                                 ),
@@ -480,11 +489,25 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                             ),
                             const SizedBox(height: 10),
                             SizedBox(
-                              height:
-                                  300, // Atur tinggi minimum agar tetap bisa discroll
+                              height: 300,
                               child:
                                   controller.isLoading.value
                                       ? ShimmerLoadingStations()
+                                      : controller.errorMessage.value.isNotEmpty
+                                      && controller.hasError.value
+                                      ? ErrorStationsWidget(
+                                        message: controller.errorMessage.value,
+                                        onRetry:
+                                            () =>
+                                                controller.fetchChargerStations(
+                                                  controller
+                                                          .wilayah
+                                                          .value
+                                                          .isNotEmpty
+                                                      ? controller.wilayah.value
+                                                      : "Jakarta",
+                                                ),
+                                      )
                                       : controller.filteredStations.isEmpty
                                       ? const EmptyStationsWidget()
                                       : ChargerStationsList(

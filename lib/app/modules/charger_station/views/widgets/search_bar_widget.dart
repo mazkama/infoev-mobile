@@ -17,7 +17,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with TickerProviderSt
   final TextEditingController textController = TextEditingController();
   final FocusNode focusNode = FocusNode();
   bool isSearchFocused = false;
-  final debouncer = Debouncer(milliseconds: 500);
+  final debouncer = Debouncer(milliseconds: 600);
   
   // Animation controllers
   late AnimationController _slideController;
