@@ -258,7 +258,9 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
             AnimatedPadding(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeOut,
-              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
               child: DraggableScrollableSheet(
                 controller: _draggableController,
                 initialChildSize: 0.50,
@@ -300,7 +302,9 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                       ),
                       child: SingleChildScrollView(
                         controller: scrollController,
-                        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).viewInsets.bottom,
+                        ),
                         child: Column(
                           children: [
                             Container(
@@ -314,7 +318,9 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                             ),
                             const SizedBox(height: 10),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
                               child: Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
@@ -331,10 +337,12 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                             ),
                             const SizedBox(height: 10),
                             SizedBox(
-                              height: 300, // Atur tinggi minimum agar tetap bisa discroll
-                              child: controller.isLoading.value
-                                  ? ShimmerLoadingStations()
-                                  : controller.filteredStations.isEmpty
+                              height:
+                                  300, // Atur tinggi minimum agar tetap bisa discroll
+                              child:
+                                  controller.isLoading.value
+                                      ? ShimmerLoadingStations()
+                                      : controller.filteredStations.isEmpty
                                       ? const EmptyStationsWidget()
                                       : ChargerStationsList(
                                         stations: controller.filteredStations,
@@ -344,8 +352,10 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                                             CameraUpdate.newCameraPosition(
                                               CameraPosition(
                                                 target: LatLng(
-                                                  station.lat ?? _defaultCenter.latitude,
-                                                  station.lng ?? _defaultCenter.longitude,
+                                                  station.lat ??
+                                                      _defaultCenter.latitude,
+                                                  station.lng ??
+                                                      _defaultCenter.longitude,
                                                 ),
                                                 zoom: 16,
                                               ),

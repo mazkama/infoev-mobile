@@ -148,15 +148,9 @@ class _ArticalPageState extends State<ArticalPage> {
                               // Semua button
                               GestureDetector(
                                 onTap: () {
-                                  if (newsController.currentFilter.value ==
+                                  if (newsController.currentFilter.value !=
                                       'all') {
-                                    newsController.changeFilter(
-                                      '',
-                                    ); // Reset if already showing all
-                                  } else {
-                                    newsController.changeFilter(
-                                      'all',
-                                    ); // Set to all
+                                    newsController.changeFilter('all');
                                   }
                                 },
                                 child: Container(
@@ -209,15 +203,9 @@ class _ArticalPageState extends State<ArticalPage> {
                               // Untukmu button
                               GestureDetector(
                                 onTap: () {
-                                  if (newsController.currentFilter.value ==
+                                  if (newsController.currentFilter.value !=
                                       'sticky') {
-                                    newsController.changeFilter(
-                                      '',
-                                    ); // Reset if already selected
-                                  } else {
-                                    newsController.changeFilter(
-                                      'sticky',
-                                    ); // Select this filter
+                                    newsController.changeFilter('sticky');
                                   }
                                 },
                                 child: Container(
@@ -270,15 +258,11 @@ class _ArticalPageState extends State<ArticalPage> {
                               // Tips & Trik button
                               GestureDetector(
                                 onTap: () {
-                                  if (newsController.currentFilter.value ==
+                                  if (newsController.currentFilter.value !=
                                       'tips_and_tricks') {
                                     newsController.changeFilter(
-                                      '',
-                                    ); // Reset if already selected
-                                  } else {
-                                    newsController.changeFilter(
                                       'tips_and_tricks',
-                                    ); // Select this filter
+                                    );
                                   }
                                 },
                                 child: Container(
