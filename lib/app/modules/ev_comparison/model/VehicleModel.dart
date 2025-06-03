@@ -158,6 +158,7 @@ class SpecVehicleValue {
   final String? value;
   final String? unit;
   final bool? valueBool;
+  final List<String>? listItems; // Add this field
 
   SpecVehicleValue({
     required this.vehicleId,
@@ -165,19 +166,16 @@ class SpecVehicleValue {
     this.value,
     this.unit,
     this.valueBool,
+    this.listItems, // Add this parameter
   });
 
   factory SpecVehicleValue.fromJson(Map<String, dynamic> json) {
     final pivot = json['pivot'];
     final rawValue = pivot['value'];
-    // final rawDesc = pivot['value_desc'];
-    // final rawBool = pivot['value_bool'];
+    final listItems = pivot['list_items']; // Get list_items from pivot
 
     // Use cast for vehicle_id as int
-    final vehicleId = cast<int>(
-      pivot['vehicle_id'],
-      'vehicle_id',
-    ); // cast to int
+    final vehicleId = cast<int>(pivot['vehicle_id'], 'vehicle_id');
     final vehicleSlug = cast<String>(json['slug'], 'slug');
 
     return SpecVehicleValue(
@@ -186,10 +184,16 @@ class SpecVehicleValue {
       value: _parseNumber(rawValue),
       unit: cast<String?>(json['unit'], 'unit'),
       valueBool: _parseBool(pivot['value_bool']),
+      listItems: listItems != null ? List<String>.from(listItems) : null,
     );
   }
 
   String? getDisplayWithUnit({String? itemUnit, String? itemType}) {
+    // Handle list type first
+    if (itemType == 'list' && listItems != null) {
+      return listItems!.join(', '); // Join list items with comma
+    }
+
     if (valueBool != null) return valueBool! ? '✓' : '✗';
     if (value == null || value.toString().toLowerCase() == "null") return null;
 
@@ -239,6 +243,7 @@ class SpecVehicleValue {
     value: null,
     unit: null,
     valueBool: null,
+    listItems: null, // Add this field
   );
 
   @override

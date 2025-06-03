@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:infoev/app/styles/app_colors.dart';
 import 'package:shimmer/shimmer.dart';
 import 'dart:async';
+import 'package:google_fonts/google_fonts.dart';
 
 class EVSearchField extends StatefulWidget {
   final String hintText;
@@ -89,11 +90,14 @@ class _EVSearchFieldState extends State<EVSearchField> {
       children: [
         TextField(
           controller: _controller,
-          style: const TextStyle(color: AppColors.textColor),
+          style: GoogleFonts.poppins(color: AppColors.textColor, fontSize: 14),
           onChanged: _searchVehicles,
           decoration: InputDecoration(
             hintText: widget.hintText,
-            hintStyle: const TextStyle(color: AppColors.textTertiary),
+            hintStyle: GoogleFonts.poppins(
+              color: AppColors.textTertiary,
+              fontSize: 14,
+            ),
             filled: true,
             fillColor: AppColors.cardBackgroundColor,
             contentPadding: const EdgeInsets.symmetric(
@@ -202,14 +206,15 @@ class _EVSearchFieldState extends State<EVSearchField> {
                     ),
                     title: Text(
                       '${vehicle['brand']['name']} ${vehicle['name']}',
-                      style: const TextStyle(
+                      style: GoogleFonts.poppins(
                         color: AppColors.textColor,
                         fontWeight: FontWeight.w500,
+                        fontSize: 14,
                       ),
                     ),
                     subtitle: Text(
                       'Tahun ${double.parse(vehicle['pivot']['value'].toString()).toStringAsFixed(0)}',
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         color: AppColors.textSecondary,
                         fontSize: 12,
                       ),

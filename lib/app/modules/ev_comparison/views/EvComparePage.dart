@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:infoev/app/modules/ev_comparison/controllers/EvCompareController.dart';
 import 'package:infoev/app/modules/ev_comparison/views/widgets/ComparisonTable.dart';
 import 'package:infoev/app/modules/ev_comparison/views/widgets/EvCard.dart';
@@ -34,11 +35,12 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
       appBar: AppBar(
         elevation: 0,
         scrolledUnderElevation: 0, // Bayangan tetap saat scroll
-        backgroundColor: AppColors.backgroundColor,
-        title: const Text(
+        backgroundColor: AppColors.cardBackgroundColor,
+        title: Text(
           "Comparison Page",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
+          style: GoogleFonts.poppins(
+            fontSize: 21,
+            fontWeight: FontWeight.w600,
             color: AppColors.textColor,
           ),
         ),
@@ -68,22 +70,30 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
                   children: [
                     Text(
                       'Pilih Kendaraan 1:',
-                      style: TextStyle(color: AppColors.textColor),
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textColor,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     EVSearchField(
-                      hintText: 'Cari kendaraan pertama...',
+                      hintText: 'Cari kendaraan pertama...', 
                       onSelected: controller.selectVehicleA,
                       externalController: searchControllerA,
                     ),
                     const SizedBox(height: 16),
                     Text(
                       'Pilih Kendaraan 2:',
-                      style: TextStyle(color: AppColors.textColor),
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textColor,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     EVSearchField(
-                      hintText: 'Cari kendaraan kedua...',
+                      hintText: 'Cari kendaraan kedua...', 
                       onSelected: controller.selectVehicleB,
                       externalController: searchControllerB,
                     ),
@@ -104,7 +114,13 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
                         ElevatedButton.icon(
                           onPressed: controller.compareNow,
                           icon: const Icon(Icons.compare_arrows),
-                          label: const Text('Compare Sekarang'),
+                          label: Text(
+                            'Compare Sekarang',
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryColor,
                             foregroundColor: AppColors.textOnPrimary,
@@ -117,15 +133,21 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
                         const SizedBox(width: 12),
                         ElevatedButton.icon(
                           onPressed: () {
-                            controller.resetComparison();
-                            searchControllerA.clear();
-                            searchControllerB.clear();
+                          controller.resetComparison();
+                          searchControllerA.clear();
+                          searchControllerB.clear();
                           },
                           icon: const Icon(Icons.refresh),
-                          label: const Text('Reset'),
+                          label: Text(
+                          'Reset',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.backgroundSecondary,
-                            foregroundColor: AppColors.textColor,
+                          backgroundColor: AppColors.backgroundSecondary,
+                          foregroundColor: AppColors.textColor,
                           ),
                         ),
                       ],
@@ -195,10 +217,10 @@ class PlaceholderCard extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         label,
-        style: TextStyle(
-          color: AppColors.secondaryTextColor,
-          fontSize: 16,
+        style: GoogleFonts.poppins(
+          fontSize: 14,
           fontWeight: FontWeight.w500,
+          color: AppColors.textSecondary,
         ),
       ),
     );

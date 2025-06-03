@@ -567,7 +567,7 @@ class _HomePageState extends State<HomePage> {
                           // Shimmer untuk "Hottest News"
                           Obx(() {
                             if (newsController.isLoading.value) {
-                              return const ShimmerVehiclePopuler();
+                              return const ShimmerVehicleNew();
                             } else {
                               return SingleChildScrollView(
                                 physics: const BouncingScrollPhysics(),
@@ -617,7 +617,7 @@ class _HomePageState extends State<HomePage> {
                           // Shimmer untuk "Hottest News"
                           Obx(() {
                             if (newsController.isLoading.value) {
-                              return const ShimmerVehicleNew();
+                              return const ShimmerVehiclePopuler();
                             } else {
                               return SingleChildScrollView(
                                 physics: const BouncingScrollPhysics(),

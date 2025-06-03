@@ -33,6 +33,7 @@ class SpecItem {
   final String? value;
   final String? valueDesc;
   final bool? valueBool;
+  final List<String>? listItems; // Add this field
 
   SpecItem({
     required this.id,
@@ -42,6 +43,7 @@ class SpecItem {
     this.value,
     this.valueDesc,
     this.valueBool,
+    this.listItems, // Add this parameter
   });
 
   factory SpecItem.fromJson(Map<String, dynamic> json) {
@@ -49,6 +51,7 @@ class SpecItem {
     String? value;
     String? valueDesc;
     bool? valueBool;
+    List<String>? listItems;
 
     if (json['vehicles'] != null && (json['vehicles'] as List).isNotEmpty) {
       final vehicle = json['vehicles'][0];
@@ -57,6 +60,11 @@ class SpecItem {
         value = pivot['value']?.toString();
         valueDesc = pivot['value_desc'];
         valueBool = pivot['value_bool'] == 1;
+        
+        // Parse list_items from pivot
+        if (pivot['list_items'] != null) {
+          listItems = List<String>.from(pivot['list_items']);
+        }
       }
     }
 
@@ -68,15 +76,20 @@ class SpecItem {
       value: value,
       valueDesc: valueDesc,
       valueBool: valueBool,
+      listItems: listItems,
     );
   }
 
   String? getValue() {
+    // Handle list type first
+    if (type == 'list' && listItems != null) {
+      return listItems!.join(', ');
+    }
+
     if (type == 'availability') {
       return valueBool == true ? 'Ya' : 'Tidak';
     }
 
-    // Khusus untuk Pengisian Daya AC, tampilkan value dan valueDesc
     if (name == 'Pengisian Daya AC' && value != null && valueDesc != null) {
       return '$value jam ($valueDesc)';
     }
@@ -88,7 +101,6 @@ class SpecItem {
     if (value == null) return null;
     if (unit != null && unit!.isNotEmpty) {
       if (type == 'price') {
-        // Format nilai harga
         try {
           final price = double.parse(value!);
           final formatted = price

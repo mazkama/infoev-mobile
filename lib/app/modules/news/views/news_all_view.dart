@@ -124,7 +124,7 @@ class _ArticalPageState extends State<ArticalPage> {
                             vertical: 10,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.secondaryColor.withAlpha(25),
+                            color: AppColors.primaryColor.withAlpha(25),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -132,7 +132,7 @@ class _ArticalPageState extends State<ArticalPage> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.secondaryColor,
+                              color: AppColors.primaryColor,
                             ),
                           ),
                         ),
@@ -329,7 +329,7 @@ class _ArticalPageState extends State<ArticalPage> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 15),
                     ]),
                   ),
                 ),
@@ -348,14 +348,7 @@ class _ArticalPageState extends State<ArticalPage> {
                     child: EmptyStateWidget(
                       message: 'Pencarian tidak ditemukan.',
                     ),
-                  ),
-                // if (!isLoading && newsList.isEmpty && query.isEmpty)
-                //   SliverFillRemaining(
-                //     hasScrollBody: false,
-                //     child: EmptyStateWidget(
-                //       message: 'Belum ada berita tersedia.',
-                //     ),
-                //   ),
+                  ), 
                 if (isLoading)
                   const SliverFillRemaining(
                     hasScrollBody: false,

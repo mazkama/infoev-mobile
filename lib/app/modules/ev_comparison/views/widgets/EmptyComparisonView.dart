@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:infoev/app/styles/app_colors.dart';
 
 class EmptyComparisonView extends StatelessWidget {
@@ -17,7 +18,7 @@ class EmptyComparisonView extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'Belum ada kendaraan yang dibandingkan',
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                 color: AppColors.textSecondary,
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
@@ -27,7 +28,11 @@ class EmptyComparisonView extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'Silakan pilih kendaraan untuk memulai perbandingan.',
-              style: TextStyle(color: AppColors.textTertiary, fontSize: 14),
+              style: GoogleFonts.poppins(
+                color: AppColors.textTertiary,
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+              ),
               textAlign: TextAlign.center,
             ),
           ],

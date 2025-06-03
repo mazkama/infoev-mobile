@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:infoev/app/modules/ev_comparison/model/VehicleModel.dart';
 import 'package:infoev/app/styles/app_colors.dart';
 
@@ -63,13 +64,12 @@ class EVCard extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Nama
                   Text(
                     '${vehicle.brand} ${vehicle.name}',
-                    style: const TextStyle(
+                    style: GoogleFonts.poppins(
                       color: AppColors.textColor,
                       fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 2,
@@ -131,9 +131,9 @@ class EVCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             value ?? "-",
-            style: const TextStyle(
+            style: GoogleFonts.poppins(
               color: AppColors.textColor,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               fontSize: 16,
             ),
             maxLines: 1,
@@ -143,7 +143,7 @@ class EVCard extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             label,
-            style: const TextStyle(
+            style: GoogleFonts.poppins(
               color: AppColors.textSecondary,
               fontSize: 12,
               fontWeight: FontWeight.w500,

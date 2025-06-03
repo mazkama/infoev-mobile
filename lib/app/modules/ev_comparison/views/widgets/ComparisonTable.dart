@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:infoev/app/modules/ev_comparison/model/VehicleModel.dart';
 import 'package:infoev/app/styles/app_colors.dart';
 
@@ -11,6 +12,25 @@ class ComparisonTable extends StatelessWidget {
     required this.vehicleA,
     required this.vehicleB,
   });
+
+  IconData _getCategoryIcon(String categoryName) {
+    final name = categoryName.toLowerCase();
+    if (name.contains('motor') || name.contains('mesin')) {
+      return Icons.engineering_rounded;
+    } else if (name.contains('dimensi') || name.contains('ukuran')) {
+      return Icons.straighten_rounded;
+    } else if (name.contains('baterai') || name.contains('battery')) {
+      return Icons.battery_charging_full_rounded;
+    } else if (name.contains('performa') || name.contains('performance')) {
+      return Icons.speed_rounded;
+    } else if (name.contains('fitur') || name.contains('feature')) {
+      return Icons.stars_rounded;
+    } else if (name.contains('suspensi') || name.contains('chassis')) {
+      return Icons.tire_repair_rounded;
+    } else {
+      return Icons.info_outline_rounded;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,127 +58,131 @@ class ComparisonTable extends StatelessWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children:
-          categories.map((category) {
-            final Map<int, SpecItem> specMap = {};
-            for (var spec in category.specs) {
-              if (specMap.containsKey(spec.id)) {
-                final current = specMap[spec.id]!;
-                final allVehicles =
-                    {...current.vehicles, ...spec.vehicles}.toList();
-                specMap[spec.id] = SpecItem(
-                  id: spec.id,
-                  name: spec.name,
-                  unit: current.unit ?? spec.unit,
-                  type: current.type ?? spec.type,
-                  vehicles: allVehicles,
-                );
-              } else {
-                specMap[spec.id] = spec;
-              }
-            }
+      children: categories.map((category) {
+        final Map<int, SpecItem> specMap = {};
+        for (var spec in category.specs) {
+          if (specMap.containsKey(spec.id)) {
+            final current = specMap[spec.id]!;
+            final allVehicles =
+                {...current.vehicles, ...spec.vehicles}.toList();
+            specMap[spec.id] = SpecItem(
+              id: spec.id,
+              name: spec.name,
+              unit: current.unit ?? spec.unit,
+              type: current.type ?? spec.type,
+              vehicles: allVehicles,
+            );
+          } else {
+            specMap[spec.id] = spec;
+          }
+        }
 
-            final mergedSpecs = specMap.values.toList();
+        final mergedSpecs = specMap.values.toList();
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            // Category Header with Icon
+            Row(
               children: [
-                const SizedBox(height: 20),
+                Icon(
+                  _getCategoryIcon(category.name),
+                  color: AppColors.secondaryColor,
+                  size: 24,
+                ),
+                const SizedBox(width: 8),
                 Text(
                   category.name,
-                  style: const TextStyle(
-                    fontSize: 18,
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    // color: Colors.amber,
                     color: AppColors.textColor,
                   ),
                 ),
-                const SizedBox(height: 10),
-                Container(
-                  decoration: BoxDecoration(
-                    // color: Colors.grey[600],
-                    color: AppColors.cardBackgroundColor,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.shadowMedium.withOpacity(0.1),
-                        blurRadius: 6,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children:
-                        mergedSpecs.map((spec) {
-                          final valueA = spec.getVehicleValueBySlug(
-                            vehicleA!.slug,
-                          );
-                          final valueB = spec.getVehicleValueBySlug(
-                            vehicleB!.slug,
-                          );
-
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 10,
-                              horizontal: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              border: Border(
-                                // top: BorderSide(color: Colors.grey[850]!),
-                                top: BorderSide(color: AppColors.dividerColor),
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                // Nama spesifikasi
-                                Expanded(
-                                  flex: 4,
-                                  child: Text(
-                                    spec.name,
-                                    style: const TextStyle(
-                                      // color: Colors.white70,
-                                      color: AppColors.textColor,
-                                      fontSize: 14,
-                                      // fontWeight: FontWeight.w500,
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                                  ),
-                                ),
-                                // Nilai kendaraan A
-                                Expanded(
-                                  flex: 4,
-                                  child: Text(
-                                    valueA ?? '-',
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      // color: Colors.white,
-                                      color: AppColors.textSecondary,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ),
-                                // Nilai kendaraan B
-                                Expanded(
-                                  flex: 4,
-                                  child: Text(
-                                    valueB ?? '-',
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      // color: Colors.white,
-                                      color: AppColors.textSecondary,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                  ),
-                ),
               ],
-            );
-          }).toList(),
+            ),
+            const SizedBox(height: 12),
+            // Specs Container
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.cardBackgroundColor,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.shadowMedium.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: mergedSpecs.map((spec) {
+                  final valueA = spec.getVehicleValueBySlug(vehicleA!.slug);
+                  final valueB = spec.getVehicleValueBySlug(vehicleB!.slug);
+
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(
+                          color: AppColors.dividerColor,
+                          width: 0.5,
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        // Spec Name
+                        Expanded(
+                          flex: 4,
+                          child: Text(
+                            spec.name,
+                            style: GoogleFonts.poppins(
+                              color: AppColors.textColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        // Vehicle A Value
+                        Expanded(
+                          flex: 4,
+                          child: Text(
+                            valueA ?? '-',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              color: AppColors.textColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        // Vehicle B Value
+                        Expanded(
+                          flex: 4,
+                          child: Text(
+                            valueB ?? '-',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              color: AppColors.textColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        );
+      }).toList(),
     );
   }
 }
