@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:infoev/app/styles/app_colors.dart'; // Import palet warna
+import 'package:infoev/app/styles/app_colors.dart';
 
 class NewsTitle extends StatelessWidget {
   final String imageUrl;
@@ -28,17 +28,13 @@ class NewsTitle extends StatelessWidget {
       onTap: ontap,
       child: Container(
         padding: const EdgeInsets.all(10),
-        margin: const EdgeInsets.only(
-          bottom: 12,
-        ), // Margin konsisten dengan TrandingCard
+        margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: AppColors.cardBackgroundColor, // Abu-abu terang dari palet
-          borderRadius: BorderRadius.circular(
-            12,
-          ), // Sudut lebih halus, konsisten dengan TrandingCard
+          color: AppColors.cardBackgroundColor,
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: AppColors.shadowLight.withAlpha(33), // Bayangan halus
+              color: AppColors.shadowLight.withAlpha(33),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -47,49 +43,60 @@ class NewsTitle extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Optimized Cached Image
             Container(
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(
-                  12,
-                ), // Sesuaikan dengan borderRadius container
-                color:
-                    AppColors
-                        .cardBackgroundColor, // Putih untuk latar belakang gambar
-              ),
-              child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl,
-                  placeholder:
-                      (context, url) => Shimmer.fromColors(
-                        baseColor: AppColors.shimmerBase,
-                        highlightColor: AppColors.shimmerHighlight,
-                        child: Container(
-                          height: 120,
-                          width: double.infinity,
+                color: AppColors.cardBackgroundColor,
+              ),
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
+                cacheKey: imageUrl,
+                useOldImageOnUrlChange: true,
+                fadeInDuration: Duration.zero,
+                fadeOutDuration: Duration.zero,
+                imageBuilder:
+                    (context, imageProvider) => Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        image: DecorationImage(
+                          image: imageProvider,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                placeholder:
+                    (context, url) => Shimmer.fromColors(
+                      baseColor: AppColors.shimmerBase,
+                      highlightColor: AppColors.shimmerHighlight,
+                      child: Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
                           color: AppColors.shimmerBase,
                         ),
                       ),
-                  errorWidget:
-                      (context, url, error) => Container(
-                        height: 120,
+                    ),
+                errorWidget:
+                    (context, url, error) => Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
                         color: AppColors.shimmerBase,
-                        child: const Icon(
-                          Icons.error,
-                          color: AppColors.errorColor,
-                        ),
                       ),
-                  height: 120,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
+                      child: const Icon(
+                        Icons.error,
+                        color: AppColors.errorColor,
+                      ),
+                    ),
               ),
             ),
-            const SizedBox(
-              width: 12,
-            ), // Spacing sedikit lebih besar untuk kejelasan
+            const SizedBox(width: 12),
+            // Text Section
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
@@ -126,7 +133,6 @@ class NewsTitle extends StatelessWidget {
                           style: GoogleFonts.poppins(
                             color: AppColors.textTertiary,
                             fontSize: 12,
-                            fontWeight: FontWeight.normal,
                           ),
                         ),
                       ],

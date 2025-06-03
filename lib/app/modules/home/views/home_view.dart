@@ -569,26 +569,28 @@ class _HomePageState extends State<HomePage> {
                             if (newsController.isLoading.value) {
                               return const ShimmerVehicleNew();
                             } else {
-                              return SingleChildScrollView(
-                                physics: const BouncingScrollPhysics(),
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children:
-                                      newsController.popularVehiclesList
-                                          .map(
-                                            (e) => VehicleNewCard(
-                                              onTap: () {
-                                                Get.toNamed(
-                                                  '/kendaraan/${e.slug}',
-                                                );
-                                              },
-                                              bannerUrl: e.thumbnailUrl,
-                                              name: e.name,
-                                              brand:
-                                                  e.brand?.name ?? 'InfoEV.id',
-                                            ),
-                                          )
-                                          .toList(),
+                              return SizedBox(
+                                height: 180, // Sesuaikan tinggi card
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount:
+                                      newsController.popularVehiclesList.length,
+                                  itemBuilder: (context, index) {
+                                    final e =
+                                        newsController
+                                            .popularVehiclesList[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.only(right: 5),
+                                      child: VehicleNewCard(
+                                        onTap: () {
+                                          Get.toNamed('/kendaraan/${e.slug}');
+                                        },
+                                        bannerUrl: e.thumbnailUrl,
+                                        name: e.name,
+                                        brand: e.brand?.name ?? 'InfoEV.id',
+                                      ),
+                                    );
+                                  },
                                 ),
                               );
                             }
@@ -619,26 +621,27 @@ class _HomePageState extends State<HomePage> {
                             if (newsController.isLoading.value) {
                               return const ShimmerVehiclePopuler();
                             } else {
-                              return SingleChildScrollView(
-                                physics: const BouncingScrollPhysics(),
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children:
-                                      newsController.newVehiclesList
-                                          .map(
-                                            (e) => VehiclePopulerCard(
-                                              onTap: () {
-                                                Get.toNamed(
-                                                  '/kendaraan/${e.slug}',
-                                                );
-                                              },
-                                              bannerUrl: e.thumbnailUrl,
-                                              name: e.name,
-                                              brand:
-                                                  e.brand?.name ?? 'InfoEV.id',
-                                            ),
-                                          )
-                                          .toList(),
+                              return SizedBox(
+                                height: 90,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount:
+                                      newsController.newVehiclesList.length,
+                                  itemBuilder: (context, index) {
+                                    final e =
+                                        newsController.newVehiclesList[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.only(right: 2),
+                                      child: VehiclePopulerCard(
+                                        onTap: () {
+                                          Get.toNamed('/kendaraan/${e.slug}');
+                                        },
+                                        bannerUrl: e.thumbnailUrl,
+                                        name: e.name,
+                                        brand: e.brand?.name ?? 'InfoEV.id',
+                                      ),
+                                    );
+                                  },
                                 ),
                               );
                             }
@@ -688,7 +691,8 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         "Lihat Semua",
@@ -699,7 +703,8 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       Icon(
-                                        Icons.arrow_forward_ios_rounded, // Ikon panah kanan
+                                        Icons
+                                            .arrow_forward_ios_rounded, // Ikon panah kanan
                                         color: AppColors.primaryColor,
                                         size: 16, // Sesuaikan ukuran ikon
                                       ),
@@ -716,26 +721,28 @@ class _HomePageState extends State<HomePage> {
                             if (newsController.isLoading.value) {
                               return const ShimmerLoading();
                             } else {
-                              return Column(
-                                children:
-                                    newsController.newNewsList
-                                        .map(
-                                          (e) => NewsTitle(
-                                            ontap: () {
-                                              FocusScope.of(context).unfocus();
-                                              Get.to(NewsDetailsPage(news: e));
-                                            },
-                                            imageUrl: e.thumbnailUrl,
-                                            tag: "EV",
-                                            time: DateFormat(
-                                              "dd MMM yyyy",
-                                              'id_ID',
-                                            ).format(e.createdAt),
-                                            title: e.title,
-                                            author: "InfoEV.id",
-                                          ),
-                                        )
-                                        .toList(),
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics:
+                                    const NeverScrollableScrollPhysics(), // agar tidak bentrok dengan SingleChildScrollView
+                                itemCount: newsController.newNewsList.length,
+                                itemBuilder: (context, index) {
+                                  final e = newsController.newNewsList[index];
+                                  return NewsTitle(
+                                    ontap: () {
+                                      FocusScope.of(context).unfocus();
+                                      Get.to(NewsDetailsPage(news: e));
+                                    },
+                                    imageUrl: e.thumbnailUrl,
+                                    tag: "EV",
+                                    time: DateFormat(
+                                      "dd MMM yyyy",
+                                      'id_ID',
+                                    ).format(e.createdAt),
+                                    title: e.title,
+                                    author: "InfoEV.id",
+                                  );
+                                },
                               );
                             }
                           }),

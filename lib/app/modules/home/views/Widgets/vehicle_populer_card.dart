@@ -47,22 +47,55 @@ class VehiclePopulerCard extends StatelessWidget {
                   ),
                   child: CachedNetworkImage(
                     imageUrl: bannerUrl,
+                    cacheKey: bannerUrl, // gunakan url sebagai cacheKey
+                    useOldImageOnUrlChange: true,
+                    fadeInDuration: Duration.zero,
+                    fadeOutDuration: Duration.zero,
                     height: 90,
                     width: double.infinity,
                     fit: BoxFit.cover,
+                    imageBuilder:
+                        (context, imageProvider) => Container(
+                          height: 90,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(16),
+                              topRight: Radius.circular(16),
+                            ),
+                            image: DecorationImage(
+                              image: imageProvider,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
                     placeholder:
                         (context, url) => Shimmer.fromColors(
                           baseColor: AppColors.shimmerBase,
                           highlightColor: AppColors.shimmerHighlight,
                           child: Container(
-                            height: 140,
-                            color: AppColors.shimmerBase,
+                            height: 90,
+                            width: double.infinity,
+                            decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(16),
+                                topRight: Radius.circular(16),
+                              ),
+                              color: AppColors.shimmerBase,
+                            ),
                           ),
                         ),
                     errorWidget:
                         (context, url, error) => Container(
-                          height: 140,
-                          color: AppColors.shimmerBase,
+                          height: 90,
+                          width: double.infinity,
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(16),
+                              topRight: Radius.circular(16),
+                            ),
+                            color: AppColors.shimmerBase,
+                          ),
                           child: const Icon(
                             Icons.error,
                             color: AppColors.errorColor,

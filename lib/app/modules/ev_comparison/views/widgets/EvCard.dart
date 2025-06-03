@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:infoev/app/modules/ev_comparison/model/VehicleModel.dart';
 import 'package:infoev/app/styles/app_colors.dart';
+import 'package:shimmer/shimmer.dart';
 
 class EVCard extends StatelessWidget {
   final VehicleModel vehicle;
@@ -43,16 +45,24 @@ class EVCard extends StatelessWidget {
               aspectRatio: 16 / 9,
               child: Container(
                 color: AppColors.cardBackgroundColor, // Background putih
-                child: Image.network(
-                  image,
+                child: CachedNetworkImage(
+                  imageUrl: image,
                   fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return const Center(child: CircularProgressIndicator());
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Center(child: Icon(Icons.broken_image));
-                  },
+                  placeholder:
+                      (context, url) => Shimmer.fromColors(
+                        baseColor: AppColors.shimmerBase,
+                        highlightColor: AppColors.shimmerHighlight,
+                        child: Container(color: AppColors.shimmerBase),
+                      ),
+                  errorWidget:
+                      (context, url, error) => Container(
+                        color: AppColors.cardBackgroundColor,
+                        child: Icon(
+                          Icons.broken_image_rounded,
+                          size: 48,
+                          color: AppColors.textTertiary,
+                        ),
+                      ),
                 ),
               ),
             ),

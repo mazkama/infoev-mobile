@@ -8,6 +8,8 @@ class VehicleNewCard extends StatelessWidget {
   final String name;
   final String brand;
   final VoidCallback onTap;
+  final double width;
+  final double imageHeight;
 
   const VehicleNewCard({
     super.key,
@@ -15,6 +17,8 @@ class VehicleNewCard extends StatelessWidget {
     required this.name,
     required this.brand,
     required this.onTap,
+    this.width = 280,
+    this.imageHeight = 170,
   });
 
   @override
@@ -22,7 +26,7 @@ class VehicleNewCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 280,
+        width: width,
         margin: const EdgeInsets.only(right: 10),
         decoration: BoxDecoration(
           color: AppColors.cardBackgroundColor,
@@ -39,35 +43,51 @@ class VehicleNewCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           child: Stack(
             children: [
-              // Gambar banner
               CachedNetworkImage(
                 imageUrl: bannerUrl,
-                height: 170,
-                width: double.infinity,
-                fit: BoxFit.cover,
+                cacheKey: bannerUrl,
+                useOldImageOnUrlChange: true,
+                fadeInDuration: Duration.zero,
+                fadeOutDuration: Duration.zero,
+                imageBuilder:
+                    (context, imageProvider) => Container(
+                      height: imageHeight,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        image: DecorationImage(
+                          image: imageProvider,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
                 placeholder:
                     (context, url) => Shimmer.fromColors(
                       baseColor: AppColors.shimmerBase,
                       highlightColor: AppColors.shimmerHighlight,
                       child: Container(
-                        height: 150,
+                        height: imageHeight,
                         width: double.infinity,
-                        color: AppColors.shimmerBase,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: AppColors.shimmerBase,
+                        ),
                       ),
                     ),
                 errorWidget:
                     (context, url, error) => Container(
-                      height: 150,
+                      height: imageHeight,
                       width: double.infinity,
-                      color: AppColors.shimmerBase,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: AppColors.shimmerBase,
+                      ),
                       child: const Icon(
                         Icons.error,
                         color: AppColors.errorColor,
                       ),
                     ),
               ),
-
-              // Overlay teks nama dan brand
               Positioned(
                 left: 0,
                 right: 0,

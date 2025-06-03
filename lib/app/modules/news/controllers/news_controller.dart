@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:infoev/app/modules/explore/model/VehicleModel.dart';
 import 'package:infoev/app/modules/news/model/NewsModel.dart';
 import 'package:infoev/core/halper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NewsController extends GetxController {
   RxList<NewsModel> newNewsList = <NewsModel>[].obs;
@@ -22,10 +23,55 @@ class NewsController extends GetxController {
 
   int currentPage = 1;
 
+  // Add cache duration constant
+  static const cacheDuration = Duration(hours: 12);
+
+  // Add cache keys
+  static const String _cacheKeyNewNews = 'cache_new_news';
+  static const String _cacheKeyNewsForYou = 'cache_news_for_you';
+  static const String _cacheKeyAllNews = 'cache_all_news';
+  static const String _cacheKeyPopularVehicles = 'cache_popular_vehicles';
+  static const String _cacheKeyNewVehicles = 'cache_new_vehicles';
+
   @override
   void onInit() {
     super.onInit();
+    _loadCachedData();
     loadAllData();
+  }
+
+  Future<void> _loadCachedData() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Load cached data with timestamps
+    _loadCachedList(prefs, _cacheKeyNewNews, newNewsList);
+    _loadCachedList(prefs, _cacheKeyNewsForYou, newsForYouList);
+    _loadCachedList(prefs, _cacheKeyAllNews, allNewsList);
+    _loadCachedList(prefs, _cacheKeyPopularVehicles, popularVehiclesList);
+    _loadCachedList(prefs, _cacheKeyNewVehicles, newVehiclesList);
+  }
+
+  void _loadCachedList<T>(SharedPreferences prefs, String key, RxList<T> list) {
+    final cached = prefs.getString(key);
+    final timestamp = prefs.getString('${key}_timestamp');
+
+    if (cached != null && timestamp != null) {
+      final cachedTime = DateTime.parse(timestamp);
+      if (DateTime.now().difference(cachedTime) < cacheDuration) {
+        final data = json.decode(cached) as List;
+        if (T == NewsModel) {
+          list.assignAll(data.map((x) => NewsModel.fromJson(x)).cast<T>());
+        } else if (T == VehicleModel) {
+          list.assignAll(data.map((x) => VehicleModel.fromJson(x)).cast<T>());
+        }
+      }
+    }
+  }
+
+  Future<void> _saveToCache(String key, List<dynamic> data) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(key, json.encode(data));
+    await prefs.setString('${key}_timestamp', DateTime.now().toIso8601String());
   }
 
   Future<void> loadAllData() async {
@@ -55,14 +101,22 @@ class NewsController extends GetxController {
   }
 
   Future<void> getNewNews() async {
+    // Check cache first
+    if (newNewsList.isNotEmpty) return;
+
     var baseURL = "${baseUrlDev}";
     final response = await http.get(Uri.parse(baseURL));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final List<dynamic> newsData = data['posts'];
+      final newsList = newsData.take(15).toList();
+
       newNewsList.assignAll(
-        newsData.take(15).map((json) => NewsModel.fromJson(json)).toList(),
+        newsList.map((json) => NewsModel.fromJson(json)).toList(),
       );
+
+      // Save to cache
+      await _saveToCache(_cacheKeyNewNews, newsList);
     } else {
       isError.value = true;
     }
@@ -87,7 +141,6 @@ class NewsController extends GetxController {
       currentPage = 1;
       hasMoreNews.value = true;
       allNewsList.clear();
-      // Only update currentFilter if type is provided during reset
       if (type != null) {
         currentFilter.value = type;
       }
@@ -98,13 +151,9 @@ class NewsController extends GetxController {
     isLoadingMore.value = true;
 
     try {
-      // Build base URL
       String url = "${baseUrlDev}/berita?page=$currentPage";
-
-      // Use existing filter if type is not provided
       final activeFilter = type ?? currentFilter.value;
-      
-      // Add filter to URL if exists and not 'all'
+
       if (activeFilter.isNotEmpty && activeFilter != 'all') {
         url += "&type=$activeFilter";
       }
@@ -118,10 +167,15 @@ class NewsController extends GetxController {
         if (newsData.isEmpty) {
           hasMoreNews.value = false;
         } else {
-          allNewsList.addAll(
-            newsData.map((json) => NewsModel.fromJson(json)).toList(),
-          );
+          final newsList =
+              newsData.map((json) => NewsModel.fromJson(json)).toList();
+          allNewsList.addAll(newsList);
           currentPage++;
+
+          // Only cache first page
+          if (currentPage == 2) {
+            await _saveToCache(_cacheKeyAllNews, newsData);
+          }
         }
       } else {
         isError.value = true;
@@ -201,5 +255,14 @@ class NewsController extends GetxController {
         isLoading.value = false;
       }
     }
+  }
+
+  Future<void> clearCache() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_cacheKeyNewNews);
+    await prefs.remove(_cacheKeyNewsForYou);
+    await prefs.remove(_cacheKeyAllNews);
+    await prefs.remove(_cacheKeyPopularVehicles);
+    await prefs.remove(_cacheKeyNewVehicles);
   }
 }

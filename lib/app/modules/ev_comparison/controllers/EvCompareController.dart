@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:infoev/app/modules/ev_comparison/model/VehicleModel.dart';
 import 'package:infoev/core/halper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EVComparisonController extends GetxController {
   var vehicleA = Rxn<VehicleModel>();
@@ -38,7 +39,61 @@ class EVComparisonController extends GetxController {
     isCompared.value = false;
   }
 
-  // ────────────────────────────────────────────────────────────
+  // Add cache duration constant
+  static const cacheDuration = Duration(hours: 12);
+
+  // Add cache keys
+  static const String _cacheKeyVehicleDetails = 'cache_vehicle_details_';
+  static const String _cacheKeySearchResults = 'cache_vehicle_search_';
+
+  @override
+  void onInit() async {
+    super.onInit();
+    await _loadCachedData();
+  }
+
+  Future<void> _loadCachedData() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Load cached vehicles if any
+    if (vehicleA.value != null) {
+      _loadCachedVehicle(prefs, vehicleA.value!.slug, true);
+    }
+    if (vehicleB.value != null) {
+      _loadCachedVehicle(prefs, vehicleB.value!.slug, false);
+    }
+  }
+
+  Future<void> _loadCachedVehicle(
+    SharedPreferences prefs,
+    String slug,
+    bool isFirst,
+  ) async {
+    final cached = prefs.getString('${_cacheKeyVehicleDetails}$slug');
+    final timestamp = prefs.getString(
+      '${_cacheKeyVehicleDetails}${slug}_timestamp',
+    );
+
+    if (cached != null && timestamp != null) {
+      final cachedTime = DateTime.parse(timestamp);
+      if (DateTime.now().difference(cachedTime) < cacheDuration) {
+        final data = json.decode(cached);
+        final vehicle = VehicleModel.fromJson(data);
+        if (isFirst) {
+          vehicleA.value = vehicle;
+        } else {
+          vehicleB.value = vehicle;
+        }
+      }
+    }
+  }
+
+  Future<void> _saveToCache(String key, dynamic data) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(key, json.encode(data));
+    await prefs.setString('${key}_timestamp', DateTime.now().toIso8601String());
+  }
+
   Future<void> setVehicle(String slug, bool isFirst) async {
     if (isFirst) {
       isLoadingA.value = true;
@@ -47,8 +102,32 @@ class EVComparisonController extends GetxController {
     }
 
     try {
+      // Check cache first
+      final prefs = await SharedPreferences.getInstance();
+      final cached = prefs.getString('${_cacheKeyVehicleDetails}$slug');
+      final timestamp = prefs.getString(
+        '${_cacheKeyVehicleDetails}${slug}_timestamp',
+      );
+
+      if (cached != null && timestamp != null) {
+        final cachedTime = DateTime.parse(timestamp);
+        if (DateTime.now().difference(cachedTime) < cacheDuration) {
+          final data = json.decode(cached);
+          final vehicle = VehicleModel.fromJson(data);
+          if (isFirst) {
+            vehicleA.value = vehicle;
+          } else {
+            vehicleB.value = vehicle;
+          }
+          return;
+        }
+      }
+
       final data = await _fetchVehicleDetail(slug);
       final vehicle = VehicleModel.fromJson(data);
+
+      // Save to cache
+      await _saveToCache('${_cacheKeyVehicleDetails}$slug', data);
 
       if (isFirst) {
         vehicleA.value = vehicle;
@@ -66,18 +145,35 @@ class EVComparisonController extends GetxController {
     }
   }
 
-  // ────────────────────────────────────────────────────────────
   Future<List<Map<String, dynamic>>> searchVehicles(String query) async {
     isSearching.value = true;
 
     try {
+      // Check cache first
+      final prefs = await SharedPreferences.getInstance();
+      final cacheKey = '${_cacheKeySearchResults}${query.toLowerCase()}';
+      final cached = prefs.getString(cacheKey);
+      final timestamp = prefs.getString('${cacheKey}_timestamp');
+
+      if (cached != null && timestamp != null) {
+        final cachedTime = DateTime.parse(timestamp);
+        if (DateTime.now().difference(cachedTime) < cacheDuration) {
+          return List<Map<String, dynamic>>.from(json.decode(cached));
+        }
+      }
+
       final encodedQuery = Uri.encodeComponent(query);
       final url = Uri.parse('${baseUrlDev}/cari?q=$encodedQuery');
       final res = await http.get(url);
 
       if (res.statusCode == 200) {
         final body = json.decode(res.body);
-        return List<Map<String, dynamic>>.from(body['vehicles']);
+        final results = List<Map<String, dynamic>>.from(body['vehicles']);
+
+        // Save to cache
+        await _saveToCache(cacheKey, results);
+
+        return results;
       } else {
         throw Exception('Gagal mencari kendaraan');
       }
@@ -89,6 +185,18 @@ class EVComparisonController extends GetxController {
     }
   }
 
+  Future<void> clearCache() async {
+    final prefs = await SharedPreferences.getInstance();
+    final keys = prefs.getKeys();
+    for (var key in keys) {
+      if (key.startsWith(_cacheKeyVehicleDetails) ||
+          key.startsWith(_cacheKeySearchResults)) {
+        await prefs.remove(key);
+      }
+    }
+  }
+
+  // ────────────────────────────────────────────────────────────
   Future<Map<String, dynamic>> _fetchVehicleDetail(String slug) async {
     final url = Uri.parse('${baseUrlDev}/$slug');
     final res = await http.get(url);
