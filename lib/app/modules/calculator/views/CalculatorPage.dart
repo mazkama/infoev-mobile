@@ -147,7 +147,7 @@ class _CalculatorPageState extends State<CalculatorPage>
             child: Container(
               padding: const EdgeInsets.all(8),
               child: const Icon(
-                Icons.arrow_back_ios,
+                Icons.arrow_back_ios_rounded,
                 color: AppColors.textColor,
                 size: 20,
               ),

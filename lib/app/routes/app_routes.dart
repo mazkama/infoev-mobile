@@ -17,6 +17,7 @@ abstract class Routes {
   static const CHARGER_STATION = Path.CHARGER_STATION;
   static const EV_COMPARISON = Path.EV_COMPARISON;
   static const CALCULATOR = Path.CALCULATOR;
+  static const PRIVASI_KEAMANAN = Path.PRIVASI_KEAMANAN;
 }
 
 abstract class Path {
@@ -36,4 +37,5 @@ abstract class Path {
   static const EV_COMPARISON = '/ev_comparison';
   static const PROFIL = '/profil';
   static const CALCULATOR = '/calculator';
+  static const PRIVASI_KEAMANAN = '/privasi-keamanan';
 }

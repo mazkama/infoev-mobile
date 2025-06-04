@@ -154,9 +154,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     _buildMenuItem(
                       icon: Icons.security,
                       title: 'Privasi & Keamanan',
-                      subtitle: 'Kelola kata sandi dan autentikasi',
+                      subtitle: 'Hubungi kami, privacy policy',
                       onTap: () {
-                        // Arahkan ke halaman pengaturan keamanan
+                        Get.toNamed('/privasi-keamanan');
                       },
                       backgroundColor: Colors.grey.shade100,
                       iconColor: Colors.black,

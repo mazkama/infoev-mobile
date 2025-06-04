@@ -20,6 +20,7 @@ import 'package:infoev/app/modules/register/views/RegisterPage.dart';
 import 'package:infoev/app/modules/splash/controllers/splash_controller.dart';
 import 'package:infoev/app/modules/news/controllers/news_controller.dart';
 import 'package:infoev/app/modules/splash/views/splash_view.dart';
+import 'package:infoev/app/modules/profil/views/privasi&keamanan.dart';
 part 'app_routes.dart';
 
 class AppPages {
@@ -119,6 +120,12 @@ class AppPages {
     GetPage(
       name: Path.CALCULATOR,
       page: () => const CalculatorPage(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: Path.PRIVASI_KEAMANAN,
+      page: () => const PrivasiKeamananPage(),
       transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 300),
     ),
