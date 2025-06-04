@@ -1,8 +1,8 @@
 import 'package:infoev/app/modules/favorite_vehicles/views/FavoriteVehiclesPage.dart';
-import 'package:infoev/app/modules/home/views/Widgets/new_vehicle_card.dart';
-import 'package:infoev/app/modules/home/views/Widgets/shimmer_vehicle_new.dart';
 import 'package:infoev/app/modules/home/views/Widgets/shimmer_vehicle_populer.dart';
 import 'package:infoev/app/modules/home/views/Widgets/vehicle_populer_card.dart';
+import 'package:infoev/app/modules/home/views/Widgets/vehicle_carousel_card.dart';
+import 'package:infoev/app/modules/home/views/Widgets/shimmer_vehicle_carousel.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +19,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:infoev/app/modules/explore/controllers/MerekController.dart';
 import 'package:infoev/app/modules/explore/model/MerekModel.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -548,40 +549,138 @@ class _HomePageState extends State<HomePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Kendaaran Populer",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                  color:
-                                      AppColors.textColor, // Warna teks hitam
+                          // Modern centered title with enhanced styling
+                          Center(
+                            child: Column(
+                              children: [
+                                Text(
+                                  "Kendaraan Populer",
+                                  style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 24,
+                                    color: AppColors.textColor,
+                                    letterSpacing: -0.5,
+                                  ),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 8),
+                                Container(
+                                  width: 60,
+                                  height: 4,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        AppColors.primaryColor,
+                                        AppColors.secondaryColor,
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 15),
-
-                          // Shimmer untuk "Hottest News"
+                          const SizedBox(height: 24),                          // Modern Carousel for Popular Vehicles
                           Obx(() {
                             if (newsController.isLoading.value) {
-                              return const ShimmerVehicleNew();
+                              return const ShimmerVehicleCarousel();
                             } else {
-                              return SizedBox(
-                                height: 180, // Sesuaikan tinggi card
+                              // Responsive height calculation
+                              final screenHeight = MediaQuery.of(context).size.height;
+                              final carouselHeight = screenHeight < 600 ? 260.0 : 280.0; // Smaller height on smaller screens
+                              
+                              return CarouselSlider.builder(
+                                itemCount: newsController.popularVehiclesList.length,
+                                options: CarouselOptions(
+                                  height: carouselHeight, // Responsive height to accommodate shadows
+                                  viewportFraction: 1.0, // Full width to prevent showing adjacent cards
+                                  enlargeCenterPage: false, // Disable enlargement
+                                  autoPlay: true,
+                                  autoPlayInterval: const Duration(seconds: 4),
+                                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                                  autoPlayCurve: Curves.easeInOutCubic,
+                                  scrollDirection: Axis.horizontal,
+                                  enableInfiniteScroll: newsController.popularVehiclesList.length > 1,
+                                  padEnds: false, // Remove default padding
+                                ),
+                                itemBuilder: (context, index, realIndex) {
+                                  final e = newsController.popularVehiclesList[index];
+                                  return Container(
+                                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20), // Margins for shadow space
+                                    child: VehicleCarouselCard(
+                                      onTap: () {
+                                        Get.toNamed('/kendaraan/${e.slug}');
+                                      },
+                                      bannerUrl: e.thumbnailUrl,
+                                      name: e.name,
+                                      brand: e.brand?.name ?? 'InfoEV.id',
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+                          }),
+
+                          const SizedBox(
+                            height: 30,
+                          ), // Spacing lebih besar untuk pemisahan
+
+                          // Modern centered title with enhanced styling for "Kendaraan Terbaru"
+                          Center(
+                            child: Column(
+                              children: [
+                                Text(
+                                  "Kendaraan Terbaru",
+                                  style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 24,
+                                    color: AppColors.textColor,
+                                    letterSpacing: -0.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  width: 60,
+                                  height: 4,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        AppColors.primaryColor,
+                                        AppColors.secondaryColor,
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Modern horizontal list for "Kendaraan Terbaru"
+                          Obx(() {
+                            if (newsController.isLoading.value) {
+                              return const ShimmerVehiclePopuler();
+                            } else {
+                              final screenWidth = MediaQuery.of(context).size.width;
+                              final isTablet = screenWidth > 600;
+                              
+                              return Container(
+                                margin: const EdgeInsets.symmetric(vertical: 15), // Reduced margin for better spacing
+                                height: isTablet ? 220.0 : 200.0, // Reduced height to make cards shorter
                                 child: ListView.builder(
                                   scrollDirection: Axis.horizontal,
-                                  itemCount:
-                                      newsController.popularVehiclesList.length,
+                                  physics: const BouncingScrollPhysics(),
+                                  itemCount: newsController.newVehiclesList.length,
                                   itemBuilder: (context, index) {
-                                    final e =
-                                        newsController
-                                            .popularVehiclesList[index];
+                                    final e = newsController.newVehiclesList[index];
                                     return Padding(
-                                      padding: const EdgeInsets.only(right: 5),
-                                      child: VehicleNewCard(
+                                      padding: EdgeInsets.only(
+                                        left: index == 0 ? 4 : 0,
+                                        right: 12,
+                                        top: 12, // Add top spacing for shadow
+                                        bottom: 15, // Add bottom spacing for shadow
+                                      ),
+                                      child: VehiclePopulerCard(
                                         onTap: () {
                                           Get.toNamed('/kendaraan/${e.slug}');
                                         },
@@ -600,52 +699,177 @@ class _HomePageState extends State<HomePage> {
                             height: 30,
                           ), // Spacing lebih besar untuk pemisahan
 
+                          // Modern Action Cards Row
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                "Kendaraan Terbaru",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                  color:
-                                      AppColors.textColor, // Warna teks hitam
+                              // Charger Stations Card
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    // Navigate to index 2 of bottom navbar (Charger Stations)
+                                    // Note: This navigation will need to be implemented when bottom navbar controller is available
+                                    // Example: Get.find<BottomNavController>().changeTabIndex(2);
+                                  },
+                                  child: Container(
+                                    height: MediaQuery.of(context).size.width > 600 ? 140 : 120,
+                                    margin: const EdgeInsets.only(right: 8),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          AppColors.primaryColor.withOpacity(0.1),
+                                          AppColors.secondaryColor.withOpacity(0.05),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppColors.shadowMedium.withOpacity(0.1),
+                                          blurRadius: 15,
+                                          offset: const Offset(0, 5),
+                                          spreadRadius: 0,
+                                        ),
+                                      ],
+                                      border: Border.all(
+                                        color: AppColors.primaryColor.withOpacity(0.1),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.primaryColor.withOpacity(0.1),
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            // TODO: Replace with custom image
+                                            // Optimal image size: 48x48 px (white background)
+                                            // For tablet: 56x56 px (white background)
+                                            child: Text(
+                                              '⚡',
+                                              style: TextStyle(
+                                                fontSize: MediaQuery.of(context).size.width > 600 ? 24 : 20,
+                                              ),
+                                            ),
+                                          ),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Charging Stations',
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: MediaQuery.of(context).size.width > 600 ? 14 : 13,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: AppColors.textColor,
+                                                ),
+                                              ),
+                                              Text(
+                                                'Temukan lokasi charging',
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: MediaQuery.of(context).size.width > 600 ? 10 : 9,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: AppColors.textSecondary,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              
+                              // Kalkulator EV Card
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    // Navigate to calculator page
+                                    Get.toNamed('/calculator');
+                                  },
+                                  child: Container(
+                                    height: MediaQuery.of(context).size.width > 600 ? 140 : 120,
+                                    margin: const EdgeInsets.only(left: 8),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          AppColors.secondaryColor.withOpacity(0.1),
+                                          AppColors.primaryColor.withOpacity(0.05),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppColors.shadowMedium.withOpacity(0.1),
+                                          blurRadius: 15,
+                                          offset: const Offset(0, 5),
+                                          spreadRadius: 0,
+                                        ),
+                                      ],
+                                      border: Border.all(
+                                        color: AppColors.secondaryColor.withOpacity(0.1),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.secondaryColor.withOpacity(0.1),
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            // TODO: Replace with custom image
+                                            // Optimal image size: 48x48 px (white background)
+                                            // For tablet: 56x56 px (white background)
+                                            child: Text(
+                                              '🧮',
+                                              style: TextStyle(
+                                                fontSize: MediaQuery.of(context).size.width > 600 ? 24 : 20,
+                                              ),
+                                            ),
+                                          ),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Kalkulator EV',
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: MediaQuery.of(context).size.width > 600 ? 14 : 13,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: AppColors.textColor,
+                                                ),
+                                              ),
+                                              Text(
+                                                'Hitung biaya listrik',
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: MediaQuery.of(context).size.width > 600 ? 10 : 9,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: AppColors.textSecondary,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 15),
-
-                          // Shimmer untuk "Hottest News"
-                          Obx(() {
-                            if (newsController.isLoading.value) {
-                              return const ShimmerVehiclePopuler();
-                            } else {
-                              return SizedBox(
-                                height: 90,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount:
-                                      newsController.newVehiclesList.length,
-                                  itemBuilder: (context, index) {
-                                    final e =
-                                        newsController.newVehiclesList[index];
-                                    return Padding(
-                                      padding: const EdgeInsets.only(right: 2),
-                                      child: VehiclePopulerCard(
-                                        onTap: () {
-                                          Get.toNamed('/kendaraan/${e.slug}');
-                                        },
-                                        bannerUrl: e.thumbnailUrl,
-                                        name: e.name,
-                                        brand: e.brand?.name ?? 'InfoEV.id',
-                                      ),
-                                    );
-                                  },
-                                ),
-                              );
-                            }
-                          }),
 
                           const SizedBox(
                             height: 30,

@@ -51,6 +51,7 @@ dependencies:
   firebase_messaging: ^15.2.6
   flutter_local_notifications: ^19.2.1
   path_provider: ^2.1.1
+  carousel_slider: ^5.0.0
 
 dev_dependencies:
   flutter_test:

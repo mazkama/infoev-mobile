@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:infoev/app/modules/explore/model/VehicleModel.dart';
 import 'package:infoev/app/modules/news/model/NewsModel.dart';
 import 'package:infoev/core/halper.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:infoev/app/services/cache_service.dart';
 
 class NewsController extends GetxController {
   RxList<NewsModel> newNewsList = <NewsModel>[].obs;
@@ -23,74 +23,88 @@ class NewsController extends GetxController {
 
   int currentPage = 1;
 
-  // Add cache duration constant
-  static const cacheDuration = Duration(hours: 12);
-
-  // Add cache keys
-  static const String _cacheKeyNewNews = 'cache_new_news';
-  static const String _cacheKeyNewsForYou = 'cache_news_for_you';
-  static const String _cacheKeyAllNews = 'cache_all_news';
-  static const String _cacheKeyPopularVehicles = 'cache_popular_vehicles';
-  static const String _cacheKeyNewVehicles = 'cache_new_vehicles';
-
   @override
   void onInit() {
     super.onInit();
     _loadCachedData();
     loadAllData();
+    
+    // Clean expired cache on startup
+    CacheService.cleanExpiredCache();
   }
 
   Future<void> _loadCachedData() async {
-    final prefs = await SharedPreferences.getInstance();
+    // Load cached data using the new CacheService
+    final cachedNewNews = await CacheService.loadListFromCache(
+      CacheService.newNewsKey, 
+      (json) => NewsModel.fromJson(json)
+    );
+    if (cachedNewNews != null) newNewsList.assignAll(cachedNewNews);
 
-    // Load cached data with timestamps
-    _loadCachedList(prefs, _cacheKeyNewNews, newNewsList);
-    _loadCachedList(prefs, _cacheKeyNewsForYou, newsForYouList);
-    _loadCachedList(prefs, _cacheKeyAllNews, allNewsList);
-    _loadCachedList(prefs, _cacheKeyPopularVehicles, popularVehiclesList);
-    _loadCachedList(prefs, _cacheKeyNewVehicles, newVehiclesList);
-  }
+    final cachedNewsForYou = await CacheService.loadListFromCache(
+      CacheService.newsForYouKey, 
+      (json) => NewsModel.fromJson(json)
+    );
+    if (cachedNewsForYou != null) newsForYouList.assignAll(cachedNewsForYou);
 
-  void _loadCachedList<T>(SharedPreferences prefs, String key, RxList<T> list) {
-    final cached = prefs.getString(key);
-    final timestamp = prefs.getString('${key}_timestamp');
+    final cachedAllNews = await CacheService.loadListFromCache(
+      CacheService.allNewsKey, 
+      (json) => NewsModel.fromJson(json)
+    );
+    if (cachedAllNews != null) allNewsList.assignAll(cachedAllNews);
 
-    if (cached != null && timestamp != null) {
-      final cachedTime = DateTime.parse(timestamp);
-      if (DateTime.now().difference(cachedTime) < cacheDuration) {
-        final data = json.decode(cached) as List;
-        if (T == NewsModel) {
-          list.assignAll(data.map((x) => NewsModel.fromJson(x)).cast<T>());
-        } else if (T == VehicleModel) {
-          list.assignAll(data.map((x) => VehicleModel.fromJson(x)).cast<T>());
-        }
-      }
-    }
-  }
+    final cachedPopularVehicles = await CacheService.loadListFromCache(
+      CacheService.popularVehiclesKey, 
+      (json) => VehicleModel.fromJson(json)
+    );
+    if (cachedPopularVehicles != null) popularVehiclesList.assignAll(cachedPopularVehicles);
 
-  Future<void> _saveToCache(String key, List<dynamic> data) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(key, json.encode(data));
-    await prefs.setString('${key}_timestamp', DateTime.now().toIso8601String());
+    final cachedNewVehicles = await CacheService.loadListFromCache(
+      CacheService.newVehiclesKey, 
+      (json) => VehicleModel.fromJson(json)
+    );
+    if (cachedNewVehicles != null) newVehiclesList.assignAll(cachedNewVehicles);
   }
 
   Future<void> loadAllData() async {
     isLoading.value = true;
-    await Future.wait([
-      getNewNews(),
-      getNewVehicles(),
-      getPopularVehicles(),
-      getAllNews(reset: true),
+    
+    // Check if we have valid cached data first
+    final hasValidCache = await Future.wait([
+      CacheService.isCacheValid(CacheService.newNewsKey),
+      CacheService.isCacheValid(CacheService.popularVehiclesKey),
+      CacheService.isCacheValid(CacheService.newVehiclesKey),
+      CacheService.isCacheValid(CacheService.allNewsKey),
     ]);
+
+    // Only fetch data that doesn't have valid cache
+    final tasks = <Future>[];
+    
+    if (!hasValidCache[0]) tasks.add(getNewNews());
+    if (!hasValidCache[1]) tasks.add(getPopularVehicles());
+    if (!hasValidCache[2]) tasks.add(getNewVehicles());
+    if (!hasValidCache[3]) tasks.add(getAllNews(reset: true));
+
+    // If all data is cached, skip API calls
+    if (tasks.isEmpty) {
+      isLoading.value = false;
+      return;
+    }
+
+    await Future.wait(tasks);
     isLoading.value = false;
   }
 
-  // Di dalam NewsController
+  // Enhanced refresh method with cache clearing
   Future<void> refreshNews() async {
     isLoading.value = true;
     isError.value = false; // Reset error state
-    searchQuery.value = ''; // Kosongkan pencarian
-    allNewsList.clear(); // Kosongkan list sebelumnya
+    searchQuery.value = ''; // Clear search
+    allNewsList.clear(); // Clear existing list
+    
+    // Clear cache to force fresh data
+    await clearCache();
+    
     try {
       await getAllNews(reset: true);
     } catch (e) {
@@ -102,7 +116,9 @@ class NewsController extends GetxController {
 
   Future<void> getNewNews() async {
     // Check cache first
-    if (newNewsList.isNotEmpty) return;
+    if (await CacheService.isCacheValid(CacheService.newNewsKey) && newNewsList.isNotEmpty) {
+      return; // Use cached data
+    }
 
     var baseURL = "${baseUrlDev}";
     final response = await http.get(Uri.parse(baseURL));
@@ -115,8 +131,12 @@ class NewsController extends GetxController {
         newsList.map((json) => NewsModel.fromJson(json)).toList(),
       );
 
-      // Save to cache
-      await _saveToCache(_cacheKeyNewNews, newsList);
+      // Save to cache using CacheService
+      await CacheService.saveToCache(
+        CacheService.newNewsKey, 
+        newsList.map((json) => NewsModel.fromJson(json)).toList(),
+        duration: CacheService.defaultCacheDuration,
+      );
     } else {
       isError.value = true;
     }
@@ -128,8 +148,15 @@ class NewsController extends GetxController {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final List<dynamic> newsData = data['stickies'];
-      newsForYouList.assignAll(
-        newsData.take(15).map((json) => NewsModel.fromJson(json)).toList(),
+      final newsList = newsData.take(15).map((json) => NewsModel.fromJson(json)).toList();
+      
+      newsForYouList.assignAll(newsList);
+
+      // Save to cache using CacheService
+      await CacheService.saveToCache(
+        CacheService.newsForYouKey, 
+        newsList,
+        duration: CacheService.defaultCacheDuration,
       );
     } else {
       isError.value = true;
@@ -172,9 +199,13 @@ class NewsController extends GetxController {
           allNewsList.addAll(newsList);
           currentPage++;
 
-          // Only cache first page
+          // Only cache first page using CacheService
           if (currentPage == 2) {
-            await _saveToCache(_cacheKeyAllNews, newsData);
+            await CacheService.saveToCache(
+              CacheService.allNewsKey, 
+              newsList,
+              duration: CacheService.defaultCacheDuration,
+            );
           }
         }
       } else {
@@ -188,13 +219,25 @@ class NewsController extends GetxController {
   }
 
   Future<void> getPopularVehicles() async {
+    // Check cache first
+    if (await CacheService.isCacheValid(CacheService.popularVehiclesKey) && popularVehiclesList.isNotEmpty) {
+      return; // Use cached data
+    }
+
     var baseURL = "${baseUrlDev}";
     final response = await http.get(Uri.parse(baseURL));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final List<dynamic> vehicleData = data['popularVehicles'];
-      popularVehiclesList.assignAll(
-        vehicleData.map((json) => VehicleModel.fromJson(json)).toList(),
+      final vehicleList = vehicleData.map((json) => VehicleModel.fromJson(json)).toList();
+      
+      popularVehiclesList.assignAll(vehicleList);
+
+      // Save to cache using CacheService
+      await CacheService.saveToCache(
+        CacheService.popularVehiclesKey, 
+        vehicleList,
+        duration: CacheService.defaultCacheDuration,
       );
     } else {
       isError.value = true;
@@ -202,13 +245,25 @@ class NewsController extends GetxController {
   }
 
   Future<void> getNewVehicles() async {
+    // Check cache first
+    if (await CacheService.isCacheValid(CacheService.newVehiclesKey) && newVehiclesList.isNotEmpty) {
+      return; // Use cached data
+    }
+
     var baseURL = "${baseUrlDev}";
     final response = await http.get(Uri.parse(baseURL));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final List<dynamic> vehicleData = data['latestVehicles'];
-      newVehiclesList.assignAll(
-        vehicleData.map((json) => VehicleModel.fromJson(json)).toList(),
+      final vehicleList = vehicleData.map((json) => VehicleModel.fromJson(json)).toList();
+      
+      newVehiclesList.assignAll(vehicleList);
+
+      // Save to cache using CacheService
+      await CacheService.saveToCache(
+        CacheService.newVehiclesKey, 
+        vehicleList,
+        duration: CacheService.defaultCacheDuration,
       );
     } else {
       isError.value = true;
@@ -258,11 +313,11 @@ class NewsController extends GetxController {
   }
 
   Future<void> clearCache() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_cacheKeyNewNews);
-    await prefs.remove(_cacheKeyNewsForYou);
-    await prefs.remove(_cacheKeyAllNews);
-    await prefs.remove(_cacheKeyPopularVehicles);
-    await prefs.remove(_cacheKeyNewVehicles);
+    // Use CacheService to clear all news-related cache
+    await CacheService.clearCache(CacheService.newNewsKey);
+    await CacheService.clearCache(CacheService.newsForYouKey);
+    await CacheService.clearCache(CacheService.allNewsKey);
+    await CacheService.clearCache(CacheService.popularVehiclesKey);
+    await CacheService.clearCache(CacheService.newVehiclesKey);
   }
 }
