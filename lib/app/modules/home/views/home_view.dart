@@ -3,6 +3,7 @@ import 'package:infoev/app/modules/home/views/Widgets/shimmer_vehicle_populer.da
 import 'package:infoev/app/modules/home/views/Widgets/vehicle_populer_card.dart';
 import 'package:infoev/app/modules/home/views/Widgets/vehicle_carousel_card.dart';
 import 'package:infoev/app/modules/home/views/Widgets/shimmer_vehicle_carousel.dart';
+import 'package:infoev/app/modules/navbar/controllers/bottom_nav_controller.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
@@ -579,33 +580,53 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 24),                          // Modern Carousel for Popular Vehicles
+                          const SizedBox(
+                            height: 5,
+                          ), // Modern Carousel for Popular Vehicles
                           Obx(() {
                             if (newsController.isLoading.value) {
                               return const ShimmerVehicleCarousel();
                             } else {
                               // Responsive height calculation
-                              final screenHeight = MediaQuery.of(context).size.height;
-                              final carouselHeight = screenHeight < 600 ? 260.0 : 280.0; // Smaller height on smaller screens
-                              
+                              final screenHeight =
+                                  MediaQuery.of(context).size.height;
+                              final carouselHeight =
+                                  screenHeight < 600
+                                      ? 260.0
+                                      : 280.0; // Smaller height on smaller screens
+
                               return CarouselSlider.builder(
-                                itemCount: newsController.popularVehiclesList.length,
+                                itemCount:
+                                    newsController.popularVehiclesList.length,
                                 options: CarouselOptions(
-                                  height: carouselHeight, // Responsive height to accommodate shadows
-                                  viewportFraction: 1.0, // Full width to prevent showing adjacent cards
-                                  enlargeCenterPage: false, // Disable enlargement
+                                  height:
+                                      carouselHeight, // Responsive height to accommodate shadows
+                                  viewportFraction:
+                                      1.0, // Full width to prevent showing adjacent cards
+                                  enlargeCenterPage:
+                                      false, // Disable enlargement
                                   autoPlay: true,
                                   autoPlayInterval: const Duration(seconds: 4),
-                                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                                  autoPlayAnimationDuration: const Duration(
+                                    milliseconds: 800,
+                                  ),
                                   autoPlayCurve: Curves.easeInOutCubic,
                                   scrollDirection: Axis.horizontal,
-                                  enableInfiniteScroll: newsController.popularVehiclesList.length > 1,
+                                  enableInfiniteScroll:
+                                      newsController
+                                          .popularVehiclesList
+                                          .length >
+                                      1,
                                   padEnds: false, // Remove default padding
                                 ),
                                 itemBuilder: (context, index, realIndex) {
-                                  final e = newsController.popularVehiclesList[index];
+                                  final e =
+                                      newsController.popularVehiclesList[index];
                                   return Container(
-                                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20), // Margins for shadow space
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 20,
+                                    ), // Margins for shadow space
                                     child: VehicleCarouselCard(
                                       onTap: () {
                                         Get.toNamed('/kendaraan/${e.slug}');
@@ -621,9 +642,8 @@ class _HomePageState extends State<HomePage> {
                           }),
 
                           const SizedBox(
-                            height: 30,
+                            height: 20,
                           ), // Spacing lebih besar untuk pemisahan
-
                           // Modern centered title with enhanced styling for "Kendaraan Terbaru"
                           Center(
                             child: Column(
@@ -654,31 +674,40 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 5),
 
                           // Modern horizontal list for "Kendaraan Terbaru"
                           Obx(() {
                             if (newsController.isLoading.value) {
                               return const ShimmerVehiclePopuler();
                             } else {
-                              final screenWidth = MediaQuery.of(context).size.width;
+                              final screenWidth =
+                                  MediaQuery.of(context).size.width;
                               final isTablet = screenWidth > 600;
-                              
+
                               return Container(
-                                margin: const EdgeInsets.symmetric(vertical: 15), // Reduced margin for better spacing
-                                height: isTablet ? 220.0 : 200.0, // Reduced height to make cards shorter
+                                margin: const EdgeInsets.symmetric(
+                                  vertical: 15,
+                                ), // Reduced margin for better spacing
+                                height:
+                                    isTablet
+                                        ? 220.0
+                                        : 200.0, // Reduced height to make cards shorter
                                 child: ListView.builder(
                                   scrollDirection: Axis.horizontal,
                                   physics: const BouncingScrollPhysics(),
-                                  itemCount: newsController.newVehiclesList.length,
+                                  itemCount:
+                                      newsController.newVehiclesList.length,
                                   itemBuilder: (context, index) {
-                                    final e = newsController.newVehiclesList[index];
+                                    final e =
+                                        newsController.newVehiclesList[index];
                                     return Padding(
                                       padding: EdgeInsets.only(
                                         left: index == 0 ? 4 : 0,
                                         right: 12,
                                         top: 12, // Add top spacing for shadow
-                                        bottom: 15, // Add bottom spacing for shadow
+                                        bottom:
+                                            15, // Add bottom spacing for shadow
                                       ),
                                       child: VehiclePopulerCard(
                                         onTap: () {
@@ -698,7 +727,6 @@ class _HomePageState extends State<HomePage> {
                           const SizedBox(
                             height: 30,
                           ), // Spacing lebih besar untuk pemisahan
-
                           // Modern Action Cards Row
                           Row(
                             children: [
@@ -706,47 +734,60 @@ class _HomePageState extends State<HomePage> {
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
-                                    // Navigate to index 2 of bottom navbar (Charger Stations)
-                                    // Note: This navigation will need to be implemented when bottom navbar controller is available
-                                    // Example: Get.find<BottomNavController>().changeTabIndex(2);
+                                    Get.put(
+                                      BottomNavController(
+                                    ).changemenuselection(2));
                                   },
                                   child: Container(
-                                    height: MediaQuery.of(context).size.width > 600 ? 140 : 120,
+                                    height:
+                                        MediaQuery.of(context).size.width > 600
+                                            ? 140
+                                            : 120,
                                     margin: const EdgeInsets.only(right: 8),
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
                                         colors: [
-                                          AppColors.primaryColor.withOpacity(0.1),
-                                          AppColors.secondaryColor.withOpacity(0.05),
+                                          AppColors.primaryColor.withOpacity(
+                                            0.1,
+                                          ),
+                                          AppColors.secondaryColor.withOpacity(
+                                            0.05,
+                                          ),
                                         ],
                                       ),
                                       borderRadius: BorderRadius.circular(20),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: AppColors.shadowMedium.withOpacity(0.1),
+                                          color: AppColors.shadowMedium
+                                              .withOpacity(0.1),
                                           blurRadius: 15,
                                           offset: const Offset(0, 5),
                                           spreadRadius: 0,
                                         ),
                                       ],
                                       border: Border.all(
-                                        color: AppColors.primaryColor.withOpacity(0.1),
+                                        color: AppColors.primaryColor
+                                            .withOpacity(0.1),
                                         width: 1,
                                       ),
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.all(16),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Container(
                                             padding: const EdgeInsets.all(8),
                                             decoration: BoxDecoration(
-                                              color: AppColors.primaryColor.withOpacity(0.1),
-                                              borderRadius: BorderRadius.circular(12),
+                                              color: AppColors.primaryColor
+                                                  .withOpacity(0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
                                             ),
                                             // TODO: Replace with custom image
                                             // Optimal image size: 48x48 px (white background)
@@ -754,17 +795,30 @@ class _HomePageState extends State<HomePage> {
                                             child: Text(
                                               '⚡',
                                               style: TextStyle(
-                                                fontSize: MediaQuery.of(context).size.width > 600 ? 24 : 20,
+                                                fontSize:
+                                                    MediaQuery.of(
+                                                              context,
+                                                            ).size.width >
+                                                            600
+                                                        ? 24
+                                                        : 20,
                                               ),
                                             ),
                                           ),
                                           Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 'Charging Stations',
                                                 style: GoogleFonts.poppins(
-                                                  fontSize: MediaQuery.of(context).size.width > 600 ? 14 : 13,
+                                                  fontSize:
+                                                      MediaQuery.of(
+                                                                context,
+                                                              ).size.width >
+                                                              600
+                                                          ? 14
+                                                          : 13,
                                                   fontWeight: FontWeight.w700,
                                                   color: AppColors.textColor,
                                                 ),
@@ -772,9 +826,16 @@ class _HomePageState extends State<HomePage> {
                                               Text(
                                                 'Temukan lokasi charging',
                                                 style: GoogleFonts.poppins(
-                                                  fontSize: MediaQuery.of(context).size.width > 600 ? 10 : 9,
+                                                  fontSize:
+                                                      MediaQuery.of(
+                                                                context,
+                                                              ).size.width >
+                                                              600
+                                                          ? 10
+                                                          : 9,
                                                   fontWeight: FontWeight.w400,
-                                                  color: AppColors.textSecondary,
+                                                  color:
+                                                      AppColors.textSecondary,
                                                 ),
                                               ),
                                             ],
@@ -785,7 +846,7 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                               ),
-                              
+
                               // Kalkulator EV Card
                               Expanded(
                                 child: GestureDetector(
@@ -794,42 +855,55 @@ class _HomePageState extends State<HomePage> {
                                     Get.toNamed('/calculator');
                                   },
                                   child: Container(
-                                    height: MediaQuery.of(context).size.width > 600 ? 140 : 120,
+                                    height:
+                                        MediaQuery.of(context).size.width > 600
+                                            ? 140
+                                            : 120,
                                     margin: const EdgeInsets.only(left: 8),
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
                                         colors: [
-                                          AppColors.secondaryColor.withOpacity(0.1),
-                                          AppColors.primaryColor.withOpacity(0.05),
+                                          AppColors.secondaryColor.withOpacity(
+                                            0.1,
+                                          ),
+                                          AppColors.primaryColor.withOpacity(
+                                            0.05,
+                                          ),
                                         ],
                                       ),
                                       borderRadius: BorderRadius.circular(20),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: AppColors.shadowMedium.withOpacity(0.1),
+                                          color: AppColors.shadowMedium
+                                              .withOpacity(0.1),
                                           blurRadius: 15,
                                           offset: const Offset(0, 5),
                                           spreadRadius: 0,
                                         ),
                                       ],
                                       border: Border.all(
-                                        color: AppColors.secondaryColor.withOpacity(0.1),
+                                        color: AppColors.secondaryColor
+                                            .withOpacity(0.1),
                                         width: 1,
                                       ),
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.all(16),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Container(
                                             padding: const EdgeInsets.all(8),
                                             decoration: BoxDecoration(
-                                              color: AppColors.secondaryColor.withOpacity(0.1),
-                                              borderRadius: BorderRadius.circular(12),
+                                              color: AppColors.secondaryColor
+                                                  .withOpacity(0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
                                             ),
                                             // TODO: Replace with custom image
                                             // Optimal image size: 48x48 px (white background)
@@ -837,17 +911,30 @@ class _HomePageState extends State<HomePage> {
                                             child: Text(
                                               '🧮',
                                               style: TextStyle(
-                                                fontSize: MediaQuery.of(context).size.width > 600 ? 24 : 20,
+                                                fontSize:
+                                                    MediaQuery.of(
+                                                              context,
+                                                            ).size.width >
+                                                            600
+                                                        ? 24
+                                                        : 20,
                                               ),
                                             ),
                                           ),
                                           Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 'Kalkulator EV',
                                                 style: GoogleFonts.poppins(
-                                                  fontSize: MediaQuery.of(context).size.width > 600 ? 14 : 13,
+                                                  fontSize:
+                                                      MediaQuery.of(
+                                                                context,
+                                                              ).size.width >
+                                                              600
+                                                          ? 14
+                                                          : 13,
                                                   fontWeight: FontWeight.w700,
                                                   color: AppColors.textColor,
                                                 ),
@@ -855,9 +942,16 @@ class _HomePageState extends State<HomePage> {
                                               Text(
                                                 'Hitung biaya listrik',
                                                 style: GoogleFonts.poppins(
-                                                  fontSize: MediaQuery.of(context).size.width > 600 ? 10 : 9,
+                                                  fontSize:
+                                                      MediaQuery.of(
+                                                                context,
+                                                              ).size.width >
+                                                              600
+                                                          ? 10
+                                                          : 9,
                                                   fontWeight: FontWeight.w400,
-                                                  color: AppColors.textSecondary,
+                                                  color:
+                                                      AppColors.textSecondary,
                                                 ),
                                               ),
                                             ],

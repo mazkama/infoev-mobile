@@ -99,8 +99,8 @@ class VehiclePopulerCard extends StatelessWidget {
                           child: CachedNetworkImage(
                             imageUrl: bannerUrl,
                             cacheKey: bannerUrl,
-                            maxWidthDiskCache: 200,
-                            maxHeightDiskCache: 200,
+                            maxWidthDiskCache: 500,
+                            maxHeightDiskCache: 500,
                             useOldImageOnUrlChange: true,
                             fadeInDuration: const Duration(milliseconds: 300),
                             fadeOutDuration: const Duration(milliseconds: 200),

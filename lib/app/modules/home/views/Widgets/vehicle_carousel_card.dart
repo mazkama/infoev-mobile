@@ -72,7 +72,8 @@ class VehicleCarouselCard extends StatelessWidget {
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [Colors.grey.shade50, Colors.white],
+                        // colors: [Colors.red.shade50, Colors.red],
+                        colors: [AppColors.backgroundSecondary, AppColors.cardBackgroundColor],
                       ),
                     ),
                     child: Stack(
@@ -94,12 +95,12 @@ class VehicleCarouselCard extends StatelessWidget {
                         ),
                         // Vehicle image
                         Padding(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(10),
                           child: Center(
                             child: CachedNetworkImage(
                               imageUrl: bannerUrl,
-                              maxWidthDiskCache: 200,
-                              maxHeightDiskCache: 200,
+                              maxWidthDiskCache: 500,
+                              maxHeightDiskCache: 500,
                               useOldImageOnUrlChange: true,
                               fit: BoxFit.contain,
                               placeholder:
@@ -173,7 +174,7 @@ class VehicleCarouselCard extends StatelessWidget {
                       8, // Reduced bottom padding
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.cardBackgroundColor,
                       borderRadius: const BorderRadius.only(
                         bottomLeft: Radius.circular(24),
                         bottomRight: Radius.circular(24),
@@ -238,7 +239,7 @@ class VehicleCarouselCard extends StatelessWidget {
                         // Action indicator - no flex, fixed content
                         Padding(
                           padding: const EdgeInsets.only(
-                            top: 4,
+                            bottom: 10,
                           ), // Move up slightly
                           child: Row(
                             children: [
