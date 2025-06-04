@@ -13,12 +13,13 @@ class SearchBarWidget extends StatefulWidget {
   State<SearchBarWidget> createState() => _SearchBarWidgetState();
 }
 
-class _SearchBarWidgetState extends State<SearchBarWidget> with TickerProviderStateMixin {
+class _SearchBarWidgetState extends State<SearchBarWidget>
+    with TickerProviderStateMixin {
   final TextEditingController textController = TextEditingController();
   final FocusNode focusNode = FocusNode();
   bool isSearchFocused = false;
   final debouncer = Debouncer(milliseconds: 600);
-  
+
   // Animation controllers
   late AnimationController _slideController;
   late AnimationController _scaleController;
@@ -28,39 +29,34 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with TickerProviderSt
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize animation controllers
     _slideController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    
+
     _scaleController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    
+
     // Define animations
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, -0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutBack,
-    ));
-    
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _scaleController,
-      curve: Curves.easeOutCubic,
-    ));
-    
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutBack),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _scaleController, curve: Curves.easeOutCubic),
+    );
+
     // Start animations
     _slideController.forward();
     _scaleController.forward();
-    
+
     focusNode.addListener(() {
       setState(() {
         isSearchFocused = focusNode.hasFocus;
@@ -126,7 +122,10 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with TickerProviderSt
                 decoration: InputDecoration(
                   hintText: 'Cari lokasi...',
                   hintStyle: TextStyle(color: AppColors.textTertiary),
-                  prefixIcon: const Icon(Icons.search, color: AppColors.textColor),
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: AppColors.textColor,
+                  ),
                   suffixIcon:
                       textController.text.isNotEmpty
                           ? IconButton(
@@ -187,14 +186,18 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with TickerProviderSt
                           itemCount: suggestions.length,
                           itemBuilder: (context, index) {
                             return AnimatedContainer(
-                              duration: Duration(milliseconds: 150 + (index * 50)),
+                              duration: Duration(
+                                milliseconds: 150 + (index * 50),
+                              ),
                               curve: Curves.easeOutCubic,
                               child: ListTile(
                                 dense: true,
                                 title: Text(
                                   suggestions[index]
                                       .name, // Use .name property from CitySuggestion
-                                  style: const TextStyle(color: AppColors.textColor),
+                                  style: const TextStyle(
+                                    color: AppColors.textColor,
+                                  ),
                                 ),
                                 leading: const Icon(
                                   Icons.location_city,
@@ -231,27 +234,6 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with TickerProviderSt
                             child: CircularProgressIndicator(
                               color: AppColors.secondaryColor,
                             ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                );
-              } else if (widget.controller.hasError.value) {
-                return TweenAnimationBuilder<double>(
-                  tween: Tween(begin: 0.0, end: 1.0),
-                  duration: const Duration(milliseconds: 300),
-                  builder: (context, value, child) {
-                    return Transform.scale(
-                      scale: value,
-                      child: Opacity(
-                        opacity: value,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            widget.controller.errorMessage.value,
-                            style: const TextStyle(color: AppColors.errorColor),
-                            textAlign: TextAlign.center,
                           ),
                         ),
                       ),
