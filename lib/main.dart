@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:infoev/app/modules/explore/controllers/MerekController.dart';
 import 'package:infoev/app/modules/login/controllers/LoginController.dart';
 import 'package:infoev/app/routes/app_pages.dart';
@@ -37,41 +38,48 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Menutup keyboard jika area di luar TextField disentuh
-        FocusScope.of(context).unfocus();
-      },
-      child: GetMaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: AppColors.lightColorScheme,
-          useMaterial3: true,
-          // Additional theme configurations using AppColors
-          scaffoldBackgroundColor: AppColors.backgroundColor,
-          cardColor: AppColors.cardBackgroundColor,
-          dividerColor: AppColors.dividerColor,
-          // AppBar theme
-          appBarTheme: const AppBarTheme(
-            backgroundColor: AppColors.surfaceColor,
-            foregroundColor: AppColors.textColor,
-            elevation: 0,
-          ),
-          // ElevatedButton theme
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.buttonPrimary,
-              foregroundColor: AppColors.textOnPrimary,
+    return ScreenUtilInit(
+      designSize: const Size(428, 926), // iPhone 12 Pro Max design size
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return GestureDetector(
+          onTap: () {
+            // Menutup keyboard jika area di luar TextField disentuh
+            FocusScope.of(context).unfocus();
+          },
+          child: GetMaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              colorScheme: AppColors.lightColorScheme,
+              useMaterial3: true,
+              // Additional theme configurations using AppColors
+              scaffoldBackgroundColor: AppColors.backgroundColor,
+              cardColor: AppColors.cardBackgroundColor,
+              dividerColor: AppColors.dividerColor,
+              // AppBar theme
+              appBarTheme: const AppBarTheme(
+                backgroundColor: AppColors.surfaceColor,
+                foregroundColor: AppColors.textColor,
+                elevation: 0,
+              ),
+              // ElevatedButton theme
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.buttonPrimary,
+                  foregroundColor: AppColors.textOnPrimary,
+                ),
+              ),
+              // TextButton theme
+              textButtonTheme: TextButtonThemeData(
+                style: TextButton.styleFrom(foregroundColor: AppColors.linkColor),
+              ),
             ),
+            initialRoute: AppPages.INITIAL,
+            getPages: AppPages.routes,
           ),
-          // TextButton theme
-          textButtonTheme: TextButtonThemeData(
-            style: TextButton.styleFrom(foregroundColor: AppColors.linkColor),
-          ),
-        ),
-        initialRoute: AppPages.INITIAL,
-        getPages: AppPages.routes,
-      ),
+        );
+      },
     );
   }
 }
