@@ -170,101 +170,288 @@ class _CalculatorPageState extends State<CalculatorPage>
   }
 
   Widget _buildVehicleSelection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Pilih Kendaraan',
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textTertiary,
+    final isTablet = MediaQuery.of(context).size.width > 600;
+    
+    return Container(
+      padding: EdgeInsets.all(isTablet ? 24 : 20),
+      decoration: BoxDecoration(
+        color: AppColors.cardBackgroundColor,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
-        ),
-        const SizedBox(height: 8),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Modern Header Section
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.primaryColor,
+                      AppColors.primaryColor.withOpacity(0.8),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryColor.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.directions_car_filled_outlined,
+                  color: Colors.white,
+                  size: isTablet ? 24 : 20,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Pilih Kendaraan Listrik',
+                      style: GoogleFonts.poppins(
+                        fontSize: isTablet ? 20 : 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textColor,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Cari dan pilih kendaraan listrik untuk perhitungan',
+                      style: GoogleFonts.poppins(
+                        fontSize: isTablet ? 14 : 12,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
 
-        // Selection button or selected vehicle card
-        Obx(
-          () =>
-              controller.selectedVehicle.value != null
-                  ? _buildSelectedVehicleCard()
-                  : _buildVehicleSelectionButton(),
-        ),
+          SizedBox(height: isTablet ? 20 : 16),
 
-        // Search results
-        Obx(() {
-          if (controller.isSearching.value) {
-            return Column(
-              children: [const SizedBox(height: 8), _buildSearchResults()],
-            );
-          }
-          return const SizedBox.shrink();
-        }),
-      ],
+          // Selection button or selected vehicle card
+          Obx(
+            () =>
+                controller.selectedVehicle.value != null
+                    ? _buildSelectedVehicleCard()
+                    : _buildVehicleSelectionButton(),
+          ),
+
+          // Search results
+          Obx(() {
+            if (controller.isSearching.value) {
+              return Column(
+                children: [
+                  SizedBox(height: isTablet ? 16 : 12),
+                  _buildSearchResults()
+                ],
+              );
+            }
+            return const SizedBox.shrink();
+          }),
+        ],
+      ),
     );
   }
 
   Widget _buildVehicleSelectionButton() {
-    return InkWell(
-      onTap: () {
-        controller.toggleSearch();
-        FocusScope.of(context).requestFocus(_searchFocusNode);
-      },
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: AppColors.backgroundSecondary,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.borderLight),
-        ),
-        child: TextField(
-          controller: _searchController,
-          focusNode: _searchFocusNode,
-          style: GoogleFonts.poppins(color: AppColors.textColor),
-          decoration: InputDecoration(
-            hintText: 'Pilih kendaraan listrik',
-            hintStyle: GoogleFonts.poppins(
-              color: AppColors.textTertiary,
-              fontSize: 14,
+    final isTablet = MediaQuery.of(context).size.width > 600;
+    
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+      child: InkWell(
+        onTap: () {
+          controller.toggleSearch();
+          FocusScope.of(context).requestFocus(_searchFocusNode);
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppColors.backgroundSecondary,
+                AppColors.backgroundSecondary.withOpacity(0.8),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            prefixIcon: const Icon(
-              Icons.search,
-              color: AppColors.textSecondary,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: AppColors.borderMedium.withOpacity(0.3),
+              width: 1.5,
             ),
-            border: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 16),
-            suffixIcon: ValueListenableBuilder<TextEditingValue>(
-              valueListenable: _searchController,
-              builder: (context, value, child) {
-                return value.text.isNotEmpty
-                    ? IconButton(
-                      icon: const Icon(
-                        Icons.close,
-                        color: AppColors.textSecondary,
-                      ),
-                      onPressed: () {
-                        _searchController.clear();
-                        controller.resetSearch();
-                      },
-                    )
-                    : const SizedBox.shrink();
-              },
-            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 12,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-          onChanged: (value) {
-            if (!controller.isSearching.value) {
-              controller.toggleSearch();
-            }
+          child: Stack(
+            children: [
+              // Background pattern/decoration
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.primaryColor.withOpacity(0.02),
+                        Colors.transparent,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                ),
+              ),
+              
+              // Main content
+              Padding(
+                padding: EdgeInsets.all(isTablet ? 20 : 16),
+                child: Row(
+                  children: [
+                    // Search icon with background
+                    Container(
+                      padding: EdgeInsets.all(isTablet ? 12 : 10),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.primaryColor.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.search_rounded,
+                        color: AppColors.primaryColor,
+                        size: isTablet ? 24 : 20,
+                      ),
+                    ),
+                    
+                    const SizedBox(width: 16),
+                    
+                    // Text field and content
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextField(
+                            controller: _searchController,
+                            focusNode: _searchFocusNode,
+                            style: GoogleFonts.poppins(
+                              color: AppColors.textColor,
+                              fontSize: isTablet ? 16 : 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: 'Cari kendaraan listrik...',
+                              hintStyle: GoogleFonts.poppins(
+                                color: AppColors.textTertiary,
+                                fontSize: isTablet ? 16 : 14,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.zero,
+                              isDense: true,
+                            ),
+                            onChanged: (value) {
+                              if (!controller.isSearching.value) {
+                                controller.toggleSearch();
+                              }
 
-            if (_debounceTimer?.isActive ?? false) _debounceTimer?.cancel();
-            _debounceTimer = Timer(const Duration(milliseconds: 500), () {
-              if (mounted) {
-                controller.performSearch(value);
-              }
-            });
-          },
+                              if (_debounceTimer?.isActive ?? false) _debounceTimer?.cancel();
+                              _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+                                if (mounted) {
+                                  controller.performSearch(value);
+                                }
+                              });
+                            },
+                          ),
+                          
+                          const SizedBox(height: 4),
+                          
+                          Text(
+                            'Ketik nama atau merek kendaraan',
+                            style: GoogleFonts.poppins(
+                              color: AppColors.textTertiary.withOpacity(0.8),
+                              fontSize: isTablet ? 12 : 10,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Clear button or indicator
+                    ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: _searchController,
+                      builder: (context, value, child) {
+                        return AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: value.text.isNotEmpty
+                              ? Container(
+                                  key: const ValueKey('clear'),
+                                  child: InkWell(
+                                    onTap: () {
+                                      _searchController.clear();
+                                      controller.resetSearch();
+                                    },
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.errorColor.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Icon(
+                                        Icons.close_rounded,
+                                        color: AppColors.errorColor,
+                                        size: isTablet ? 20 : 16,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                  key: const ValueKey('arrow'),
+                                  padding: const EdgeInsets.all(8),
+                                  child: Icon(
+                                    Icons.keyboard_arrow_down_rounded,
+                                    color: AppColors.textSecondary,
+                                    size: isTablet ? 24 : 20,
+                                  ),
+                                ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -614,246 +801,420 @@ class _CalculatorPageState extends State<CalculatorPage>
   }
 
   Widget _buildElectricityPriceInput() {
+    final isTablet = MediaQuery.of(context).size.width > 600;
+    
+    return Container(
+      padding: EdgeInsets.all(isTablet ? 24 : 20),
+      decoration: BoxDecoration(
+        color: AppColors.cardBackgroundColor,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Daily Distance Section
+          _buildModernInputSection(
+            title: 'Rata-rata Berkendara per Hari',
+            icon: Icons.route_outlined,
+            iconColor: AppColors.primaryColor,
+            child: _buildModernDistanceInput(isTablet),
+          ),
+
+          SizedBox(height: isTablet ? 32 : 28),
+
+          // Electricity Price Section
+          _buildModernInputSection(
+            title: 'Harga Listrik per kWh',
+            icon: Icons.electrical_services_outlined,
+            iconColor: AppColors.secondaryColor,
+            child: _buildModernPriceInput(isTablet),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModernInputSection({
+    required String title,
+    required IconData icon,
+    required Color iconColor,
+    required Widget child,
+  }) {
+    final isTablet = MediaQuery.of(context).size.width > 600;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Rata-rata Berkendara per Hari
-        Text(
-          'Rata-rata Berkendara per Hari',
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textColor,
-          ),
-        ),
-        const SizedBox(height: 8),
-
         Row(
           children: [
-            // Distance prefix
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.cardBackgroundColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(8),
-                  bottomLeft: Radius.circular(8),
-                ),
+                color: iconColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(
-                'KM',
-                style: GoogleFonts.poppins(
-                  color: AppColors.textColor,
-                  fontWeight: FontWeight.w500,
-                ),
+              child: Icon(
+                icon,
+                color: iconColor,
+                size: isTablet ? 24 : 20,
               ),
             ),
-
-            // Text field
+            const SizedBox(width: 12),
             Expanded(
-              child: TextField(
-                controller: _dailyDistanceController,
-                style: GoogleFonts.poppins(color: AppColors.textColor),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: AppColors.backgroundSecondary,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(8),
-                      bottomRight: Radius.circular(8),
-                    ),
-                    borderSide: BorderSide.none,
-                  ),
-                  hintText: '30',
-                  hintStyle: GoogleFonts.poppins(color: AppColors.textTertiary),
-                  suffixText: 'per hari',
-                  suffixStyle: GoogleFonts.poppins(
-                    color: AppColors.textSecondary,
-                    fontSize: 12,
-                  ),
+              child: Text(
+                title,
+                style: GoogleFonts.poppins(
+                  fontSize: isTablet ? 18 : 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textColor,
                 ),
-                onChanged: (value) {
-                  if (value.isNotEmpty) {
-                    final distance =
-                        double.tryParse(value) ??
-                        controller.dailyDistance.value;
-                    controller.updateDailyDistance(distance);
-                  }
-                },
               ),
             ),
           ],
         ),
-
-        const SizedBox(height: 16),
-
-        // Slider
-        Obx(
-          () => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Slider(
-                value: controller.dailyDistanceSlider.value.clamp(1, 500),
-                min: 1,
-                max: 500,
-                divisions: 499, // (500-1)
-                label:
-                    '${controller.dailyDistanceSlider.value.toStringAsFixed(0)} KM',
-                activeColor: AppColors.primaryColor,
-                inactiveColor: AppColors.borderMedium,
-                onChanged: (value) {
-                  controller.updateDailyDistance(value);
-                  _dailyDistanceController.text = value.toStringAsFixed(0);
-                },
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '1 KM',
-                      style: GoogleFonts.poppins(
-                        color: AppColors.textOnPrimary,
-                        fontSize: 12,
-                      ),
-                    ),
-                    Text(
-                      '500 KM',
-                      style: GoogleFonts.poppins(
-                        color: AppColors.textOnPrimary,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Harga Listrik per kWh
-        Text(
-          'Harga Listrik per kWh',
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textColor,
-          ),
-        ),
-        const SizedBox(height: 8),
-
-        Row(
-          children: [
-            // Price prefix
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-              decoration: BoxDecoration(
-                color: AppColors.cardBackgroundColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(8),
-                  bottomLeft: Radius.circular(8),
-                ),
-              ),
-              child: Text(
-                'Rp',
-                style: GoogleFonts.poppins(
-                  color: AppColors.textColor,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-
-            // Text field
-            Expanded(
-              child: TextField(
-                controller: _priceController,
-                style: GoogleFonts.poppins(color: AppColors.textColor),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: AppColors.backgroundSecondary,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(8),
-                      bottomRight: Radius.circular(8),
-                    ),
-                    borderSide: BorderSide.none,
-                  ),
-                  hintText: '1445',
-                  hintStyle: GoogleFonts.poppins(color: AppColors.textTertiary),
-                  suffixText: 'per kWh',
-                  suffixStyle: GoogleFonts.poppins(
-                    color: AppColors.textSecondary,
-                    fontSize: 12,
-                  ),
-                ),
-                onChanged: (value) {
-                  if (value.isNotEmpty) {
-                    final price =
-                        double.tryParse(value) ??
-                        controller.electricityPrice.value;
-                    controller.updateElectricityPrice(price);
-                  }
-                },
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 16),
-
-        // Slider
-        Obx(
-          () => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Slider(
-                value: controller.sliderValue.value.clamp(900, 2600),
-                min: 900,
-                max: 2600,
-                divisions: 34, // (2600-900)/50
-                label: 'Rp ${controller.sliderValue.value.toStringAsFixed(0)}',
-                activeColor: AppColors.primaryColor,
-                inactiveColor: AppColors.borderMedium,
-                onChanged: (value) {
-                  controller.updateElectricityPrice(value);
-                  _priceController.text = value.toStringAsFixed(0);
-                },
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Rp 900',
-                      style: GoogleFonts.poppins(
-                        color: AppColors.textOnPrimary,
-                        fontSize: 12,
-                      ),
-                    ),
-                    Text(
-                      'Rp 2.600',
-                      style: GoogleFonts.poppins(
-                        color: AppColors.textOnPrimary,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+        SizedBox(height: isTablet ? 16 : 12),
+        child,
       ],
+    );
+  }
+
+  Widget _buildModernDistanceInput(bool isTablet) {
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.backgroundSecondary,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: AppColors.borderMedium.withOpacity(0.3),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              // KM prefix
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isTablet ? 16 : 14,
+                  vertical: isTablet ? 18 : 16,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColor.withOpacity(0.1),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    bottomLeft: Radius.circular(16),
+                  ),
+                ),
+                child: Text(
+                  'KM',
+                  style: GoogleFonts.poppins(
+                    color: AppColors.primaryColor,
+                    fontWeight: FontWeight.w600,
+                    fontSize: isTablet ? 16 : 14,
+                  ),
+                ),
+              ),
+
+              // Text field
+              Expanded(
+                child: TextField(
+                  controller: _dailyDistanceController,
+                  style: GoogleFonts.poppins(
+                    color: AppColors.textColor,
+                    fontSize: isTablet ? 16 : 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.transparent,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: isTablet ? 20 : 16,
+                      vertical: isTablet ? 18 : 16,
+                    ),
+                    border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(16),
+                        bottomRight: Radius.circular(16),
+                      ),
+                      borderSide: BorderSide.none,
+                    ),
+                    hintText: '30',
+                    hintStyle: GoogleFonts.poppins(
+                      color: AppColors.textTertiary,
+                      fontSize: isTablet ? 16 : 14,
+                    ),
+                    suffixIcon: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isTablet ? 16 : 12,
+                        vertical: isTablet ? 18 : 16,
+                      ),
+                      child: Text(
+                        'per hari',
+                        style: GoogleFonts.poppins(
+                          color: AppColors.textSecondary,
+                          fontSize: isTablet ? 14 : 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    suffixIconConstraints: const BoxConstraints(),
+                  ),
+                  onChanged: (value) {
+                    if (value.isNotEmpty) {
+                      final distance = double.tryParse(value) ?? controller.dailyDistance.value;
+                      controller.updateDailyDistance(distance);
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        SizedBox(height: isTablet ? 20 : 16),
+
+        // Modern Slider
+        Obx(() => _buildModernSlider(
+          value: controller.dailyDistanceSlider.value.clamp(1, 500),
+          min: 1,
+          max: 500,
+          divisions: 499,
+          label: '${controller.dailyDistanceSlider.value.toStringAsFixed(0)} KM',
+          minLabel: '1 KM',
+          maxLabel: '500 KM',
+          onChanged: (value) {
+            controller.updateDailyDistance(value);
+            _dailyDistanceController.text = value.toStringAsFixed(0);
+          },
+          isTablet: isTablet,
+        )),
+      ],
+    );
+  }
+
+  Widget _buildModernPriceInput(bool isTablet) {
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.backgroundSecondary,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: AppColors.borderMedium.withOpacity(0.3),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              // Rp prefix
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isTablet ? 16 : 14,
+                  vertical: isTablet ? 18 : 16,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.secondaryColor.withOpacity(0.1),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    bottomLeft: Radius.circular(16),
+                  ),
+                ),
+                child: Text(
+                  'Rp',
+                  style: GoogleFonts.poppins(
+                    color: AppColors.secondaryColor,
+                    fontWeight: FontWeight.w600,
+                    fontSize: isTablet ? 16 : 14,
+                  ),
+                ),
+              ),
+
+              // Text field
+              Expanded(
+                child: TextField(
+                  controller: _priceController,
+                  style: GoogleFonts.poppins(
+                    color: AppColors.textColor,
+                    fontSize: isTablet ? 16 : 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.transparent,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: isTablet ? 20 : 16,
+                      vertical: isTablet ? 18 : 16,
+                    ),
+                    border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(16),
+                        bottomRight: Radius.circular(16),
+                      ),
+                      borderSide: BorderSide.none,
+                    ),
+                    hintText: '1445',
+                    hintStyle: GoogleFonts.poppins(
+                      color: AppColors.textTertiary,
+                      fontSize: isTablet ? 16 : 14,
+                    ),
+                    suffixIcon: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isTablet ? 16 : 12,
+                        vertical: isTablet ? 18 : 16,
+                      ),
+                      child: Text(
+                        'per kWh',
+                        style: GoogleFonts.poppins(
+                          color: AppColors.textSecondary,
+                          fontSize: isTablet ? 14 : 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    suffixIconConstraints: const BoxConstraints(),
+                  ),
+                  onChanged: (value) {
+                    if (value.isNotEmpty) {
+                      final price = double.tryParse(value) ?? controller.electricityPrice.value;
+                      controller.updateElectricityPrice(price);
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        SizedBox(height: isTablet ? 20 : 16),
+
+        // Modern Slider
+        Obx(() => _buildModernSlider(
+          value: controller.sliderValue.value.clamp(900, 2600),
+          min: 900,
+          max: 2600,
+          divisions: 34,
+          label: 'Rp ${controller.sliderValue.value.toStringAsFixed(0)}',
+          minLabel: 'Rp 900',
+          maxLabel: 'Rp 2.600',
+          onChanged: (value) {
+            controller.updateElectricityPrice(value);
+            _priceController.text = value.toStringAsFixed(0);
+          },
+          isTablet: isTablet,
+        )),
+      ],
+    );
+  }
+
+  Widget _buildModernSlider({
+    required double value,
+    required double min,
+    required double max,
+    required int divisions,
+    required String label,
+    required String minLabel,
+    required String maxLabel,
+    required ValueChanged<double> onChanged,
+    required bool isTablet,
+  }) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: isTablet ? 16 : 12,
+        vertical: isTablet ? 16 : 12,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundSecondary.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppColors.borderMedium.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              activeTrackColor: AppColors.primaryColor,
+              inactiveTrackColor: AppColors.borderMedium.withOpacity(0.3),
+              thumbColor: AppColors.primaryColor,
+              overlayColor: AppColors.primaryColor.withOpacity(0.2),
+              thumbShape: RoundSliderThumbShape(
+                enabledThumbRadius: isTablet ? 14 : 12,
+              ),
+              overlayShape: RoundSliderOverlayShape(
+                overlayRadius: isTablet ? 24 : 20,
+              ),
+              trackHeight: isTablet ? 6 : 4,
+              valueIndicatorColor: AppColors.primaryColor,
+              valueIndicatorTextStyle: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: isTablet ? 14 : 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            child: Slider(
+              value: value,
+              min: min,
+              max: max,
+              divisions: divisions,
+              label: label,
+              onChanged: onChanged,
+            ),
+          ),
+          
+          SizedBox(height: isTablet ? 8 : 4),
+          
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: isTablet ? 16 : 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  minLabel,
+                  style: GoogleFonts.poppins(
+                    color: AppColors.textSecondary,
+                    fontSize: isTablet ? 14 : 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  maxLabel,
+                  style: GoogleFonts.poppins(
+                    color: AppColors.textSecondary,
+                    fontSize: isTablet ? 14 : 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
