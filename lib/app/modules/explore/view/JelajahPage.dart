@@ -609,6 +609,7 @@ class _JelajahPageState extends State<JelajahPage> {
                     fit: BoxFit.contain,
                     maxWidthDiskCache: 200,
                     maxHeightDiskCache: 200,
+                    useOldImageOnUrlChange: true,
                     placeholder:
                         (context, url) => Shimmer.fromColors(
                           baseColor: AppColors.shimmerBase,
@@ -690,6 +691,7 @@ class _JelajahPageState extends State<JelajahPage> {
                   fit: BoxFit.contain,
                   maxWidthDiskCache: 200,
                   maxHeightDiskCache: 200,
+                  useOldImageOnUrlChange: true,
                   placeholder:
                       (context, url) => Shimmer.fromColors(
                         baseColor: AppColors.shimmerBase,
@@ -805,6 +807,9 @@ class _JelajahPageState extends State<JelajahPage> {
                   merek.banner != null
                       ? CachedNetworkImage(
                         imageUrl: merek.banner!,
+                        maxWidthDiskCache: 200,
+                        maxHeightDiskCache: 200,
+                        useOldImageOnUrlChange: true,
                         imageBuilder: (context, imageProvider) {
                           return _buildCardWithContentLoaded(
                             merek,

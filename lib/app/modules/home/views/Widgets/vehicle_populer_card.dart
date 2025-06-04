@@ -72,10 +72,7 @@ class VehiclePopulerCard extends StatelessWidget {
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.grey.shade50,
-                        Colors.white,
-                      ],
+                      colors: [Colors.grey.shade50, Colors.white],
                     ),
                   ),
                   child: Stack(
@@ -102,31 +99,37 @@ class VehiclePopulerCard extends StatelessWidget {
                           child: CachedNetworkImage(
                             imageUrl: bannerUrl,
                             cacheKey: bannerUrl,
+                            maxWidthDiskCache: 200,
+                            maxHeightDiskCache: 200,
                             useOldImageOnUrlChange: true,
                             fadeInDuration: const Duration(milliseconds: 300),
                             fadeOutDuration: const Duration(milliseconds: 200),
                             fit: BoxFit.contain,
-                            placeholder: (context, url) => Shimmer.fromColors(
-                              baseColor: AppColors.shimmerBase,
-                              highlightColor: AppColors.shimmerHighlight,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.shimmerBase,
-                                  borderRadius: BorderRadius.circular(12),
+                            placeholder:
+                                (context, url) => Shimmer.fromColors(
+                                  baseColor: AppColors.shimmerBase,
+                                  highlightColor: AppColors.shimmerHighlight,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: AppColors.shimmerBase,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            errorWidget: (context, url, error) => Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Icon(
-                                Icons.electric_car_outlined,
-                                color: AppColors.primaryColor.withOpacity(0.5),
-                                size: isTablet ? 36 : 32,
-                              ),
-                            ),
+                            errorWidget:
+                                (context, url, error) => Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade100,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(
+                                    Icons.electric_car_outlined,
+                                    color: AppColors.primaryColor.withOpacity(
+                                      0.5,
+                                    ),
+                                    size: isTablet ? 36 : 32,
+                                  ),
+                                ),
                           ),
                         ),
                       ),

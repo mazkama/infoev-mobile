@@ -46,6 +46,8 @@ class VehicleNewCard extends StatelessWidget {
               CachedNetworkImage(
                 imageUrl: bannerUrl,
                 cacheKey: bannerUrl,
+                maxWidthDiskCache: 200,
+                maxHeightDiskCache: 200,
                 useOldImageOnUrlChange: true,
                 fadeInDuration: Duration.zero,
                 fadeOutDuration: Duration.zero,

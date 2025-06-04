@@ -23,7 +23,7 @@ class VehicleCarouselCard extends StatelessWidget {
     // Responsive design
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -64,17 +64,15 @@ class VehicleCarouselCard extends StatelessWidget {
               children: [
                 // Image section with enhanced styling
                 Expanded(
-                  flex: 6, // Reduced from 7 to accommodate larger content section
+                  flex:
+                      6, // Reduced from 7 to accommodate larger content section
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.grey.shade50,
-                          Colors.white,
-                        ],
+                        colors: [Colors.grey.shade50, Colors.white],
                       ),
                     ),
                     child: Stack(
@@ -100,28 +98,35 @@ class VehicleCarouselCard extends StatelessWidget {
                           child: Center(
                             child: CachedNetworkImage(
                               imageUrl: bannerUrl,
+                              maxWidthDiskCache: 200,
+                              maxHeightDiskCache: 200,
+                              useOldImageOnUrlChange: true,
                               fit: BoxFit.contain,
-                              placeholder: (context, url) => Shimmer.fromColors(
-                                baseColor: AppColors.shimmerBase,
-                                highlightColor: AppColors.shimmerHighlight,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: AppColors.shimmerBase,
-                                    borderRadius: BorderRadius.circular(12),
+                              placeholder:
+                                  (context, url) => Shimmer.fromColors(
+                                    baseColor: AppColors.shimmerBase,
+                                    highlightColor: AppColors.shimmerHighlight,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: AppColors.shimmerBase,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              errorWidget: (context, url, error) => Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Icon(
-                                  Icons.electric_car_outlined,
-                                  color: AppColors.primaryColor.withOpacity(0.5),
-                                  size: 48,
-                                ),
-                              ),
+                              errorWidget:
+                                  (context, url, error) => Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade100,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Icon(
+                                      Icons.electric_car_outlined,
+                                      color: AppColors.primaryColor.withOpacity(
+                                        0.5,
+                                      ),
+                                      size: 48,
+                                    ),
+                                  ),
                             ),
                           ),
                         ),
@@ -164,8 +169,8 @@ class VehicleCarouselCard extends StatelessWidget {
                     padding: EdgeInsets.fromLTRB(
                       isTablet ? 20 : 16, // More padding on tablets
                       8, // Reduced top padding
-                      isTablet ? 20 : 16, 
-                      8  // Reduced bottom padding
+                      isTablet ? 20 : 16,
+                      8, // Reduced bottom padding
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -182,20 +187,28 @@ class VehicleCarouselCard extends StatelessWidget {
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween, // Distribute space evenly
+                      mainAxisAlignment:
+                          MainAxisAlignment
+                              .spaceBetween, // Distribute space evenly
                       children: [
                         // Vehicle info section - no flex, fixed content
                         Padding(
-                          padding: const EdgeInsets.only(top: 8), // Add top padding to move text down
+                          padding: const EdgeInsets.only(
+                            top: 8,
+                          ), // Add top padding to move text down
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min, // Take minimum space needed
+                            mainAxisSize:
+                                MainAxisSize.min, // Take minimum space needed
                             children: [
                               // Brand name - increased font size
                               Text(
                                 brand.toUpperCase(),
                                 style: GoogleFonts.poppins(
-                                  fontSize: isTablet ? 13 : 12, // Increased brand font size
+                                  fontSize:
+                                      isTablet
+                                          ? 13
+                                          : 12, // Increased brand font size
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.secondaryColor,
                                   letterSpacing: 0.8,
@@ -208,7 +221,10 @@ class VehicleCarouselCard extends StatelessWidget {
                               Text(
                                 name,
                                 style: GoogleFonts.poppins(
-                                  fontSize: isTablet ? 18 : 16, // Increased vehicle name size
+                                  fontSize:
+                                      isTablet
+                                          ? 18
+                                          : 16, // Increased vehicle name size
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.textColor,
                                   height: 1.1, // Slightly looser line height
@@ -221,14 +237,17 @@ class VehicleCarouselCard extends StatelessWidget {
                         ),
                         // Action indicator - no flex, fixed content
                         Padding(
-                          padding: const EdgeInsets.only(top: 4), // Move up slightly
+                          padding: const EdgeInsets.only(
+                            top: 4,
+                          ), // Move up slightly
                           child: Row(
                             children: [
                               Expanded(
                                 child: Text(
                                   'Lihat Detail',
                                   style: GoogleFonts.poppins(
-                                    fontSize: isTablet ? 15 : 14, // Increased size
+                                    fontSize:
+                                        isTablet ? 15 : 14, // Increased size
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primaryColor,
                                   ),

@@ -28,7 +28,7 @@ class NewsController extends GetxController {
     super.onInit();
     _loadCachedData();
     loadAllData();
-    
+
     // Clean expired cache on startup
     CacheService.cleanExpiredCache();
   }
@@ -36,39 +36,40 @@ class NewsController extends GetxController {
   Future<void> _loadCachedData() async {
     // Load cached data using the new CacheService
     final cachedNewNews = await CacheService.loadListFromCache(
-      CacheService.newNewsKey, 
-      (json) => NewsModel.fromJson(json)
+      CacheService.newNewsKey,
+      (json) => NewsModel.fromJson(json),
     );
     if (cachedNewNews != null) newNewsList.assignAll(cachedNewNews);
 
     final cachedNewsForYou = await CacheService.loadListFromCache(
-      CacheService.newsForYouKey, 
-      (json) => NewsModel.fromJson(json)
+      CacheService.newsForYouKey,
+      (json) => NewsModel.fromJson(json),
     );
     if (cachedNewsForYou != null) newsForYouList.assignAll(cachedNewsForYou);
 
     final cachedAllNews = await CacheService.loadListFromCache(
-      CacheService.allNewsKey, 
-      (json) => NewsModel.fromJson(json)
+      CacheService.allNewsKey,
+      (json) => NewsModel.fromJson(json),
     );
     if (cachedAllNews != null) allNewsList.assignAll(cachedAllNews);
 
     final cachedPopularVehicles = await CacheService.loadListFromCache(
-      CacheService.popularVehiclesKey, 
-      (json) => VehicleModel.fromJson(json)
+      CacheService.popularVehiclesKey,
+      (json) => VehicleModel.fromJson(json),
     );
-    if (cachedPopularVehicles != null) popularVehiclesList.assignAll(cachedPopularVehicles);
+    if (cachedPopularVehicles != null)
+      popularVehiclesList.assignAll(cachedPopularVehicles);
 
     final cachedNewVehicles = await CacheService.loadListFromCache(
-      CacheService.newVehiclesKey, 
-      (json) => VehicleModel.fromJson(json)
+      CacheService.newVehiclesKey,
+      (json) => VehicleModel.fromJson(json),
     );
     if (cachedNewVehicles != null) newVehiclesList.assignAll(cachedNewVehicles);
   }
 
   Future<void> loadAllData() async {
     isLoading.value = true;
-    
+
     // Check if we have valid cached data first
     final hasValidCache = await Future.wait([
       CacheService.isCacheValid(CacheService.newNewsKey),
@@ -79,7 +80,7 @@ class NewsController extends GetxController {
 
     // Only fetch data that doesn't have valid cache
     final tasks = <Future>[];
-    
+
     if (!hasValidCache[0]) tasks.add(getNewNews());
     if (!hasValidCache[1]) tasks.add(getPopularVehicles());
     if (!hasValidCache[2]) tasks.add(getNewVehicles());
@@ -101,10 +102,10 @@ class NewsController extends GetxController {
     isError.value = false; // Reset error state
     searchQuery.value = ''; // Clear search
     allNewsList.clear(); // Clear existing list
-    
+
     // Clear cache to force fresh data
     await clearCache();
-    
+
     try {
       await getAllNews(reset: true);
     } catch (e) {
@@ -116,7 +117,8 @@ class NewsController extends GetxController {
 
   Future<void> getNewNews() async {
     // Check cache first
-    if (await CacheService.isCacheValid(CacheService.newNewsKey) && newNewsList.isNotEmpty) {
+    if (await CacheService.isCacheValid(CacheService.newNewsKey) &&
+        newNewsList.isNotEmpty) {
       return; // Use cached data
     }
 
@@ -133,7 +135,7 @@ class NewsController extends GetxController {
 
       // Save to cache using CacheService
       await CacheService.saveToCache(
-        CacheService.newNewsKey, 
+        CacheService.newNewsKey,
         newsList.map((json) => NewsModel.fromJson(json)).toList(),
         duration: CacheService.defaultCacheDuration,
       );
@@ -148,13 +150,14 @@ class NewsController extends GetxController {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final List<dynamic> newsData = data['stickies'];
-      final newsList = newsData.take(15).map((json) => NewsModel.fromJson(json)).toList();
-      
+      final newsList =
+          newsData.take(15).map((json) => NewsModel.fromJson(json)).toList();
+
       newsForYouList.assignAll(newsList);
 
       // Save to cache using CacheService
       await CacheService.saveToCache(
-        CacheService.newsForYouKey, 
+        CacheService.newsForYouKey,
         newsList,
         duration: CacheService.defaultCacheDuration,
       );
@@ -202,7 +205,7 @@ class NewsController extends GetxController {
           // Only cache first page using CacheService
           if (currentPage == 2) {
             await CacheService.saveToCache(
-              CacheService.allNewsKey, 
+              CacheService.allNewsKey,
               newsList,
               duration: CacheService.defaultCacheDuration,
             );
@@ -220,7 +223,8 @@ class NewsController extends GetxController {
 
   Future<void> getPopularVehicles() async {
     // Check cache first
-    if (await CacheService.isCacheValid(CacheService.popularVehiclesKey) && popularVehiclesList.isNotEmpty) {
+    if (await CacheService.isCacheValid(CacheService.popularVehiclesKey) &&
+        popularVehiclesList.isNotEmpty) {
       return; // Use cached data
     }
 
@@ -229,13 +233,14 @@ class NewsController extends GetxController {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final List<dynamic> vehicleData = data['popularVehicles'];
-      final vehicleList = vehicleData.map((json) => VehicleModel.fromJson(json)).toList();
-      
+      final vehicleList =
+          vehicleData.map((json) => VehicleModel.fromJson(json)).toList();
+
       popularVehiclesList.assignAll(vehicleList);
 
       // Save to cache using CacheService
       await CacheService.saveToCache(
-        CacheService.popularVehiclesKey, 
+        CacheService.popularVehiclesKey,
         vehicleList,
         duration: CacheService.defaultCacheDuration,
       );
@@ -246,7 +251,8 @@ class NewsController extends GetxController {
 
   Future<void> getNewVehicles() async {
     // Check cache first
-    if (await CacheService.isCacheValid(CacheService.newVehiclesKey) && newVehiclesList.isNotEmpty) {
+    if (await CacheService.isCacheValid(CacheService.newVehiclesKey) &&
+        newVehiclesList.isNotEmpty) {
       return; // Use cached data
     }
 
@@ -255,13 +261,14 @@ class NewsController extends GetxController {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final List<dynamic> vehicleData = data['latestVehicles'];
-      final vehicleList = vehicleData.map((json) => VehicleModel.fromJson(json)).toList();
-      
+      final vehicleList =
+          vehicleData.map((json) => VehicleModel.fromJson(json)).toList();
+
       newVehiclesList.assignAll(vehicleList);
 
       // Save to cache using CacheService
       await CacheService.saveToCache(
-        CacheService.newVehiclesKey, 
+        CacheService.newVehiclesKey,
         vehicleList,
         duration: CacheService.defaultCacheDuration,
       );
