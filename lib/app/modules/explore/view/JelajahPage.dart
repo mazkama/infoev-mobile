@@ -607,6 +607,8 @@ class _JelajahPageState extends State<JelajahPage> {
                   child: CachedNetworkImage(
                     imageUrl: brand.banner!,
                     fit: BoxFit.contain,
+                    maxWidthDiskCache: 200,
+                    maxHeightDiskCache: 200,
                     placeholder:
                         (context, url) => Shimmer.fromColors(
                           baseColor: AppColors.shimmerBase,
@@ -686,6 +688,8 @@ class _JelajahPageState extends State<JelajahPage> {
                 child: CachedNetworkImage(
                   imageUrl: vehicle['thumbnail_url'] ?? '',
                   fit: BoxFit.contain,
+                  maxWidthDiskCache: 200,
+                  maxHeightDiskCache: 200,
                   placeholder:
                       (context, url) => Shimmer.fromColors(
                         baseColor: AppColors.shimmerBase,
