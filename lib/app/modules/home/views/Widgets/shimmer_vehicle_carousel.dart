@@ -9,18 +9,42 @@ class ShimmerVehicleCarousel extends StatelessWidget {
   Widget build(BuildContext context) {
     // Responsive height to match carousel
     final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth > 600;
     final carouselHeight = screenHeight < 600 ? 260.0 : 280.0;
     
-    return Container(
-      height: carouselHeight, // Match the responsive carousel height
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 0), // No horizontal padding
-        itemCount: 3,
-        itemBuilder: (context, index) {
-          return Container(
-            width: MediaQuery.of(context).size.width - 32, // Full width minus margins
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20), // Match carousel margin
+    // Card width calculation - smaller than screen width for proper display
+    final cardWidth = screenWidth * 0.8;
+    
+    return SizedBox(
+      height: carouselHeight,
+      width: double.infinity,
+      // Center a single card instead of using ListView
+      child: Center(
+        child: Container(
+          width: cardWidth,
+          margin: EdgeInsets.symmetric(
+            vertical: 20,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowMedium.withOpacity(0.15),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+                spreadRadius: 0,
+              ),
+              BoxShadow(
+                color: AppColors.primaryColor.withOpacity(0.08),
+                blurRadius: 40,
+                offset: const Offset(0, 16),
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
             child: Shimmer.fromColors(
               baseColor: AppColors.shimmerBase,
               highlightColor: AppColors.shimmerHighlight,
@@ -28,39 +52,67 @@ class ShimmerVehicleCarousel extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.shimmerBase,
                   borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.shadowMedium.withOpacity(0.15),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                      spreadRadius: 0,
-                    ),
-                  ],
                 ),
                 child: Column(
                   children: [
-                    // Image shimmer - maintain 7:3 ratio from real card
+                    // Image shimmer - match flex: 5
                     Expanded(
-                      flex: 7,
+                      flex: 5,
                       child: Container(
                         width: double.infinity,
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           color: AppColors.shimmerBase,
-                          borderRadius: BorderRadius.only(
+                          borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(24),
                             topRight: Radius.circular(24),
                           ),
                         ),
+                        child: Stack(
+                          children: [
+                            // Main image shimmer
+                            Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Center(
+                                child: Container(
+                                  width: isTablet ? 160 : 120,
+                                  height: isTablet ? 80 : 60,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            // Brand badge shimmer
+                            Positioned(
+                              top: 12,
+                              right: 12,
+                              child: Container(
+                                width: 32,
+                                height: 18,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    // Content shimmer
+                    // Content shimmer - match flex: 4
                     Expanded(
-                      flex: 3,
+                      flex: 4,
                       child: Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.fromLTRB(16, 10, 16, 10), // Match card padding
+                        padding: EdgeInsets.fromLTRB(
+                          isTablet ? 20 : 16,
+                          8,
+                          isTablet ? 20 : 16,
+                          8,
+                        ),
                         decoration: const BoxDecoration(
-                          color: AppColors.shimmerBase,
+                          color: Colors.white,
                           borderRadius: BorderRadius.only(
                             bottomLeft: Radius.circular(24),
                             bottomRight: Radius.circular(24),
@@ -68,30 +120,60 @@ class ShimmerVehicleCarousel extends StatelessWidget {
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Container(
-                              width: 80,
-                              height: 12,
-                              color: AppColors.shimmerHighlight,
+                            // Brand & name shimmer
+                            Padding(
+                              padding: const EdgeInsets.only(top: 5, bottom: 5),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 60,
+                                    height: isTablet ? 13.0 : 12.0,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Container(
+                                    width: double.infinity,
+                                    height: isTablet ? 18.0 : 16.0,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            const SizedBox(height: 8),
-                            Container(
-                              width: double.infinity,
-                              height: 16,
-                              color: AppColors.shimmerHighlight,
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              width: 120,
-                              height: 16,
-                              color: AppColors.shimmerHighlight,
-                            ),
-                            const SizedBox(height: 8),
-                            Container(
-                              width: 100,
-                              height: 12,
-                              color: AppColors.shimmerHighlight,
+                            // Action shimmer
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      width: 80,
+                                      height: isTablet ? 15.0 : 14.0,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: isTablet ? 15.0 : 14.0,
+                                    height: isTablet ? 15.0 : 14.0,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -101,8 +183,8 @@ class ShimmerVehicleCarousel extends StatelessWidget {
                 ),
               ),
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }

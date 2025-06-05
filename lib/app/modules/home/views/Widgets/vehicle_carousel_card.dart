@@ -65,7 +65,7 @@ class VehicleCarouselCard extends StatelessWidget {
                 // Image section with enhanced styling
                 Expanded(
                   flex:
-                      6, // Reduced from 7 to accommodate larger content section
+                      5, // Reduced from 7 to accommodate larger content section
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -195,7 +195,7 @@ class VehicleCarouselCard extends StatelessWidget {
                         // Vehicle info section - no flex, fixed content
                         Padding(
                           padding: const EdgeInsets.only(
-                            top: 8,
+                            top: 5, bottom: 5 
                           ), // Add top padding to move text down
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,

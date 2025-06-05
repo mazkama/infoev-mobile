@@ -674,7 +674,7 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 5),
+                          const SizedBox(height: 2),
 
                           // Modern horizontal list for "Kendaraan Terbaru"
                           Obx(() {
@@ -725,7 +725,7 @@ class _HomePageState extends State<HomePage> {
                           }),
 
                           const SizedBox(
-                            height: 30,
+                            height: 20,
                           ), // Spacing lebih besar untuk pemisahan
                           // Modern Action Cards Row
                           Row(
@@ -735,8 +735,10 @@ class _HomePageState extends State<HomePage> {
                                 child: GestureDetector(
                                   onTap: () {
                                     Get.put(
-                                      BottomNavController(
-                                    ).changemenuselection(2));
+                                      BottomNavController().changemenuselection(
+                                        2,
+                                      ),
+                                    );
                                   },
                                   child: Container(
                                     height:
@@ -966,7 +968,7 @@ class _HomePageState extends State<HomePage> {
                           ),
 
                           const SizedBox(
-                            height: 30,
+                            height: 40,
                           ), // Spacing lebih besar untuk pemisahan
 
                           Row(
@@ -974,9 +976,9 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               Text(
                                 "Berita Terbaru",
-                                style: TextStyle(
+                                style: GoogleFonts.poppins(
+                                  fontSize: 21,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 20,
                                   color: AppColors.textColor,
                                 ),
                               ),
@@ -1014,12 +1016,13 @@ class _HomePageState extends State<HomePage> {
                                     children: [
                                       Text(
                                         "Lihat Semua",
-                                        style: TextStyle(
-                                          fontSize: 16,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14,
                                           color: AppColors.primaryColor,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
+                                      const SizedBox(width: 5),
                                       Icon(
                                         Icons
                                             .arrow_forward_ios_rounded, // Ikon panah kanan
@@ -1032,7 +1035,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 15),
+                          const SizedBox(height: 20),
 
                           // Shimmer untuk "News For You"
                           Obx(() {
