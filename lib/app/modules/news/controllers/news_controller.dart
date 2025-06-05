@@ -4,110 +4,104 @@ import 'package:http/http.dart' as http;
 import 'package:infoev/app/modules/explore/model/VehicleModel.dart';
 import 'package:infoev/app/modules/news/model/NewsModel.dart';
 import 'package:infoev/core/halper.dart';
-import 'package:infoev/app/services/cache_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NewsController extends GetxController {
-  RxList<NewsModel> newNewsList = <NewsModel>[].obs;
-  RxList<NewsModel> newsForYouList = <NewsModel>[].obs;
+  // List & state for each type
   RxList<NewsModel> allNewsList = <NewsModel>[].obs;
-  RxList<VehicleModel> popularVehiclesList = <VehicleModel>[].obs;
-  RxList<VehicleModel> newVehiclesList = <VehicleModel>[].obs;
-  RxBool isLoading = true.obs;
-  RxBool isLoadingMore = false.obs;
-  RxBool hasMoreNews = true.obs;
-  RxBool isError = false.obs; // Menambahkan status error
-  var searchQuery = ''.obs;
+  RxList<NewsModel> newsForYou = <NewsModel>[].obs;
+  RxList<NewsModel> newsTipsAndTricks = <NewsModel>[].obs;
 
-  // Change the currentFilter initialization
+  // Pagination state for each type
+  int currentPageAll = 1;
+  int currentPageForYou = 1;
+  int currentPageTips = 1;
+
+  RxBool isLoading = true.obs;
+  RxBool isLoadingMoreAll = false.obs;
+  RxBool isLoadingMoreForYou = false.obs;
+  RxBool isLoadingMoreTips = false.obs;
+
+  RxBool hasMoreAll = true.obs;
+  RxBool hasMoreForYou = true.obs;
+  RxBool hasMoreTips = true.obs;
+
+  RxBool isError = false.obs;
+  var searchQuery = ''.obs;
   RxString currentFilter = 'all'.obs;
 
-  int currentPage = 1;
+  static const cacheDuration = Duration(hours: 12);
+  static const String _cacheKeyAllNews = 'cache_all_news';
+  static const String _cacheKeyNewsForYou = 'cache_news_for_you';
+  static const String _cacheKeyNewsTips = 'cache_news_tips';
 
   @override
-  void onInit() {
-    super.onInit();
-    _loadCachedData();
-    loadAllData();
-
-    // Clean expired cache on startup
-    CacheService.cleanExpiredCache();
-  }
+void onInit() {
+  super.onInit();
+  _loadCachedData().then((_) {
+    if (allNewsList.isEmpty && newsForYou.isEmpty && newsTipsAndTricks.isEmpty) {
+      loadAllData();
+    }
+  });
+}
 
   Future<void> _loadCachedData() async {
-    // Load cached data using the new CacheService
-    final cachedNewNews = await CacheService.loadListFromCache(
-      CacheService.newNewsKey,
-      (json) => NewsModel.fromJson(json),
-    );
-    if (cachedNewNews != null) newNewsList.assignAll(cachedNewNews);
+    final prefs = await SharedPreferences.getInstance();
+    _loadCachedList(prefs, _cacheKeyAllNews, allNewsList);
+    _loadCachedList(prefs, _cacheKeyNewsForYou, newsForYou);
+    _loadCachedList(prefs, _cacheKeyNewsTips, newsTipsAndTricks);
+    isLoading.value = false;
+  }
 
-    final cachedNewsForYou = await CacheService.loadListFromCache(
-      CacheService.newsForYouKey,
-      (json) => NewsModel.fromJson(json),
-    );
-    if (cachedNewsForYou != null) newsForYouList.assignAll(cachedNewsForYou);
+  void _loadCachedList<T>(SharedPreferences prefs, String key, RxList<T> list) {
+    final cached = prefs.getString(key);
+    final timestamp = prefs.getString('${key}_timestamp');
+    if (cached != null && timestamp != null) {
+      final cachedTime = DateTime.parse(timestamp);
+      if (DateTime.now().difference(cachedTime) < cacheDuration) {
+        final data = json.decode(cached) as List;
+        if (T == NewsModel) {
+          print('[CACHE] Load $key: ${data.length} items');
+          list.assignAll(data.map((x) => NewsModel.fromJson(x)).cast<T>());
+        } else if (T == VehicleModel) {
+          print('[CACHE] Load $key: ${data.length} items');
+          list.assignAll(data.map((x) => VehicleModel.fromJson(x)).cast<T>());
+        }
+      }
+    }
+  }
 
-    final cachedAllNews = await CacheService.loadListFromCache(
-      CacheService.allNewsKey,
-      (json) => NewsModel.fromJson(json),
-    );
-    if (cachedAllNews != null) allNewsList.assignAll(cachedAllNews);
-
-    final cachedPopularVehicles = await CacheService.loadListFromCache(
-      CacheService.popularVehiclesKey,
-      (json) => VehicleModel.fromJson(json),
-    );
-    if (cachedPopularVehicles != null)
-      popularVehiclesList.assignAll(cachedPopularVehicles);
-
-    final cachedNewVehicles = await CacheService.loadListFromCache(
-      CacheService.newVehiclesKey,
-      (json) => VehicleModel.fromJson(json),
-    );
-    if (cachedNewVehicles != null) newVehiclesList.assignAll(cachedNewVehicles);
+  Future<void> _saveToCache(String key, List<dynamic> data) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(key, json.encode(data));
+    await prefs.setString('${key}_timestamp', DateTime.now().toIso8601String());
   }
 
   Future<void> loadAllData() async {
     isLoading.value = true;
-
-    // Check if we have valid cached data first
-    final hasValidCache = await Future.wait([
-      CacheService.isCacheValid(CacheService.newNewsKey),
-      CacheService.isCacheValid(CacheService.popularVehiclesKey),
-      CacheService.isCacheValid(CacheService.newVehiclesKey),
-      CacheService.isCacheValid(CacheService.allNewsKey),
+    await Future.wait([
+      getAllNews(reset: true),
+      getNewsForYou(reset: true),
+      getNewsTipsAndTricks(reset: true),
     ]);
-
-    // Only fetch data that doesn't have valid cache
-    final tasks = <Future>[];
-
-    if (!hasValidCache[0]) tasks.add(getNewNews());
-    if (!hasValidCache[1]) tasks.add(getPopularVehicles());
-    if (!hasValidCache[2]) tasks.add(getNewVehicles());
-    if (!hasValidCache[3]) tasks.add(getAllNews(reset: true));
-
-    // If all data is cached, skip API calls
-    if (tasks.isEmpty) {
-      isLoading.value = false;
-      return;
-    }
-
-    await Future.wait(tasks);
     isLoading.value = false;
   }
 
-  // Enhanced refresh method with cache clearing
   Future<void> refreshNews() async {
     isLoading.value = true;
-    isError.value = false; // Reset error state
-    searchQuery.value = ''; // Clear search
-    allNewsList.clear(); // Clear existing list
-
-    // Clear cache to force fresh data
-    await clearCache();
-
+    isError.value = false;
+    searchQuery.value = '';
+    allNewsList.clear();
+    newsForYou.clear();
+    newsTipsAndTricks.clear();
+    currentPageAll = 1;
+    currentPageForYou = 1;
+    currentPageTips = 1;
+    hasMoreAll.value = true;
+    hasMoreForYou.value = true;
+    hasMoreTips.value = true;
     try {
-      await getAllNews(reset: true);
+      await loadAllData();
     } catch (e) {
       isError.value = true;
     } finally {
@@ -115,100 +109,31 @@ class NewsController extends GetxController {
     }
   }
 
-  Future<void> getNewNews() async {
-    // Check cache first
-    if (await CacheService.isCacheValid(CacheService.newNewsKey) &&
-        newNewsList.isNotEmpty) {
-      return; // Use cached data
-    }
-
-    var baseURL = "${baseUrlDev}";
-    final response = await http.get(Uri.parse(baseURL));
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final List<dynamic> newsData = data['posts'];
-      final newsList = newsData.take(15).toList();
-
-      newNewsList.assignAll(
-        newsList.map((json) => NewsModel.fromJson(json)).toList(),
-      );
-
-      // Save to cache using CacheService
-      await CacheService.saveToCache(
-        CacheService.newNewsKey,
-        newsList.map((json) => NewsModel.fromJson(json)).toList(),
-        duration: CacheService.defaultCacheDuration,
-      );
-    } else {
-      isError.value = true;
-    }
-  }
-
-  Future<void> getNewsForYou() async {
-    var baseURL = "${baseUrlDev}";
-    final response = await http.get(Uri.parse(baseURL));
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final List<dynamic> newsData = data['stickies'];
-      final newsList =
-          newsData.take(15).map((json) => NewsModel.fromJson(json)).toList();
-
-      newsForYouList.assignAll(newsList);
-
-      // Save to cache using CacheService
-      await CacheService.saveToCache(
-        CacheService.newsForYouKey,
-        newsList,
-        duration: CacheService.defaultCacheDuration,
-      );
-    } else {
-      isError.value = true;
-    }
-  }
-
-  Future<void> getAllNews({bool reset = false, String? type}) async {
+  // --- PAGINATION FOR ALL ---
+  Future<void> getAllNews({bool reset = false}) async {
     if (reset) {
-      currentPage = 1;
-      hasMoreNews.value = true;
+      currentPageAll = 1;
+      hasMoreAll.value = true;
       allNewsList.clear();
-      if (type != null) {
-        currentFilter.value = type;
-      }
     }
-
-    if (!hasMoreNews.value || isLoadingMore.value) return;
-
-    isLoadingMore.value = true;
-
+    if (!hasMoreAll.value || isLoadingMoreAll.value) return;
+    isLoadingMoreAll.value = true;
     try {
-      String url = "${baseUrlDev}/berita?page=$currentPage";
-      final activeFilter = type ?? currentFilter.value;
-
-      if (activeFilter.isNotEmpty && activeFilter != 'all') {
-        url += "&type=$activeFilter";
-      }
-
+      String url = "$baseUrlDev/berita?page=$currentPageAll";
+      print('[ENDPOINT] Fetch all news: $url');
       final response = await http.get(Uri.parse(url));
-
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final List<dynamic> newsData = data['posts']['data'];
-
         if (newsData.isEmpty) {
-          hasMoreNews.value = false;
+          hasMoreAll.value = false;
         } else {
           final newsList =
               newsData.map((json) => NewsModel.fromJson(json)).toList();
           allNewsList.addAll(newsList);
-          currentPage++;
-
-          // Only cache first page using CacheService
-          if (currentPage == 2) {
-            await CacheService.saveToCache(
-              CacheService.allNewsKey,
-              newsList,
-              duration: CacheService.defaultCacheDuration,
-            );
+          currentPageAll++;
+          if (currentPageAll == 2) {
+            await _saveToCache(_cacheKeyAllNews, newsData);
           }
         }
       } else {
@@ -217,81 +142,93 @@ class NewsController extends GetxController {
     } catch (e) {
       isError.value = true;
     } finally {
-      isLoadingMore.value = false;
+      isLoadingMoreAll.value = false;
     }
   }
 
-  Future<void> getPopularVehicles() async {
-    // Check cache first
-    if (await CacheService.isCacheValid(CacheService.popularVehiclesKey) &&
-        popularVehiclesList.isNotEmpty) {
-      return; // Use cached data
+  // --- PAGINATION FOR YOU ---
+  Future<void> getNewsForYou({bool reset = false}) async {
+    if (reset) {
+      currentPageForYou = 1;
+      hasMoreForYou.value = true;
+      newsForYou.clear();
     }
-
-    var baseURL = "${baseUrlDev}";
-    final response = await http.get(Uri.parse(baseURL));
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final List<dynamic> vehicleData = data['popularVehicles'];
-      final vehicleList =
-          vehicleData.map((json) => VehicleModel.fromJson(json)).toList();
-
-      popularVehiclesList.assignAll(vehicleList);
-
-      // Save to cache using CacheService
-      await CacheService.saveToCache(
-        CacheService.popularVehiclesKey,
-        vehicleList,
-        duration: CacheService.defaultCacheDuration,
-      );
-    } else {
-      isError.value = true;
-    }
-  }
-
-  Future<void> getNewVehicles() async {
-    // Check cache first
-    if (await CacheService.isCacheValid(CacheService.newVehiclesKey) &&
-        newVehiclesList.isNotEmpty) {
-      return; // Use cached data
-    }
-
-    var baseURL = "${baseUrlDev}";
-    final response = await http.get(Uri.parse(baseURL));
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final List<dynamic> vehicleData = data['latestVehicles'];
-      final vehicleList =
-          vehicleData.map((json) => VehicleModel.fromJson(json)).toList();
-
-      newVehiclesList.assignAll(vehicleList);
-
-      // Save to cache using CacheService
-      await CacheService.saveToCache(
-        CacheService.newVehiclesKey,
-        vehicleList,
-        duration: CacheService.defaultCacheDuration,
-      );
-    } else {
-      isError.value = true;
-    }
-  }
-
-  // Method untuk pencarian
-  Future<void> searchNews(String query) async {
-    isLoading.value = true;
-    searchQuery.value = query;
-    currentFilter.value = '';
-
+    if (!hasMoreForYou.value || isLoadingMoreForYou.value) return;
+    isLoadingMoreForYou.value = true;
     try {
-      final response = await http.get(
-        Uri.parse("${baseUrlDev}/berita?q=$query"),
-      );
+      final url = "$baseUrlDev/berita?type=sticky&page=$currentPageForYou";
+      print('[ENDPOINT] Fetch news for you: $url');
+      final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final List<dynamic> newsData = data['posts']['data'];
+        if (newsData.isEmpty) {
+          hasMoreForYou.value = false;
+        } else {
+          final newsList =
+              newsData.map((json) => NewsModel.fromJson(json)).toList();
+          newsForYou.addAll(newsList);
+          currentPageForYou++;
+          if (currentPageForYou == 2) {
+            await _saveToCache(_cacheKeyNewsForYou, newsData);
+          }
+        }
+      }
+    } catch (e) {
+      // Biarkan cache jika error
+    } finally {
+      isLoadingMoreForYou.value = false;
+    }
+  }
 
-        // Menambahkan hasil pencarian ke dalam allNewsList
+  // --- PAGINATION TIPS & TRICKS ---
+  Future<void> getNewsTipsAndTricks({bool reset = false}) async {
+    if (reset) {
+      currentPageTips = 1;
+      hasMoreTips.value = true;
+      newsTipsAndTricks.clear();
+    }
+    if (!hasMoreTips.value || isLoadingMoreTips.value) return;
+    isLoadingMoreTips.value = true;
+    try {
+      final url =
+          "$baseUrlDev/berita?type=tips_and_tricks&page=$currentPageTips";
+      print('[ENDPOINT] Fetch news tips and tricks: $url');
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final List<dynamic> newsData = data['posts']['data'];
+        if (newsData.isEmpty) {
+          hasMoreTips.value = false;
+        } else {
+          final newsList =
+              newsData.map((json) => NewsModel.fromJson(json)).toList();
+          newsTipsAndTricks.addAll(newsList);
+          currentPageTips++;
+          if (currentPageTips == 2) {
+            await _saveToCache(_cacheKeyNewsTips, newsData);
+          }
+        }
+      }
+    } catch (e) {
+      // Biarkan cache jika error
+    } finally {
+      isLoadingMoreTips.value = false;
+    }
+  }
+
+  Future<void> searchNews(String query) async {
+    isLoading.value = true;
+    searchQuery.value = query;
+    currentFilter.value = 'all';
+    try {
+      final url = "$baseUrlDev/berita?q=$query";
+      print('[ENDPOINT] Search news: $url');
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final List<dynamic> newsData = data['posts']['data'];
         allNewsList.assignAll(
           newsData.map((json) => NewsModel.fromJson(json)).toList(),
         );
@@ -305,26 +242,52 @@ class NewsController extends GetxController {
     }
   }
 
-  // Update the changeFilter method
-  Future<void> changeFilter(String type) async {
-    if (currentFilter.value != type) {
-      isLoading.value = true;
-      try {
-        await getAllNews(reset: true, type: type);
-      } catch (e) {
-        isError.value = true;
-      } finally {
-        isLoading.value = false;
+  /// Handling filter untuk setiap news type
+  Future<void> changeFilter(String type, {bool forceRefresh = false}) async {
+    if (currentFilter.value == type && !forceRefresh) return;
+    isLoading.value = true;
+    currentFilter.value = type;
+    try {
+      if (type == 'all') {
+        if (allNewsList.isEmpty || forceRefresh) {
+          await getAllNews(reset: true);
+        }
+      } else if (type == 'for_you') {
+        if (newsForYou.isEmpty || forceRefresh) {
+          await getNewsForYou(reset: true);
+        }
+      } else if (type == 'tips_and_tricks') {
+        if (newsTipsAndTricks.isEmpty || forceRefresh) {
+          await getNewsTipsAndTricks(reset: true);
+        }
+      } else {
+        // fallback: filter custom type
+        if (allNewsList.isEmpty || forceRefresh) {
+          await getAllNews(reset: true);
+        }
       }
+    } catch (e) {
+      isError.value = true;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // Call this from your view's scroll listener
+  Future<void> loadMore() async {
+    if (currentFilter.value == 'all') {
+      await getAllNews();
+    } else if (currentFilter.value == 'for_you') {
+      await getNewsForYou();
+    } else if (currentFilter.value == 'tips_and_tricks') {
+      await getNewsTipsAndTricks();
     }
   }
 
   Future<void> clearCache() async {
-    // Use CacheService to clear all news-related cache
-    await CacheService.clearCache(CacheService.newNewsKey);
-    await CacheService.clearCache(CacheService.newsForYouKey);
-    await CacheService.clearCache(CacheService.allNewsKey);
-    await CacheService.clearCache(CacheService.popularVehiclesKey);
-    await CacheService.clearCache(CacheService.newVehiclesKey);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_cacheKeyAllNews);
+    await prefs.remove(_cacheKeyNewsForYou);
+    await prefs.remove(_cacheKeyNewsTips);
   }
 }

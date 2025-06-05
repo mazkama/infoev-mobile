@@ -8,7 +8,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:infoev/app/modules/news/controllers/news_controller.dart';
+import 'package:infoev/app/modules/home/controllers/home_controller.dart';
 import 'package:infoev/app/modules/home/views/Widgets/news_title.dart';
 import 'package:infoev/app/modules/news/views/news_detail_view.dart';
 import 'package:infoev/app/modules/home/views/Widgets/shimmer_loading.dart';
@@ -69,10 +69,10 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  static final NewsController newsController = Get.put(NewsController());
+  static final HomeController homeController = Get.put(HomeController());
 
   Future<void> _onRefresh() async {
-    await newsController.loadAllData();
+    await homeController.loadAllData();
   }
 
   Widget _buildSearchAppBar() {
@@ -491,7 +491,7 @@ class _HomePageState extends State<HomePage> {
                   title: InkWell(
                     onTap: () {
                       // Aksi saat logo ditekan (opsional)
-                      // newsController.getNewsInfoEv();
+                      // homeController.getNewsInfoEv();
                     },
                     child: Image.asset(
                       'assets/images/logo_infoev.png', // Logo dari assets
@@ -584,7 +584,7 @@ class _HomePageState extends State<HomePage> {
                             height: 5,
                           ), // Modern Carousel for Popular Vehicles
                           Obx(() {
-                            if (newsController.isLoading.value) {
+                            if (homeController.isLoading.value) {
                               return const ShimmerVehicleCarousel();
                             } else {
                               // Responsive height calculation
@@ -597,7 +597,7 @@ class _HomePageState extends State<HomePage> {
 
                               return CarouselSlider.builder(
                                 itemCount:
-                                    newsController.popularVehiclesList.length,
+                                    homeController.popularVehiclesList.length,
                                 options: CarouselOptions(
                                   height:
                                       carouselHeight, // Responsive height to accommodate shadows
@@ -613,7 +613,7 @@ class _HomePageState extends State<HomePage> {
                                   autoPlayCurve: Curves.easeInOutCubic,
                                   scrollDirection: Axis.horizontal,
                                   enableInfiniteScroll:
-                                      newsController
+                                      homeController
                                           .popularVehiclesList
                                           .length >
                                       1,
@@ -621,7 +621,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 itemBuilder: (context, index, realIndex) {
                                   final e =
-                                      newsController.popularVehiclesList[index];
+                                      homeController.popularVehiclesList[index];
                                   return Container(
                                     margin: const EdgeInsets.symmetric(
                                       horizontal: 16,
@@ -678,7 +678,7 @@ class _HomePageState extends State<HomePage> {
 
                           // Modern horizontal list for "Kendaraan Terbaru"
                           Obx(() {
-                            if (newsController.isLoading.value) {
+                            if (homeController.isLoading.value) {
                               return const ShimmerVehiclePopuler();
                             } else {
                               final screenWidth =
@@ -697,10 +697,10 @@ class _HomePageState extends State<HomePage> {
                                   scrollDirection: Axis.horizontal,
                                   physics: const BouncingScrollPhysics(),
                                   itemCount:
-                                      newsController.newVehiclesList.length,
+                                      homeController.newVehiclesList.length,
                                   itemBuilder: (context, index) {
                                     final e =
-                                        newsController.newVehiclesList[index];
+                                        homeController.newVehiclesList[index];
                                     return Padding(
                                       padding: EdgeInsets.only(
                                         left: index == 0 ? 4 : 0,
@@ -1036,16 +1036,16 @@ class _HomePageState extends State<HomePage> {
 
                           // Shimmer untuk "News For You"
                           Obx(() {
-                            if (newsController.isLoading.value) {
+                            if (homeController.isLoading.value) {
                               return const ShimmerLoading();
                             } else {
                               return ListView.builder(
                                 shrinkWrap: true,
                                 physics:
                                     const NeverScrollableScrollPhysics(), // agar tidak bentrok dengan SingleChildScrollView
-                                itemCount: newsController.newNewsList.length,
+                                itemCount: homeController.newNewsList.length,
                                 itemBuilder: (context, index) {
-                                  final e = newsController.newNewsList[index];
+                                  final e = homeController.newNewsList[index];
                                   return NewsTitle(
                                     ontap: () {
                                       FocusScope.of(context).unfocus();

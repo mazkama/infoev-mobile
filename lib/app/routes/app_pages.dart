@@ -9,6 +9,7 @@ import 'package:infoev/app/modules/explore/view/JelajahPage.dart';
 import 'package:infoev/app/modules/explore/view/SearchResultsPage.dart';
 import 'package:infoev/app/modules/explore/view/TipeProduk.dart';
 import 'package:infoev/app/modules/explore/view/VehicleDetail.dart';
+import 'package:infoev/app/modules/home/controllers/home_controller.dart';
 import 'package:infoev/app/modules/home/views/home_view.dart';
 import 'package:infoev/app/modules/login/views/LoginPage.dart';
 import 'package:infoev/app/modules/login/controllers/LoginController.dart';
@@ -56,7 +57,7 @@ class AppPages {
       page: () => HomePage(),
       transition: Transition.rightToLeft,
       binding: BindingsBuilder(() {
-        Get.put(NewsController());
+        Get.put(HomeController());
       }),
     ),
     GetPage(

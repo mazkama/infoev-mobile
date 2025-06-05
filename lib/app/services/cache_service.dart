@@ -9,8 +9,6 @@ class CacheService {
 
   // Cache keys
   static const String _keyNewNews = 'cache_new_news';
-  static const String _keyNewsForYou = 'cache_news_for_you';
-  static const String _keyAllNews = 'cache_all_news';
   static const String _keyPopularVehicles = 'cache_popular_vehicles';
   static const String _keyNewVehicles = 'cache_new_vehicles';
   static const String _keyBrandList = 'cache_brand_list';
@@ -285,9 +283,7 @@ class CacheService {
   }
 
   // Cache keys for easy access
-  static const String newNewsKey = _keyNewNews;
-  static const String newsForYouKey = _keyNewsForYou;
-  static const String allNewsKey = _keyAllNews;
+  static const String newNewsKey = _keyNewNews; 
   static const String popularVehiclesKey = _keyPopularVehicles;
   static const String newVehiclesKey = _keyNewVehicles;
   static const String brandListKey = _keyBrandList;

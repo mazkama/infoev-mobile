@@ -19,7 +19,7 @@ class ArticalPage extends StatefulWidget {
 }
 
 class _ArticalPageState extends State<ArticalPage> {
-  final NewsController newsController = Get.put(NewsController());
+  final NewsController newsController = Get.find<NewsController>();
   final ScrollController scrollController = ScrollController();
   final TextEditingController searchController = TextEditingController();
   Timer? _debounce;
@@ -32,10 +32,25 @@ class _ArticalPageState extends State<ArticalPage> {
   }
 
   void _onScroll() {
+    final filter = newsController.currentFilter.value;
+    bool isLoadingMore = false;
+    bool hasMore = false;
+
+    if (filter == 'all') {
+      isLoadingMore = newsController.isLoadingMoreAll.value;
+      hasMore = newsController.hasMoreAll.value;
+    } else if (filter == 'for_you') {
+      isLoadingMore = newsController.isLoadingMoreForYou.value;
+      hasMore = newsController.hasMoreForYou.value;
+    } else if (filter == 'tips_and_tricks') {
+      isLoadingMore = newsController.isLoadingMoreTips.value;
+      hasMore = newsController.hasMoreTips.value;
+    }
+
     if (scrollController.position.pixels >=
         scrollController.position.maxScrollExtent - 200) {
-      if (!newsController.isLoadingMore.value) {
-        newsController.getAllNews();
+      if (!isLoadingMore && hasMore) {
+        newsController.loadMore();
       }
     }
   }
@@ -102,9 +117,35 @@ class _ArticalPageState extends State<ArticalPage> {
           color: AppColors.secondaryColor,
           child: Obx(() {
             final query = newsController.searchQuery.value;
-            final newsList = newsController.allNewsList;
+            final filter = newsController.currentFilter.value;
+            final newsList =
+                filter == 'all'
+                    ? newsController.allNewsList
+                    : filter == 'for_you'
+                    ? newsController.newsForYou
+                    : filter == 'tips_and_tricks'
+                    ? newsController.newsTipsAndTricks
+                    : newsController.allNewsList;
             final isLoading = newsController.isLoading.value;
             final hasError = newsController.isError.value;
+
+            // Loading more & hasMore sesuai filter
+            final isLoadingMore =
+                filter == 'all'
+                    ? newsController.isLoadingMoreAll.value
+                    : filter == 'for_you'
+                    ? newsController.isLoadingMoreForYou.value
+                    : filter == 'tips_and_tricks'
+                    ? newsController.isLoadingMoreTips.value
+                    : false;
+            final hasMore =
+                filter == 'all'
+                    ? newsController.hasMoreAll.value
+                    : filter == 'for_you'
+                    ? newsController.hasMoreForYou.value
+                    : filter == 'tips_and_tricks'
+                    ? newsController.hasMoreTips.value
+                    : false;
 
             return CustomScrollView(
               controller: scrollController,
@@ -204,8 +245,8 @@ class _ArticalPageState extends State<ArticalPage> {
                               GestureDetector(
                                 onTap: () {
                                   if (newsController.currentFilter.value !=
-                                      'sticky') {
-                                    newsController.changeFilter('sticky');
+                                      'for_you') {
+                                    newsController.changeFilter('for_you');
                                   }
                                 },
                                 child: Container(
@@ -217,7 +258,7 @@ class _ArticalPageState extends State<ArticalPage> {
                                   decoration: BoxDecoration(
                                     color:
                                         newsController.currentFilter.value ==
-                                                'sticky'
+                                                'for_you'
                                             ? AppColors.secondaryColor
                                             : AppColors.secondaryColor
                                                 .withAlpha(25),
@@ -232,7 +273,7 @@ class _ArticalPageState extends State<ArticalPage> {
                                             newsController
                                                         .currentFilter
                                                         .value ==
-                                                    'sticky'
+                                                    'for_you'
                                                 ? Colors.white
                                                 : AppColors.secondaryColor,
                                       ),
@@ -246,7 +287,7 @@ class _ArticalPageState extends State<ArticalPage> {
                                               newsController
                                                           .currentFilter
                                                           .value ==
-                                                      'sticky'
+                                                      'for_you'
                                                   ? Colors.white
                                                   : AppColors.secondaryColor,
                                         ),
@@ -344,17 +385,13 @@ class _ArticalPageState extends State<ArticalPage> {
                   SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
                       if (index == newsList.length) {
-                        return Obx(
-                          () =>
-                              newsController.isLoadingMore.value
-                                  ? const Padding(
-                                    padding: EdgeInsets.all(8),
-                                    child: Center(
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                  )
-                                  : const SizedBox(),
-                        );
+                        // Loading more indicator
+                        return isLoadingMore
+                            ? const Padding(
+                              padding: EdgeInsets.all(8),
+                              child: Center(child: CircularProgressIndicator()),
+                            )
+                            : const SizedBox();
                       }
 
                       final news = newsList[index];
@@ -376,7 +413,7 @@ class _ArticalPageState extends State<ArticalPage> {
                           author: "InfoEV.id",
                         ),
                       );
-                    }, childCount: newsList.length + 1),
+                    }, childCount: newsList.length + (hasMore ? 1 : 0)),
                   ),
               ],
             );
