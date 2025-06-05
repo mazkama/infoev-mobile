@@ -5,10 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:infoev/app/modules/ev_comparison/controllers/EvCompareController.dart';
 import 'package:infoev/app/modules/ev_comparison/model/VehicleModel.dart';
 import 'package:infoev/app/modules/ev_comparison/views/widgets/ComparisonTable.dart';
-import 'package:infoev/app/modules/ev_comparison/views/widgets/EvCard.dart';
-import 'package:infoev/app/modules/ev_comparison/views/widgets/VehicleSearchBox.dart';
-import 'package:infoev/app/styles/app_colors.dart';
-import 'package:infoev/app/modules/ev_comparison/views/widgets/EmptyComparisonView.dart';
+import 'package:infoev/app/modules/ev_comparison/views/widgets/EvCard.dart'; 
+import 'package:infoev/app/styles/app_colors.dart'; 
 import 'package:shimmer/shimmer.dart';
 
 class EVComparisonPage extends StatefulWidget {
@@ -305,8 +303,8 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
     required VehicleModel vehicle,
     required VoidCallback onChange,
   }) {
-    final imageUrl = vehicle.thumbnailUrl ?? '';
-    final brandName = vehicle.brand ?? '';
+    final imageUrl = vehicle.thumbnailUrl;
+    final brandName = vehicle.brand;
 
     return Container(
       width: double.infinity,
@@ -382,7 +380,7 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
                   ),
                 ),
                 Text(
-                  vehicle.name ?? '',
+                  vehicle.name,
                   style: GoogleFonts.poppins(
                     color: AppColors.textColor,
                     fontSize: 16,
