@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:infoev/core/halper.dart';
 import 'package:uuid/uuid.dart';
 
 class AppTokenService {
@@ -10,9 +11,9 @@ class AppTokenService {
 
   final FlutterSecureStorage _storage = FlutterSecureStorage();
   final Uuid _uuid = Uuid();
-  final String _backendUrl;
+  final String _backendUrl = '$baseUrlDev/app-handshake';
 
-  AppTokenService(this._backendUrl);
+  AppTokenService();
 
   /// Get device id or create new one and save
   Future<String> getDeviceId() async {

@@ -41,7 +41,7 @@ class NewsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _appTokenService = AppTokenService(baseUrlDev + "/app-handshake");
+    _appTokenService = AppTokenService();
     _loadCachedData().then((_) {
       if (allNewsList.isEmpty &&
           newsForYou.isEmpty &&

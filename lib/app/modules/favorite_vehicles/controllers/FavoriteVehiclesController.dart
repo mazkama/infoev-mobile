@@ -25,7 +25,8 @@ class FavoriteVehicleController extends GetxController {
 
   @override
   void onInit() {
-    super.onInit(); 
+    super.onInit();
+    _appTokenService = AppTokenService();
     fetchFavoriteVehicles(reset: true);
   }
 

@@ -47,6 +47,7 @@ class CalculatorController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _appTokenService = AppTokenService();
   }
 
   // Methods for search

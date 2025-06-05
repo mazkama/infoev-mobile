@@ -49,6 +49,7 @@ class EVComparisonController extends GetxController {
   @override
   void onInit() async {
     super.onInit(); 
+    _appTokenService = AppTokenService();
     await _loadCachedData();
   }
 

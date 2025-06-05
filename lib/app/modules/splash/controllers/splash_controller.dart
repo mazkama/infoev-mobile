@@ -17,7 +17,7 @@ class SplashController extends GetxController {
     WidgetsFlutterBinding.ensureInitialized();
 
     // Inisialisasi AppTokenService cukup dengan base URL backend
-    _appTokenService = AppTokenService(baseUrlDev);
+    _appTokenService = AppTokenService();
   
     // Ambil atau generate app_key
     final appKey = await _appTokenService.initialize(platform: "android");

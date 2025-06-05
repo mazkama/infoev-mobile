@@ -43,6 +43,7 @@ class ChargerStationController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
+    _appTokenService = AppTokenService();
     await _loadCachedData();
     fetchChargerStations("kediri");
   }
@@ -236,9 +237,7 @@ class ChargerStationController extends GetxController {
 
       final response = await http
           .get(
-            Uri.parse(
-              '$baseUrlDev/cities/search?cari=$encodedQuery',
-            ),
+            Uri.parse('$baseUrlDev/cities/search?cari=$encodedQuery'),
             headers: {'Accept': 'application/json', 'x-app-key': appKey},
           )
           .timeout(const Duration(seconds: 10));

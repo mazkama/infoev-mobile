@@ -19,6 +19,7 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _appTokenService = AppTokenService();
     _loadCachedData();
     loadAllData();
     CacheService.cleanExpiredCache();
