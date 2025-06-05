@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:infoev/app/modules/explore/controllers/MerekController.dart';
 import 'package:infoev/app/modules/explore/model/MerekModel.dart';
 import 'package:infoev/app/styles/app_colors.dart';
+import 'package:infoev/app/styles/app_text.dart';
 import 'package:shimmer/shimmer.dart';
 
 class JelajahPage extends StatefulWidget {
@@ -166,11 +167,15 @@ class _JelajahPageState extends State<JelajahPage> {
             child: TextField(
               controller: _searchController,
               focusNode: _searchFocusNode,
-              style: GoogleFonts.poppins(color: AppColors.textColor),
+              style: AppText.searchPageTitle.copyWith(
+                color: AppColors.textColor,
+              ),
               textInputAction: TextInputAction.search,
               decoration: InputDecoration(
                 hintText: 'Cari kendaraan listrik...',
-                hintStyle: GoogleFonts.poppins(color: AppColors.textTertiary),
+                hintStyle: AppText.searchPageTitle.copyWith(
+                  color: AppColors.textTertiary,
+                ),
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
@@ -247,11 +252,7 @@ class _JelajahPageState extends State<JelajahPage> {
             children: [
               Text(
                 'Jelajah',
-                style: GoogleFonts.poppins(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textColor,
-                ),
+                style: AppText.appBarTitle.copyWith(color: AppColors.textColor),
               ),
               Row(
                 children: [
@@ -301,10 +302,7 @@ class _JelajahPageState extends State<JelajahPage> {
           const SizedBox(height: 8),
           Text(
             'Temukan berbagai kendaraan listrik favorit Anda',
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: AppColors.textSecondary,
-            ),
+            style: AppText.bodySmall.copyWith(color: AppColors.textSecondary),
           ),
         ],
       ),
@@ -381,14 +379,12 @@ class _JelajahPageState extends State<JelajahPage> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              isSelected
-                                  ? AppColors.secondaryColor.withAlpha(45)
-                                  : AppColors.backgroundSecondary,
-                          foregroundColor:
-                              isSelected
-                                  ? AppColors.secondaryColor
-                                  : AppColors.textColor,
+                          backgroundColor: AppColors.ChipButtonColor(
+                            isSelected: isSelected,
+                          ),
+                          foregroundColor: AppColors.ChipTextColor(
+                            isSelected: isSelected,
+                          ),
                           elevation: 0,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -400,12 +396,11 @@ class _JelajahPageState extends State<JelajahPage> {
                         ),
                         child: Text(
                           id == 0 ? name : '$name ($count)',
-                          style: GoogleFonts.poppins(
-                            fontWeight:
-                                isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                            fontSize: 12,
+                          style: AppText.filterChipStyle(
+                            isSelected: isSelected,
+                            color: AppColors.ChipTextColor(
+                              isSelected: isSelected
+                            ),
                           ),
                         ),
                       ),
@@ -437,9 +432,8 @@ class _JelajahPageState extends State<JelajahPage> {
         return Center(
           child: Text(
             'Tidak ditemukan hasil',
-            style: GoogleFonts.poppins(
+            style: AppText.info.copyWith(
               color: AppColors.textTertiary,
-              fontSize: 16,
             ),
           ),
         );
@@ -459,10 +453,8 @@ class _JelajahPageState extends State<JelajahPage> {
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                 child: Text(
                   sectionTitle,
-                  style: GoogleFonts.poppins(
-                    color: AppColors.secondaryColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+                  style: AppText.sectionHeader.copyWith(
+                    color: AppColors.secondaryColor
                   ),
                 ),
               ),
@@ -489,9 +481,8 @@ class _JelajahPageState extends State<JelajahPage> {
         return Center(
           child: Text(
             'Belum ada riwayat pencarian',
-            style: GoogleFonts.poppins(
-              color: AppColors.textTertiary,
-              fontSize: 16,
+            style: AppText.info.copyWith(
+              color: AppColors.textTertiary
             ),
           ),
         );
@@ -507,9 +498,8 @@ class _JelajahPageState extends State<JelajahPage> {
               children: [
                 Text(
                   'Riwayat Pencarian',
-                  style: GoogleFonts.poppins(
+                  style: AppText.titleMedium.copyWith(
                     color: AppColors.textSecondary,
-                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -517,9 +507,8 @@ class _JelajahPageState extends State<JelajahPage> {
                   onPressed: () => controller.clearSearchHistory(),
                   child: Text(
                     'Hapus Semua',
-                    style: GoogleFonts.poppins(
-                      color: AppColors.secondaryColor,
-                      fontSize: 12,
+                    style: AppText.titleMedium.copyWith(
+                      color: AppColors.secondaryColor
                     ),
                   ),
                 ),
@@ -539,9 +528,8 @@ class _JelajahPageState extends State<JelajahPage> {
                   ),
                   title: Text(
                     query,
-                    style: GoogleFonts.poppins(
-                      color: AppColors.textColor,
-                      fontSize: 14,
+                    style: AppText.titleLarge.copyWith(
+                      color: AppColors.textColor
                     ),
                   ),
                   trailing: IconButton(

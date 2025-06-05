@@ -50,6 +50,10 @@ class MyApp extends StatelessWidget {
           },
           child: GetMaterialApp(
             debugShowCheckedModeBanner: false,
+            darkTheme: ThemeData(
+              colorScheme: AppColors.darkColorScheme,
+              useMaterial3: true,
+            ),
             theme: ThemeData(
               colorScheme: AppColors.lightColorScheme,
               useMaterial3: true,

@@ -82,6 +82,15 @@ class AppColors {
   /// Link color
   static const Color linkColor = Color(0xFF3B82F6);
 
+  static Color ChipButtonColor({required bool isSelected}) {
+    return isSelected ? Color(0xFFF97316).withAlpha(45) : Color(0xFFF5F5F7);
+  }
+
+  /// Chip text color
+  static Color ChipTextColor({required bool isSelected}) {
+    return isSelected ? Color(0xFFF97316) : Color(0xFF1F2937);
+  }
+
   // ============================================================================
   // STATUS COLORS
   // ============================================================================
