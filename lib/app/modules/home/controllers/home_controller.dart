@@ -5,21 +5,22 @@ import 'package:infoev/app/modules/explore/model/VehicleModel.dart';
 import 'package:infoev/app/modules/news/model/NewsModel.dart';
 import 'package:infoev/core/halper.dart';
 import 'package:infoev/app/services/cache_service.dart';
+import 'package:infoev/app/services/app_token_service.dart';
 
 class HomeController extends GetxController {
   RxList<NewsModel> newNewsList = <NewsModel>[].obs; 
   RxList<VehicleModel> popularVehiclesList = <VehicleModel>[].obs;
   RxList<VehicleModel> newVehiclesList = <VehicleModel>[].obs;
   RxBool isLoading = true.obs;  
-  RxBool isError = false.obs; // Menambahkan status error 
- 
+  RxBool isError = false.obs;
+
+  late final AppTokenService _appTokenService;
+
   @override
   void onInit() {
     super.onInit();
     _loadCachedData();
     loadAllData();
-
-    // Clean expired cache on startup
     CacheService.cleanExpiredCache();
   }
 
@@ -48,21 +49,18 @@ class HomeController extends GetxController {
   Future<void> loadAllData() async {
     isLoading.value = true;
 
-    // Check if we have valid cached data first
     final hasValidCache = await Future.wait([
       CacheService.isCacheValid(CacheService.newNewsKey),
       CacheService.isCacheValid(CacheService.popularVehiclesKey),
       CacheService.isCacheValid(CacheService.newVehiclesKey), 
     ]);
 
-    // Only fetch data that doesn't have valid cache
     final tasks = <Future>[];
 
     if (!hasValidCache[0]) tasks.add(getNewNews());
     if (!hasValidCache[1]) tasks.add(getPopularVehicles());
     if (!hasValidCache[2]) tasks.add(getNewVehicles()); 
 
-    // If all data is cached, skip API calls
     if (tasks.isEmpty) {
       isLoading.value = false;
       return;
@@ -71,17 +69,25 @@ class HomeController extends GetxController {
     await Future.wait(tasks);
     isLoading.value = false;
   }
- 
 
   Future<void> getNewNews() async {
-    // Check cache first
     if (await CacheService.isCacheValid(CacheService.newNewsKey) &&
         newNewsList.isNotEmpty) {
-      return; // Use cached data
+      return;
+    }
+
+    // Ambil app_key dari service
+    final appKey = await _appTokenService.getAppKey();
+    if (appKey == null) {
+      isError.value = true;
+      return;
     }
 
     var baseURL = "${baseUrlDev}";
-    final response = await http.get(Uri.parse(baseURL));
+    final response = await http.get(
+      Uri.parse(baseURL),
+      headers: {'x-app-key': appKey},
+    );
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final List<dynamic> newsData = data['posts'];
@@ -91,7 +97,6 @@ class HomeController extends GetxController {
         newsList.map((json) => NewsModel.fromJson(json)).toList(),
       );
 
-      // Save to cache using CacheService
       await CacheService.saveToCache(
         CacheService.newNewsKey,
         newsList.map((json) => NewsModel.fromJson(json)).toList(),
@@ -103,14 +108,23 @@ class HomeController extends GetxController {
   }
 
   Future<void> getPopularVehicles() async {
-    // Check cache first
     if (await CacheService.isCacheValid(CacheService.popularVehiclesKey) &&
         popularVehiclesList.isNotEmpty) {
-      return; // Use cached data
+      return;
+    }
+
+    // Ambil app_key dari service
+    final appKey = await _appTokenService.getAppKey();
+    if (appKey == null) {
+      isError.value = true;
+      return;
     }
 
     var baseURL = "${baseUrlDev}";
-    final response = await http.get(Uri.parse(baseURL));
+    final response = await http.get(
+      Uri.parse(baseURL),
+      headers: {'x-app-key': appKey},
+    );
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final List<dynamic> vehicleData = data['popularVehicles'];
@@ -119,7 +133,6 @@ class HomeController extends GetxController {
 
       popularVehiclesList.assignAll(vehicleList);
 
-      // Save to cache using CacheService
       await CacheService.saveToCache(
         CacheService.popularVehiclesKey,
         vehicleList,
@@ -131,14 +144,23 @@ class HomeController extends GetxController {
   }
 
   Future<void> getNewVehicles() async {
-    // Check cache first
     if (await CacheService.isCacheValid(CacheService.newVehiclesKey) &&
         newVehiclesList.isNotEmpty) {
-      return; // Use cached data
+      return;
+    }
+
+    // Ambil app_key dari service
+    final appKey = await _appTokenService.getAppKey();
+    if (appKey == null) {
+      isError.value = true;
+      return;
     }
 
     var baseURL = "${baseUrlDev}";
-    final response = await http.get(Uri.parse(baseURL));
+    final response = await http.get(
+      Uri.parse(baseURL),
+      headers: {'x-app-key': appKey},
+    );
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final List<dynamic> vehicleData = data['latestVehicles'];
@@ -147,7 +169,6 @@ class HomeController extends GetxController {
 
       newVehiclesList.assignAll(vehicleList);
 
-      // Save to cache using CacheService
       await CacheService.saveToCache(
         CacheService.newVehiclesKey,
         vehicleList,
@@ -159,7 +180,6 @@ class HomeController extends GetxController {
   } 
 
   Future<void> clearCache() async {
-    // Use CacheService to clear all news-related cache
     await CacheService.clearCache(CacheService.newNewsKey);
     await CacheService.clearCache(CacheService.popularVehiclesKey);
     await CacheService.clearCache(CacheService.newVehiclesKey);

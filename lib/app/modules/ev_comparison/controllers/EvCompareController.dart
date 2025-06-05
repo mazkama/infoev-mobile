@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:infoev/app/modules/ev_comparison/model/VehicleModel.dart';
 import 'package:infoev/core/halper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:infoev/app/services/app_token_service.dart'; // Tambahkan ini
 
 class EVComparisonController extends GetxController {
   var vehicleA = Rxn<VehicleModel>();
@@ -14,6 +15,8 @@ class EVComparisonController extends GetxController {
   var isLoadingB = false.obs;
   var isSearching = false.obs;
   var isCompared = false.obs;
+
+  late final AppTokenService _appTokenService; // Tambahkan ini
 
   // ────────────────────────────────────────────────────────────
   void selectVehicleA(String slug) => setVehicle(slug, true);
@@ -39,23 +42,19 @@ class EVComparisonController extends GetxController {
     isCompared.value = false;
   }
 
-  // Add cache duration constant
   static const cacheDuration = Duration(hours: 12);
-
-  // Add cache keys
   static const String _cacheKeyVehicleDetails = 'cache_vehicle_details_';
   static const String _cacheKeySearchResults = 'cache_vehicle_search_';
 
   @override
   void onInit() async {
-    super.onInit();
+    super.onInit(); 
     await _loadCachedData();
   }
 
   Future<void> _loadCachedData() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Load cached vehicles if any
     if (vehicleA.value != null) {
       _loadCachedVehicle(prefs, vehicleA.value!.slug, true);
     }
@@ -162,9 +161,16 @@ class EVComparisonController extends GetxController {
         }
       }
 
+      // Ambil app_key dari service
+      final appKey = await _appTokenService.getAppKey();
+      if (appKey == null) {
+        _showError('Gagal mendapatkan app_key');
+        return [];
+      }
+
       final encodedQuery = Uri.encodeComponent(query);
       final url = Uri.parse('${baseUrlDev}/cari?q=$encodedQuery');
-      final res = await http.get(url);
+      final res = await http.get(url, headers: {'x-app-key': appKey});
 
       if (res.statusCode == 200) {
         final body = json.decode(res.body);
@@ -198,8 +204,14 @@ class EVComparisonController extends GetxController {
 
   // ────────────────────────────────────────────────────────────
   Future<Map<String, dynamic>> _fetchVehicleDetail(String slug) async {
+    // Ambil app_key dari service
+    final appKey = await _appTokenService.getAppKey();
+    if (appKey == null) {
+      throw Exception('Gagal mendapatkan app_key');
+    }
+
     final url = Uri.parse('${baseUrlDev}/$slug');
-    final res = await http.get(url);
+    final res = await http.get(url, headers: {'x-app-key': appKey});
     if (res.statusCode == 200) {
       return json.decode(res.body);
     } else {

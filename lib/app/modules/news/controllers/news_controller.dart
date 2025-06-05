@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:infoev/app/modules/explore/model/VehicleModel.dart';
 import 'package:infoev/app/modules/news/model/NewsModel.dart';
+import 'package:infoev/app/services/app_token_service.dart';
 import 'package:infoev/core/halper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,6 +12,8 @@ class NewsController extends GetxController {
   RxList<NewsModel> allNewsList = <NewsModel>[].obs;
   RxList<NewsModel> newsForYou = <NewsModel>[].obs;
   RxList<NewsModel> newsTipsAndTricks = <NewsModel>[].obs;
+
+  late final AppTokenService _appTokenService;
 
   // Pagination state for each type
   int currentPageAll = 1;
@@ -36,14 +39,17 @@ class NewsController extends GetxController {
   static const String _cacheKeyNewsTips = 'cache_news_tips';
 
   @override
-void onInit() {
-  super.onInit();
-  _loadCachedData().then((_) {
-    if (allNewsList.isEmpty && newsForYou.isEmpty && newsTipsAndTricks.isEmpty) {
-      loadAllData();
-    }
-  });
-}
+  void onInit() {
+    super.onInit();
+    _appTokenService = AppTokenService(baseUrlDev + "/app-handshake");
+    _loadCachedData().then((_) {
+      if (allNewsList.isEmpty &&
+          newsForYou.isEmpty &&
+          newsTipsAndTricks.isEmpty) {
+        loadAllData();
+      }
+    });
+  }
 
   Future<void> _loadCachedData() async {
     final prefs = await SharedPreferences.getInstance();
@@ -119,9 +125,19 @@ void onInit() {
     if (!hasMoreAll.value || isLoadingMoreAll.value) return;
     isLoadingMoreAll.value = true;
     try {
+      // Ambil app_key dari service
+      final appKey = await _appTokenService.getAppKey();
+      if (appKey == null) {
+        isError.value = true;
+        isLoadingMoreAll.value = false;
+        return;
+      }
       String url = "$baseUrlDev/berita?page=$currentPageAll";
       print('[ENDPOINT] Fetch all news: $url');
-      final response = await http.get(Uri.parse(url));
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {'x-app-key': appKey},
+      );
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final List<dynamic> newsData = data['posts']['data'];
@@ -156,9 +172,19 @@ void onInit() {
     if (!hasMoreForYou.value || isLoadingMoreForYou.value) return;
     isLoadingMoreForYou.value = true;
     try {
+      // Ambil app_key dari service
+      final appKey = await _appTokenService.getAppKey();
+      if (appKey == null) {
+        isError.value = true;
+        isLoadingMoreForYou.value = false;
+        return;
+      }
       final url = "$baseUrlDev/berita?type=sticky&page=$currentPageForYou";
       print('[ENDPOINT] Fetch news for you: $url');
-      final response = await http.get(Uri.parse(url));
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {'x-app-key': appKey},
+      );
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final List<dynamic> newsData = data['posts']['data'];
@@ -173,9 +199,11 @@ void onInit() {
             await _saveToCache(_cacheKeyNewsForYou, newsData);
           }
         }
+      } else {
+        isError.value = true;
       }
     } catch (e) {
-      // Biarkan cache jika error
+      isError.value = true;
     } finally {
       isLoadingMoreForYou.value = false;
     }
@@ -191,10 +219,20 @@ void onInit() {
     if (!hasMoreTips.value || isLoadingMoreTips.value) return;
     isLoadingMoreTips.value = true;
     try {
+      // Ambil app_key dari service
+      final appKey = await _appTokenService.getAppKey();
+      if (appKey == null) {
+        isError.value = true;
+        isLoadingMoreTips.value = false;
+        return;
+      }
       final url =
           "$baseUrlDev/berita?type=tips_and_tricks&page=$currentPageTips";
       print('[ENDPOINT] Fetch news tips and tricks: $url');
-      final response = await http.get(Uri.parse(url));
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {'x-app-key': appKey},
+      );
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final List<dynamic> newsData = data['posts']['data'];
@@ -209,9 +247,11 @@ void onInit() {
             await _saveToCache(_cacheKeyNewsTips, newsData);
           }
         }
+      } else {
+        isError.value = true;
       }
     } catch (e) {
-      // Biarkan cache jika error
+      isError.value = true;
     } finally {
       isLoadingMoreTips.value = false;
     }
@@ -222,9 +262,19 @@ void onInit() {
     searchQuery.value = query;
     currentFilter.value = 'all';
     try {
+      // Ambil app_key dari service
+      final appKey = await _appTokenService.getAppKey();
+      if (appKey == null) {
+        isError.value = true;
+        isLoading.value = false;
+        return;
+      }
       final url = "$baseUrlDev/berita?q=$query";
       print('[ENDPOINT] Search news: $url');
-      final response = await http.get(Uri.parse(url));
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {'x-app-key': appKey},
+      );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);

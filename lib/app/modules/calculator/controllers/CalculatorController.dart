@@ -1,11 +1,16 @@
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:infoev/core/halper.dart';
+import 'package:infoev/app/services/app_token_service.dart';
 
 class CalculatorController extends GetxController {
   final isLoading = false.obs;
   final hasError = false.obs;
   final errorMessage = ''.obs;
+
+  // Tambahkan AppTokenService
+  late final AppTokenService _appTokenService;
 
   // Vehicle search related
   final isSearching = false.obs;
@@ -39,6 +44,11 @@ class CalculatorController extends GetxController {
   double? batteryCapacityValue; // kWh
   double? maxRange; // km
 
+  @override
+  void onInit() {
+    super.onInit();
+  }
+
   // Methods for search
   void toggleSearch() {
     isSearching.value = !isSearching.value;
@@ -64,19 +74,24 @@ class CalculatorController extends GetxController {
     try {
       isSearchLoading.value = true;
 
-      // Endpoint sesuai dengan jelajah.dart
+      // Ambil app_key dari service
+      final appKey = await _appTokenService.getAppKey();
+      if (appKey == null) {
+        hasError.value = true;
+        errorMessage.value = 'Gagal mendapatkan app_key';
+        return;
+      }
+
       final response = await http.get(
-        Uri.parse('https://infoev.mazkama.web.id/api/cari?q=$query'),
-        headers: {'Accept': 'application/json'},
+        Uri.parse('$baseUrlDev/cari?q=$query'),
+        headers: {'Accept': 'application/json', 'x-app-key': appKey},
       );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
-        // Format hasil pencarian seperti di jelajah.dart
         final Map<String, List<dynamic>> formattedResults = {};
 
-        // Hanya kendaraan (tidak termasuk merek)
         if (data['vehicles'] != null && (data['vehicles'] as List).isNotEmpty) {
           formattedResults['KENDARAAN'] = List<dynamic>.from(data['vehicles']);
         }
@@ -108,7 +123,6 @@ class CalculatorController extends GetxController {
       int typeId = vehicle['type_id'];
       String vehicleType = "";
 
-      // Set maintenance cost based on type_id
       switch (typeId) {
         case 1:
           vehicleType = "mobil";
@@ -119,34 +133,39 @@ class CalculatorController extends GetxController {
           maintenanceCostPerKm = 42.0;
       }
 
-      // DEBUG: These print statements should be commented out for release builds
       print(
         'DEBUG: Vehicle type_id from search: $typeId - Vehicle type: $vehicleType',
       );
       print('DEBUG: Maintenance cost set to: Rp $maintenanceCostPerKm per km');
     }
 
-    // Fetch vehicle details to get consumption and battery data
     fetchVehicleDetails(vehicle['slug']);
   }
 
   Future<void> fetchVehicleDetails(String slug) async {
     try {
       isLoading.value = true;
+
+      // Ambil app_key dari service
+      final appKey = await _appTokenService.getAppKey();
+      if (appKey == null) {
+        hasError.value = true;
+        errorMessage.value = 'Gagal mendapatkan app_key';
+        return;
+      }
+
       final response = await http.get(
-        Uri.parse('https://infoev.mazkama.web.id/api/$slug'),
-        headers: {'Accept': 'application/json'},
+        Uri.parse('$baseUrlDev/$slug'),
+        headers: {'Accept': 'application/json', 'x-app-key': appKey},
       );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
-        // Set maintenance cost based on vehicle type_id if not already set in selectVehicle
         if (data['type_id'] != null) {
           int typeId = data['type_id'];
           String vehicleType = "";
 
-          // Set maintenance cost based on vehicle type
           switch (typeId) {
             case 1:
               vehicleType = "mobil";
@@ -165,7 +184,6 @@ class CalculatorController extends GetxController {
               maintenanceCostPerKm = 42.0;
           }
 
-          // DEBUG: These print statements should be commented out for release builds
           print(
             'DEBUG: Vehicle type_id from detail: $typeId - Vehicle type: $vehicleType',
           );
@@ -174,10 +192,7 @@ class CalculatorController extends GetxController {
           );
         }
 
-        // Extract battery details from new API structure
         extractBatteryDetails(data);
-
-        // Calculate initial values
         calculateCosts();
       } else {
         hasError.value = true;

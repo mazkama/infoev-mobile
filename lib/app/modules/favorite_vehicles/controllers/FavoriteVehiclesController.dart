@@ -4,18 +4,20 @@ import 'package:infoev/app/modules/favorite_vehicles/model/favoriteVehicleModel.
 import 'package:infoev/core/halper.dart';
 import 'dart:convert';
 import 'package:infoev/core/local_db.dart';
+import 'package:infoev/app/services/app_token_service.dart';
 
 class FavoriteVehicleController extends GetxController {
   var favoriteVehicles = <FavoriteVehicle>[].obs;
-  var filteredVehicles = <FavoriteVehicle>[].obs; // For search results
+  var filteredVehicles = <FavoriteVehicle>[].obs;
   var isLoading = false.obs;
   var errorMessage = ''.obs;
+
+  late final AppTokenService _appTokenService;
 
   var isLoadingMore = false.obs;
   var isError = false.obs;
   var hasMoreFavorites = true.obs;
-  
-  // Search state
+
   var isSearching = false.obs;
   var searchQuery = "".obs;
 
@@ -23,14 +25,14 @@ class FavoriteVehicleController extends GetxController {
 
   @override
   void onInit() {
-    super.onInit();
+    super.onInit(); 
     fetchFavoriteVehicles(reset: true);
   }
 
   @override
   void onReady() {
     super.onReady();
-    fetchFavoriteVehicles(); // Ini akan dipanggil ulang setiap kali halaman aktif
+    fetchFavoriteVehicles();
   }
 
   // Toggle search mode
@@ -56,11 +58,14 @@ class FavoriteVehicleController extends GetxController {
     }
 
     final query = searchQuery.value.toLowerCase();
-    filteredVehicles.value = favoriteVehicles
-        .where((vehicle) => 
-          vehicle.name.toLowerCase().contains(query) || 
-          vehicle.brandName.toLowerCase().contains(query))
-        .toList();
+    filteredVehicles.value =
+        favoriteVehicles
+            .where(
+              (vehicle) =>
+                  vehicle.name.toLowerCase().contains(query) ||
+                  vehicle.brandName.toLowerCase().contains(query),
+            )
+            .toList();
   }
 
   // Reset all filters
@@ -112,9 +117,16 @@ class FavoriteVehicleController extends GetxController {
       final token = LocalDB.getToken();
 
       if (token == null || token.isEmpty) {
-        favoriteVehicles.clear(); // Hapus data lama jika token tidak valid
+        favoriteVehicles.clear();
         filteredVehicles.clear();
         errorMessage.value = 'Token tidak tersedia. Silakan login kembali.';
+        return;
+      }
+
+      // Ambil app_key dari service
+      final appKey = await _appTokenService.getAppKey();
+      if (appKey == null) {
+        errorMessage.value = 'Gagal mendapatkan app_key';
         return;
       }
 
@@ -123,6 +135,7 @@ class FavoriteVehicleController extends GetxController {
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
+          'x-app-key': appKey,
         },
       );
 
@@ -133,13 +146,11 @@ class FavoriteVehicleController extends GetxController {
         if (vehiclesJson.isEmpty) {
           hasMoreFavorites.value = false;
         } else {
-          // Jika reset, clear sudah dilakukan di atas, jadi ini tinggal addAll saja
-          final newVehicles = vehiclesJson.map((e) => FavoriteVehicle.fromJson(e)).toList();
+          final newVehicles =
+              vehiclesJson.map((e) => FavoriteVehicle.fromJson(e)).toList();
           favoriteVehicles.addAll(newVehicles);
           currentPage++;
           errorMessage.value = '';
-          
-          // Apply any active filters to update filtered list
           applyFilters();
         }
       } else {
@@ -166,6 +177,13 @@ class FavoriteVehicleController extends GetxController {
       return;
     }
 
+    // Ambil app_key dari service
+    final appKey = await _appTokenService.getAppKey();
+    if (appKey == null) {
+      errorMessage.value = 'Gagal mendapatkan app_key';
+      return;
+    }
+
     try {
       final response = await http.post(
         Uri.parse('${baseUrlDev}/favorites'),
@@ -173,12 +191,12 @@ class FavoriteVehicleController extends GetxController {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
+          'x-app-key': appKey,
         },
         body: json.encode({'vehicle_id': vehicleId}),
       );
 
       if (response.statusCode == 201) {
-        // Refresh list favorit setelah berhasil tambah
         await refreshFavorites();
         errorMessage.value = '';
       } else {
@@ -199,17 +217,24 @@ class FavoriteVehicleController extends GetxController {
       return;
     }
 
+    // Ambil app_key dari service
+    final appKey = await _appTokenService.getAppKey();
+    if (appKey == null) {
+      errorMessage.value = 'Gagal mendapatkan app_key';
+      return;
+    }
+
     try {
       final response = await http.delete(
         Uri.parse('${baseUrlDev}/favorites/$vehicleId'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
+          'x-app-key': appKey,
         },
       );
 
       if (response.statusCode == 200) {
-        // Refresh list favorit setelah berhasil hapus
         await refreshFavorites();
         errorMessage.value = '';
       } else {

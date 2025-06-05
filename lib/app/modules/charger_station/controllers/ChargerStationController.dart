@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:infoev/app/modules/charger_station/model/ChargerStationModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:infoev/app/services/app_token_service.dart'; // Tambahkan import ini
+import 'package:infoev/core/halper.dart'; // Jika butuh baseUrlDev
 
 // City suggestion model
 class CitySuggestion {
@@ -35,6 +37,8 @@ class ChargerStationController extends GetxController {
 
   // Add source tracking
   var suggestionSource = "".obs;
+
+  late final AppTokenService _appTokenService;
 
   @override
   void onInit() async {
@@ -95,12 +99,19 @@ class ChargerStationController extends GetxController {
 
       final encodedLocation = Uri.encodeComponent(location);
 
+      // Ambil app_key dari service
+      final appKey = await _appTokenService.getAppKey();
+      if (appKey == null) {
+        isLoading(false);
+        hasError(true);
+        errorMessage.value = "Gagal mendapatkan app_key";
+        return;
+      }
+
       final response = await http
           .get(
-            Uri.parse(
-              'https://infoev.mazkama.web.id/api/charger/search?wilayah=$encodedLocation',
-            ),
-            headers: {'Accept': 'application/json'},
+            Uri.parse('$baseUrlDev/charger/search?wilayah=$encodedLocation'),
+            headers: {'Accept': 'application/json', 'x-app-key': appKey},
           )
           .timeout(const Duration(seconds: 15));
 
@@ -213,12 +224,22 @@ class ChargerStationController extends GetxController {
       isSuggestLoading(true);
 
       final encodedQuery = Uri.encodeComponent(query);
+
+      // Ambil app_key dari service
+      final appKey = await _appTokenService.getAppKey();
+      if (appKey == null) {
+        citySuggestions.clear();
+        suggestionSource.value = "error";
+        print("Gagal mendapatkan app_key");
+        return;
+      }
+
       final response = await http
           .get(
             Uri.parse(
-              'https://infoev.mazkama.web.id/api/cities/search?cari=$encodedQuery',
+              '$baseUrlDev/cities/search?cari=$encodedQuery',
             ),
-            headers: {'Accept': 'application/json'},
+            headers: {'Accept': 'application/json', 'x-app-key': appKey},
           )
           .timeout(const Duration(seconds: 10));
 
