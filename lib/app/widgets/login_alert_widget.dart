@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:infoev/app/styles/app_colors.dart';
-import 'package:infoev/app/routes/app_pages.dart';
 
 class LoginAlertWidget extends StatefulWidget {
   final String title;
@@ -212,10 +211,8 @@ class _LoginAlertWidgetState extends State<LoginAlertWidget>
                           ),
                           child: ElevatedButton(
                             onPressed: () {
-                              _closeWithAnimation();
-                              Future.delayed(const Duration(milliseconds: 200), () {
-                                Get.toNamed(Path.LOGIN);
-                              });
+                              Get.back();
+                              Get.toNamed('/login');
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
