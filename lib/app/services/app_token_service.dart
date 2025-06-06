@@ -11,7 +11,7 @@ class AppTokenService {
 
   final FlutterSecureStorage _storage = FlutterSecureStorage();
   final Uuid _uuid = Uuid();
-  final String _backendUrl = '$baseUrlDev/app-handshake';
+  final String _backendUrl = baseUrlDev;
 
   AppTokenService();
 
