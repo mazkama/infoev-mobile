@@ -4,8 +4,10 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:infoev/app/modules/explore/model/MerekModel.dart';
+import 'package:infoev/core/halper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:infoev/app/services/app_token_service.dart'; // Import AppTokenService
 
 class MerekController extends GetxController {
   var merekList = <MerekModel>[].obs;
@@ -17,6 +19,9 @@ class MerekController extends GetxController {
   final int pageSize = 10;
   final Duration cacheValidity = const Duration(hours: 2);
 
+  // AppTokenService untuk x-app-key
+  late final AppTokenService _appTokenService;
+  
   // Search and filter state
   var isSearching = false.obs;
   var searchQuery = ''.obs;
@@ -91,7 +96,20 @@ class MerekController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _appTokenService = AppTokenService(); // Initialize AppTokenService
     _initializeData();
+  }
+  
+  // Helper method untuk mendapatkan header dengan app_key
+  Future<Map<String, String>> _getAuthHeaders() async {
+    final appKey = await _appTokenService.getAppKey();
+    if (appKey == null) {
+      throw Exception('Failed to get app_key');
+    }
+    return {
+      'Accept': 'application/json',
+      'x-app-key': appKey,
+    };
   }
 
   Future<void> _initializeData() async {
@@ -141,13 +159,15 @@ class MerekController extends GetxController {
     try {
       Map<int, int> counts = {};
       final prefs = await SharedPreferences.getInstance();
+      final headers = await _getAuthHeaders(); // Tambahkan app_key header
 
       // Fetch counts for all types
       for (var typeId in [1, 2, 3, 5]) {
         final typeSlug = getTypeSlug(typeId);
         if (typeSlug != null) {
           final response = await http.get(
-            Uri.parse('https://infoev.mazkama.web.id/api/tipe/$typeSlug'),
+            Uri.parse('$baseUrlDev/tipe/$typeSlug'),
+            headers: headers, // Gunakan headers dengan app_key
           );
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
@@ -392,8 +412,11 @@ class MerekController extends GetxController {
     isLoading.value = true;
 
     try {
+      final headers = await _getAuthHeaders(); // Tambahkan app_key header
+      
       final response = await http.get(
-        Uri.parse('https://infoev.mazkama.web.id/api/merek'),
+        Uri.parse('$baseUrlDev/merek'),
+        headers: headers, // Gunakan headers dengan app_key
       );
 
       if (response.statusCode == 200) {
@@ -535,8 +558,11 @@ class MerekController extends GetxController {
         }
 
         if (brandIds.isEmpty) {
+          final headers = await _getAuthHeaders(); // Tambahkan app_key header
+          
           final response = await http.get(
-            Uri.parse('https://infoev.mazkama.web.id/api/tipe/$typeSlug'),
+            Uri.parse('$baseUrlDev/tipe/$typeSlug'),
+            headers: headers, // Gunakan headers dengan app_key
           );
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
@@ -688,8 +714,11 @@ class MerekController extends GetxController {
       }
 
       // Ambil dari API jika cache tidak ada atau sudah expired
+      final headers = await _getAuthHeaders(); // Tambahkan app_key header
+      
       final response = await http.get(
-        Uri.parse('https://infoev.mazkama.web.id/api/merek/$slug'),
+        Uri.parse('$baseUrlDev/merek/$slug'),
+        headers: headers, // Gunakan headers dengan app_key
       );
 
       if (response.statusCode == 200) {
@@ -754,6 +783,8 @@ class MerekController extends GetxController {
     searchQuery.value = query;
 
     try {
+      final headers = await _getAuthHeaders(); // Tambahkan app_key header
+      
       // Add to history
       addToSearchHistory(query);
 
@@ -777,6 +808,7 @@ class MerekController extends GetxController {
         try {
           final response = await http.get(
             Uri.parse('${endpoint.value}?search=$query'),
+            headers: headers, // Gunakan headers dengan app_key
           );
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
@@ -811,7 +843,7 @@ class MerekController extends GetxController {
       isSearchLoading.value = false;
     }
   }
-
+  
   // Reset search
   void resetSearch() {
     searchQuery.value = '';
@@ -878,10 +910,10 @@ class MerekController extends GetxController {
   }
 
   final Map<String, String> typeEndpoints = {
-    'mobil': 'https://infoev.mazkama.web.id/api/tipe/mobil',
-    'sepeda-motor': 'https://infoev.mazkama.web.id/api/tipe/sepeda-motor',
-    'sepeda': 'https://infoev.mazkama.web.id/api/tipe/sepeda',
-    'skuter': 'https://infoev.mazkama.web.id/api/tipe/skuter',
+    'mobil': '$baseUrlDev/tipe/mobil',
+    'sepeda-motor': '$baseUrlDev/tipe/sepeda-motor',
+    'sepeda': '$baseUrlDev/tipe/sepeda',
+    'skuter': '$baseUrlDev/tipe/skuter',
   };
 
   // Method untuk load data tipe yang dipanggil dari jelajah.dart

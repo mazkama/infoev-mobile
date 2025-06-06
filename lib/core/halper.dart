@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 
 const baseUrlDev = "https://infoev.mazkama.web.id/api";
+const baseUrlDevOri = "https://infoev.mazkama.web.id";
 const baseUrl = "https://infoev.id/api";
 
 extension HttpResponseExtension on http.Response {

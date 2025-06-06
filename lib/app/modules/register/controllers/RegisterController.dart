@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:infoev/app/modules/login/model/UserModel.dart';
+import 'package:infoev/core/halper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../routes/app_pages.dart';
 
@@ -24,7 +25,7 @@ class RegisterController extends GetxController {
 
     try {
       final response = await http.post(
-        Uri.parse('https://infoev.mazkama.web.id/api/auth/register'),
+        Uri.parse('$baseUrlDev/auth/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'name': nameC.text.trim(),

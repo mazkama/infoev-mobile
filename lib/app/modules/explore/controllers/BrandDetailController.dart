@@ -5,10 +5,11 @@ import 'package:http/http.dart' as http;
 import 'package:infoev/app/modules/explore/model/BrandDetailModel.dart';
 import 'package:infoev/app/modules/explore/model/VehicleModel.dart';
 import 'package:infoev/app/modules/explore/model/VehicleTipeModel.dart';
+import 'package:infoev/core/halper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:infoev/app/services/app_token_service.dart';
 
-class BrandDetailController extends GetxController {
-  final String apiUrl = "https://infoev.mazkama.web.id/api";
+class BrandDetailController extends GetxController { 
 
   // Data state
   var isLoading = true.obs;
@@ -34,12 +35,15 @@ class BrandDetailController extends GetxController {
   var sortBy = "name".obs;
   var sortOrder = "asc".obs;
 
+  // Add AppTokenService
+  late final AppTokenService _appTokenService;
+
   // List of endpoints
   final Map<String, String> typeEndpoints = {
-    'mobil': 'https://infoev.mazkama.web.id/api/tipe/mobil',
-    'sepeda-motor': 'https://infoev.mazkama.web.id/api/tipe/sepeda-motor',
-    'sepeda': 'https://infoev.mazkama.web.id/api/tipe/sepeda',
-    'skuter': 'https://infoev.mazkama.web.id/api/tipe/skuter',
+    'mobil': '$baseUrlDev/tipe/mobil',
+    'sepeda-motor': '$baseUrlDev/tipe/sepeda-motor',
+    'sepeda': '$baseUrlDev/tipe/sepeda',
+    'skuter': '$baseUrlDev/tipe/skuter',
   };
 
   // Mendapatkan kisaran harga kendaraan berdasarkan slug
@@ -48,7 +52,20 @@ class BrandDetailController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _appTokenService = AppTokenService();
     fetchVehicleTypes();
+  }
+
+  // Helper method to get headers with app_key
+  Future<Map<String, String>> _getAuthHeaders() async {
+    final appKey = await _appTokenService.getAppKey();
+    if (appKey == null) {
+      throw Exception('Failed to get app_key');
+    }
+    return {
+      'Accept': 'application/json',
+      'x-app-key': appKey,
+    };
   }
 
   // Memuat detail merek berdasarkan brand ID
@@ -69,9 +86,14 @@ class BrandDetailController extends GetxController {
       if (slugCache != null) {
         brandSlug = slugCache;
       } else {
-        // If not in cache, get from API
+        // If not in cache, get from API with app_key
         try {
-          final response = await http.get(Uri.parse("$apiUrl/merek"));
+          final headers = await _getAuthHeaders();
+          final response = await http.get(
+            Uri.parse("$baseUrlDev/merek"), 
+            headers: headers
+          );
+          
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
             final List<dynamic> items = data['items'] ?? [];
@@ -155,11 +177,15 @@ class BrandDetailController extends GetxController {
   Future<void> _fetchFreshData(int brandId, String brandSlug) async {
     debugPrint('Fetching fresh data for brand ID: $brandId');
     List<VehicleModel> allVehicles = [];
+    final headers = await _getAuthHeaders();
 
     // Fetch vehicles from all endpoints
     for (var endpoint in typeEndpoints.values) {
       try {
-        final response = await http.get(Uri.parse(endpoint));
+        final response = await http.get(
+          Uri.parse(endpoint),
+          headers: headers
+        );
         if (response.statusCode == 200) {
           final data = jsonDecode(response.body);
           final vehicles =
@@ -176,7 +202,8 @@ class BrandDetailController extends GetxController {
     // Get brand details
     try {
       final brandResponse = await http.get(
-        Uri.parse("$apiUrl/merek/$brandSlug"),
+        Uri.parse("$baseUrlDev/merek/$brandSlug"),
+        headers: headers,
       );
       if (brandResponse.statusCode == 200) {
         final brandData = jsonDecode(brandResponse.body);
@@ -263,8 +290,12 @@ class BrandDetailController extends GetxController {
         return;
       }
 
-      // Jika tidak ada cache atau cache tidak valid, fetch dari API
-      final response = await http.get(Uri.parse("$apiUrl/tipe"));
+      // Jika tidak ada cache atau cache tidak valid, fetch dari API dengan app_key
+      final headers = await _getAuthHeaders();
+      final response = await http.get(
+        Uri.parse("$baseUrlDev/tipe"),
+        headers: headers
+      );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -409,7 +440,11 @@ class BrandDetailController extends GetxController {
   // Helper method to load year for a single vehicle
   Future<void> _loadSingleVehicleYear(VehicleModel vehicle) async {
     try {
-      final response = await http.get(Uri.parse('$apiUrl/${vehicle.slug}'));
+      final headers = await _getAuthHeaders();
+      final response = await http.get(
+        Uri.parse('$baseUrlDev/${vehicle.slug}'),
+        headers: headers
+      );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final specCategories = data['specCategories'] as List<dynamic>?;
@@ -756,7 +791,11 @@ class BrandDetailController extends GetxController {
   // Mendapatkan kendaraan berdasarkan tipe spesifik
   Future<void> fetchVehiclesByType(String typeSlug) async {
     try {
-      final response = await http.get(Uri.parse("$apiUrl/tipe/$typeSlug"));
+      final headers = await _getAuthHeaders();
+      final response = await http.get(
+        Uri.parse("$baseUrlDev/tipe/$typeSlug"),
+        headers: headers
+      );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);

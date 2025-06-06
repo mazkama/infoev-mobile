@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:infoev/core/halper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:infoev/app/modules/login/views/LoginPage.dart';
@@ -68,7 +69,7 @@ class AuthService {
   ) async {
     try {
       final Uri url = Uri.parse(
-        "https://infoev.mazkama.web.id/api/auth/google/login",
+        "$baseUrlDev/auth/google/login",
       );
 
       final response = await http.post(
@@ -99,7 +100,7 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    final Uri url = Uri.parse("https://infoev.mazkama.web.id/api/auth/login");
+    final Uri url = Uri.parse("$baseUrlDev/api/auth/login");
 
     try {
       final response = await http.post(
@@ -126,7 +127,7 @@ class AuthService {
 
   // Endpoint logout pada backend
   static const String logoutUrl =
-      "https://infoev.mazkama.web.id/api/auth/logout";
+      "$baseUrlDev/auth/logout";
 
   // Fungsi logout untuk menghapus data dan mengarahkan ke halaman login
   static Future<void> logout(BuildContext context) async {

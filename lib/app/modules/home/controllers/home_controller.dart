@@ -55,130 +55,93 @@ class HomeController extends GetxController {
       CacheService.isCacheValid(CacheService.popularVehiclesKey),
       CacheService.isCacheValid(CacheService.newVehiclesKey), 
     ]);
-
-    final tasks = <Future>[];
-
-    if (!hasValidCache[0]) tasks.add(getNewNews());
-    if (!hasValidCache[1]) tasks.add(getPopularVehicles());
-    if (!hasValidCache[2]) tasks.add(getNewVehicles()); 
-
-    if (tasks.isEmpty) {
-      isLoading.value = false;
-      return;
+    
+    // Cek apakah ada data yang perlu diperbarui
+    final needsRefresh = hasValidCache.contains(false);
+    
+    if (needsRefresh) {
+      // Jika perlu refresh, ambil semua data dengan satu API call
+      await fetchAllHomeData();
     }
-
-    await Future.wait(tasks);
+    
     isLoading.value = false;
   }
 
-  Future<void> getNewNews() async {
-    if (await CacheService.isCacheValid(CacheService.newNewsKey) &&
-        newNewsList.isNotEmpty) {
-      return;
-    }
+  Future<void> fetchAllHomeData() async {
+    try {
+      // Ambil app_key dari service
+      final appKey = await _appTokenService.getAppKey();
+      if (appKey == null) {
+        isError.value = true;
+        return;
+      }
 
-    // Ambil app_key dari service
-    final appKey = await _appTokenService.getAppKey();
-    if (appKey == null) {
-      isError.value = true;
-      return;
-    }
-
-    var baseURL = "${baseUrlDev}";
-    final response = await http.get(
-      Uri.parse(baseURL),
-      headers: {'x-app-key': appKey},
-    );
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final List<dynamic> newsData = data['posts'];
-      final newsList = newsData.take(15).toList();
-
-      newNewsList.assignAll(
-        newsList.map((json) => NewsModel.fromJson(json)).toList(),
+      // Lakukan satu API call untuk semua data
+      final response = await http.get(
+        Uri.parse("$baseUrlDev"),
+        headers: {'x-app-key': appKey},
       );
 
-      await CacheService.saveToCache(
-        CacheService.newNewsKey,
-        newsList.map((json) => NewsModel.fromJson(json)).toList(),
-        duration: CacheService.defaultCacheDuration,
-      );
-    } else {
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        
+        // Proses semua data dari satu response
+        await processNewsData(data);
+        await processPopularVehicles(data);
+        await processNewVehicles(data);
+      } else {
+        isError.value = true;
+      }
+    } catch (e) {
       isError.value = true;
     }
   }
-
-  Future<void> getPopularVehicles() async {
-    if (await CacheService.isCacheValid(CacheService.popularVehiclesKey) &&
-        popularVehiclesList.isNotEmpty) {
-      return;
+  
+  Future<void> processNewsData(Map<String, dynamic> data) async {
+    if (data['posts'] != null) {
+      final List<dynamic> newsData = data['posts'];
+      final newsList = newsData.take(15).toList();
+      final parsedList = newsList.map((json) => NewsModel.fromJson(json)).toList();
+      
+      newNewsList.assignAll(parsedList);
+      
+      await CacheService.saveToCache(
+        CacheService.newNewsKey,
+        parsedList,
+        duration: CacheService.defaultCacheDuration,
+      );
     }
-
-    // Ambil app_key dari service
-    final appKey = await _appTokenService.getAppKey();
-    if (appKey == null) {
-      isError.value = true;
-      return;
-    }
-
-    var baseURL = "${baseUrlDev}";
-    final response = await http.get(
-      Uri.parse(baseURL),
-      headers: {'x-app-key': appKey},
-    );
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+  }
+  
+  Future<void> processPopularVehicles(Map<String, dynamic> data) async {
+    if (data['popularVehicles'] != null) {
       final List<dynamic> vehicleData = data['popularVehicles'];
-      final vehicleList =
-          vehicleData.map((json) => VehicleModel.fromJson(json)).toList();
-
+      final vehicleList = vehicleData.map((json) => VehicleModel.fromJson(json)).toList();
+      
       popularVehiclesList.assignAll(vehicleList);
-
+      
       await CacheService.saveToCache(
         CacheService.popularVehiclesKey,
         vehicleList,
         duration: CacheService.defaultCacheDuration,
       );
-    } else {
-      isError.value = true;
     }
   }
-
-  Future<void> getNewVehicles() async {
-    if (await CacheService.isCacheValid(CacheService.newVehiclesKey) &&
-        newVehiclesList.isNotEmpty) {
-      return;
-    }
-
-    // Ambil app_key dari service
-    final appKey = await _appTokenService.getAppKey();
-    if (appKey == null) {
-      isError.value = true;
-      return;
-    }
-
-    var baseURL = "${baseUrlDev}";
-    final response = await http.get(
-      Uri.parse(baseURL),
-      headers: {'x-app-key': appKey},
-    );
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+  
+  Future<void> processNewVehicles(Map<String, dynamic> data) async {
+    if (data['latestVehicles'] != null) {
       final List<dynamic> vehicleData = data['latestVehicles'];
-      final vehicleList =
-          vehicleData.map((json) => VehicleModel.fromJson(json)).toList();
-
+      final vehicleList = vehicleData.map((json) => VehicleModel.fromJson(json)).toList();
+      
       newVehiclesList.assignAll(vehicleList);
-
+      
       await CacheService.saveToCache(
         CacheService.newVehiclesKey,
         vehicleList,
         duration: CacheService.defaultCacheDuration,
       );
-    } else {
-      isError.value = true;
     }
-  } 
+  }
 
   Future<void> clearCache() async {
     await CacheService.clearCache(CacheService.newNewsKey);

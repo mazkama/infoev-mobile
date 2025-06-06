@@ -6,6 +6,7 @@ import 'package:infoev/app/modules/explore/model/SpecCategoryModel.dart';
 import 'package:infoev/core/halper.dart';
 import 'package:infoev/core/local_db.dart';
 import 'package:infoev/app/modules/explore/model/CommentModel.dart';
+import 'package:infoev/app/services/app_token_service.dart'; // Import AppTokenService
 
 class VehicleDetailController extends GetxController {
   // Data state
@@ -26,16 +27,38 @@ class VehicleDetailController extends GetxController {
 
   var isLoggedIn = false.obs;
   int commentCount = 0;
+  
+  // Add AppTokenService
+  late final AppTokenService _appTokenService;
 
   @override
   void onInit() {
     super.onInit();
+    // Inisialisasi AppTokenService
+    _appTokenService = AppTokenService();
     // Cek token saat inisialisasi dan update isLoggedIn
     isLoggedIn.value = LocalDB.getToken() != null;
     final slug = Get.parameters['slug'];
     if (slug != null) {
       fetchVehicleDetails(slug);
     }
+  }
+  
+  // Helper method untuk mendapatkan header dengan app_key
+  Future<Map<String, String>> _getAuthHeaders() async {
+    final appKey = await _appTokenService.getAppKey();
+    final token = LocalDB.getToken();
+    
+    Map<String, String> headers = {
+      'Accept': 'application/json',
+      'x-app-key': appKey ?? '',
+    };
+    
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+    
+    return headers;
   }
 
   Future<bool> postComment({
@@ -52,7 +75,11 @@ class VehicleDetailController extends GetxController {
       return false;
     }
 
-    final url = Uri.parse('${baseUrlDev}/comment/store');
+    final url = Uri.parse('$baseUrlDev/comment/store');
+    
+    // Dapatkan headers dengan app_key dan token
+    final headers = await _getAuthHeaders();
+    headers['Content-Type'] = 'application/json';
 
     final body = jsonEncode({
       'type': type,
@@ -67,10 +94,7 @@ class VehicleDetailController extends GetxController {
     try {
       final response = await http.post(
         url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
+        headers: headers,
         body: body,
       );
 
@@ -93,14 +117,12 @@ class VehicleDetailController extends GetxController {
     hasError.value = false;
 
     try {
-      final token = LocalDB.getToken();
+      // Dapatkan headers dengan app_key dan token
+      final headers = await _getAuthHeaders();
 
       final response = await http.get(
-        Uri.parse('${baseUrlDev}/$slug'),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
+        Uri.parse('$baseUrlDev/$slug'),
+        headers: headers,
       );
 
       if (response.statusCode == 200) {
@@ -132,7 +154,7 @@ class VehicleDetailController extends GetxController {
               (vehicleData['pictures'] as List)
                   .map(
                     (pic) =>
-                        'https://infoev.mazkama.web.id/storage/${pic['path']}',
+                        '$baseUrlDevOri/storage/${pic['path']}',
                   )
                   .toList();
         }
