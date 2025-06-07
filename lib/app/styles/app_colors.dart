@@ -89,6 +89,7 @@ class AppColors {
   /// Chip text color
   static Color ChipTextColor({required bool isSelected}) {
     return isSelected ? Color(0xFFF97316) : Color(0xFF1F2937);
+  
   }
 
   // ============================================================================

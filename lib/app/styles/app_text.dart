@@ -159,9 +159,7 @@ class AppText {
   /// Primary Button Text - For main action buttons
   static TextStyle get buttonPrimary => _poppinsStyle(
     fontSize: 16,
-    fontWeight: FontWeight.w600,
-    height: 1.3,
-    letterSpacing: 0.2,
+    fontWeight: FontWeight.w600
   );
 
   /// Secondary Button Text - For secondary action buttons
@@ -220,6 +218,17 @@ class AppText {
   static TextStyle get caption =>
       _poppinsStyle(fontSize: 13, fontWeight: FontWeight.w500, height: 1.3);
 
+  static TextStyle get titleListSearchItems => _poppinsStyle(fontSize: 16, fontWeight: FontWeight.w600);
+
+  static TextStyle get descListSearchItems => _poppinsStyle(fontSize: 14);
+
+  static TextStyle get titleEmptyFilterResults => _poppinsStyle(fontSize: 16, fontWeight: FontWeight.w600);
+
+  static TextStyle get descEmptyFilterResults => _poppinsStyle(fontSize: 16);
+
+  static TextStyle get titleDialog => _poppinsStyle(fontSize: 26, fontWeight: FontWeight.bold);
+  static TextStyle get bodyDialog => _poppinsStyle(fontSize: 16);
+
   /// Overline Text - For category labels, section headers
   static TextStyle get overline => _poppinsStyle(
     fontSize: 10,
@@ -254,7 +263,7 @@ class AppText {
 
   /// Brand Card Title - For brand names in cards (16sp)
   static TextStyle get brandCardTitle =>
-      _poppinsStyle(fontSize: 20, fontWeight: FontWeight.bold, height: 1.3);
+      _poppinsStyle(fontSize: 18, fontWeight: FontWeight.bold);
 
   /// Search Page Title - For search page headings (16sp)
   static TextStyle get searchPageTitle => _poppinsStyle(fontSize: 18);
@@ -277,7 +286,7 @@ class AppText {
 
   /// Vehicle Count - For "X kendaraan" labels (12sp)
   static TextStyle get vehicleCount =>
-      _poppinsStyle(fontSize: 12, fontWeight: FontWeight.normal, height: 1.3);
+      _poppinsStyle(fontSize: 14, fontWeight: FontWeight.normal);
 
   // ============================================================================
   // UTILITY METHODS

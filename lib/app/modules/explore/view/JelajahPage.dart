@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -156,7 +157,7 @@ class _JelajahPageState extends State<JelajahPage> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColors.primaryColor),
+            icon: const Icon(Icons.arrow_back_ios_rounded, color: AppColors.primaryColor),
             onPressed: () {
               controller.resetSearch();
               controller.resetFilters(); // Reset filter saat tombol back diklik
@@ -632,17 +633,14 @@ class _JelajahPageState extends State<JelajahPage> {
                 children: [
                   Text(
                     brand.name,
-                    style: GoogleFonts.poppins(
+                    style: AppText.titleListSearchItems.copyWith(
                       color: AppColors.textColor,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   Text(
                     '${brand.vehiclesCount} kendaraan',
-                    style: GoogleFonts.poppins(
+                    style: AppText.descListSearchItems.copyWith(
                       color: AppColors.textSecondary,
-                      fontSize: 12,
                     ),
                   ),
                 ],
@@ -700,18 +698,15 @@ class _JelajahPageState extends State<JelajahPage> {
                 children: [
                   Text(
                     vehicle['name'] ?? '',
-                    style: GoogleFonts.poppins(
+                    style: AppText.titleListSearchItems.copyWith(
                       color: AppColors.textColor,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   if (vehicle['brand'] != null)
                     Text(
                       vehicle['brand']['name'] ?? '',
-                      style: GoogleFonts.poppins(
+                      style: AppText.descListSearchItems.copyWith(
                         color: AppColors.textSecondary,
-                        fontSize: 12,
                       ),
                     ),
                 ],
@@ -880,19 +875,16 @@ class _JelajahPageState extends State<JelajahPage> {
               children: [
                 Text(
                   merek.name,
-                  style: GoogleFonts.poppins(
+                  style: AppText.brandCardTitle.copyWith(
                     color: AppColors.textOnPrimary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   '${merek.vehiclesCount} kendaraan',
-                  style: GoogleFonts.poppins(
+                  style: AppText.vehicleCount.copyWith(
                     color: AppColors.textOnPrimary,
-                    fontSize: 12,
                   ),
                 ),
               ],
@@ -1021,19 +1013,16 @@ class _JelajahPageState extends State<JelajahPage> {
           Text(
             'Tidak ada merek yang sesuai',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              color: AppColors.textTertiary,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+            style: AppText.titleEmptyFilterResults.copyWith(
+              color: AppColors.textTertiary
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Coba ubah kriteria pencarian atau filter Anda',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+            style: AppText.descEmptyFilterResults.copyWith(
               color: AppColors.textTertiary,
-              fontSize: 14,
             ),
           ),
           const SizedBox(height: 24),
@@ -1051,7 +1040,7 @@ class _JelajahPageState extends State<JelajahPage> {
             ),
             child: Text(
               'Reset Filter',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+              style: AppText.buttonPrimary.copyWith(color: AppColors.textColor),
             ),
           ),
         ],
@@ -1069,9 +1058,9 @@ class _JelajahPageState extends State<JelajahPage> {
           Text(
             'Gagal memuat data merek',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+            style: AppText.bodyLarge.copyWith(
               color: AppColors.textColor,
-              fontSize: 16,
+              fontSize: 16.sp,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -1079,9 +1068,8 @@ class _JelajahPageState extends State<JelajahPage> {
           Text(
             'Periksa koneksi internet Anda\ndan coba lagi',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              color: AppColors.textTertiary,
-              fontSize: 14,
+            style: AppText.bodyLarge.copyWith(
+              color: AppColors.textTertiary
             ),
           ),
           const SizedBox(height: 24),
@@ -1097,7 +1085,7 @@ class _JelajahPageState extends State<JelajahPage> {
             ),
             child: Text(
               'Coba Lagi',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+              style: AppText.buttonPrimary.copyWith(color: AppColors.textColor),
             ),
           ),
         ],
@@ -1121,7 +1109,7 @@ class _JelajahPageState extends State<JelajahPage> {
               backgroundColor: AppColors.cardBackgroundColor,
               title: Text(
                 'Filter Merek',
-                style: GoogleFonts.poppins(
+                style: AppText.titleDialog.copyWith(
                   color: AppColors.textColor,
                   fontWeight: FontWeight.bold,
                 ),
@@ -1133,7 +1121,7 @@ class _JelajahPageState extends State<JelajahPage> {
                   const SizedBox(height: 16),
                   Text(
                     'Jumlah Kendaraan Minimal',
-                    style: GoogleFonts.poppins(color: AppColors.textColor),
+                    style: AppText.bodyDialog.copyWith(color: AppColors.textColor),
                   ),
                   const SizedBox(height: 8),
                   SliderTheme(
@@ -1163,7 +1151,7 @@ class _JelajahPageState extends State<JelajahPage> {
                   const SizedBox(height: 16),
                   Text(
                     'Urutkan Berdasarkan',
-                    style: GoogleFonts.poppins(color: AppColors.textColor),
+                    style: AppText.bodyDialog.copyWith(color: AppColors.textColor),
                   ),
                   const SizedBox(height: 8),
                   Theme(
@@ -1183,7 +1171,7 @@ class _JelajahPageState extends State<JelajahPage> {
                           contentPadding: EdgeInsets.zero,
                           title: Text(
                             'Nama',
-                            style: GoogleFonts.poppins(
+                            style: AppText.bodyDialog.copyWith(
                               color: AppColors.textColor,
                             ),
                           ),
@@ -1201,7 +1189,7 @@ class _JelajahPageState extends State<JelajahPage> {
                           contentPadding: EdgeInsets.zero,
                           title: Text(
                             'Jumlah Kendaraan',
-                            style: GoogleFonts.poppins(
+                            style: AppText.bodyDialog.copyWith(
                               color: AppColors.textColor,
                             ),
                           ),
@@ -1221,7 +1209,7 @@ class _JelajahPageState extends State<JelajahPage> {
                   const SizedBox(height: 16),
                   Text(
                     'Urutan',
-                    style: GoogleFonts.poppins(color: AppColors.textColor),
+                    style: AppText.bodyDialog.copyWith(color: AppColors.textColor),
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -1243,7 +1231,9 @@ class _JelajahPageState extends State<JelajahPage> {
                               sortOrder = 'asc';
                             });
                           },
-                          child: Text('A-Z ↑', style: GoogleFonts.poppins()),
+                          child: Text('A-Z ↑', style: GoogleFonts.poppins(
+                            fontSize: 14.sp,
+                          )                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -1254,7 +1244,7 @@ class _JelajahPageState extends State<JelajahPage> {
                                 sortOrder == 'desc'
                                     ? AppColors.primaryColor
                                     : AppColors.cardBackgroundColor,
-                            foregroundColor:
+                            foregroundColor: 
                                 sortOrder == 'desc'
                                     ? AppColors.cardBackgroundColor
                                     : AppColors.primaryColor,
@@ -1264,7 +1254,9 @@ class _JelajahPageState extends State<JelajahPage> {
                               sortOrder = 'desc';
                             });
                           },
-                          child: Text('Z-A ↓', style: GoogleFonts.poppins()),
+                          child: Text('Z-A ↓', style: GoogleFonts.poppins(
+                            fontSize: 14.sp,
+                          )),
                         ),
                       ),
                     ],
@@ -1275,7 +1267,7 @@ class _JelajahPageState extends State<JelajahPage> {
                 TextButton(
                   child: Text(
                     'Reset',
-                    style: GoogleFonts.poppins(color: AppColors.textSecondary),
+                    style: AppText.bodyDialog.copyWith(color: AppColors.textSecondary),
                   ),
                   onPressed: () {
                     // Reset hanya nilai pada dialog, bukan nilai filter sebenarnya
@@ -1294,7 +1286,7 @@ class _JelajahPageState extends State<JelajahPage> {
                   ),
                   child: Text(
                     'Terapkan',
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+                    style: AppText.bodyDialog.copyWith(fontWeight: FontWeight.bold),
                   ),
                   onPressed: () {
                     // Apply type filter if not 'All'
