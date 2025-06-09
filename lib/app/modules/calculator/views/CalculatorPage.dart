@@ -77,94 +77,78 @@ class _CalculatorPageState extends State<CalculatorPage>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: SafeArea(
-        child: GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: Column(
-            children: [
-              // AppBar
-              _buildAppBar(),
+      appBar: AppBar(
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        backgroundColor: AppColors.cardBackgroundColor,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_rounded,
+            color: AppColors.textColor,
+          ),
+          onPressed: () {
+            Navigator.of(context).pop(); // Kembali ke halaman sebelumnya
+          },
+        ),
+        title: Text(
+          "Kalkulator EV",
+          style: GoogleFonts.poppins(
+            fontSize: 21,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textColor,
+          ),
+        ),
+      ),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Column(
+          children: [
+            // AppBar
+            // _buildAppBar(),
 
-              // Content
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 8),
-                          Text(
-                            'Hitung perkiraan biaya penggunaan kendaraan listrik berdasarkan konsumsi energi dan harga listrik di daerah Anda.',
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              color: AppColors.textSecondary,
-                            ),
+            // Content
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 8),
+                        Text(
+                          'Hitung perkiraan biaya penggunaan kendaraan listrik berdasarkan konsumsi energi dan harga listrik di daerah Anda.',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: AppColors.textSecondary,
                           ),
-                          const SizedBox(height: 24),
+                        ),
+                        const SizedBox(height: 24),
 
-                          // Vehicle selection
-                          _buildVehicleSelection(),
-                          const SizedBox(height: 24),
+                        // Vehicle selection
+                        _buildVehicleSelection(),
+                        const SizedBox(height: 24),
 
-                          // Electricity price input
-                          _buildElectricityPriceInput(),
-                          const SizedBox(height: 32),
+                        // Electricity price input
+                        _buildElectricityPriceInput(),
+                        const SizedBox(height: 32),
 
-                          // Calculation results
-                          _buildCalculationResults(),
+                        // Calculation results
+                        _buildCalculationResults(),
 
-                          // Disclaimer
-                          const SizedBox(height: 24),
-                          _buildDisclaimer(),
-                        ],
-                      ),
+                        // Disclaimer
+                        const SizedBox(height: 24),
+                        _buildDisclaimer(),
+                      ],
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildAppBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: AppColors.cardBackgroundColor,
-      child: Row(
-        children: [
-          // Back button
-          GestureDetector(
-            onTap: () {
-              Navigator.of(context).pop();
-            },
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              child: const Icon(
-                Icons.arrow_back_ios_rounded,
-                color: AppColors.textColor,
-                size: 20,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-
-          // Title
-          Text(
-            'Kalkulator EV',
-            style: GoogleFonts.poppins(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textColor,
-            ),
-          ),
-        ],
       ),
     );
   }

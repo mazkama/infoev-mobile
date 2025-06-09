@@ -28,6 +28,10 @@ void main() async {
   print('FCM Token: $token'); // You can send this token to your backend
 
   await LocalDB.init();
+  
+  // Initialize ScreenUtil
+  await ScreenUtil.ensureScreenSize();
+  
   Get.lazyPut(() => MerekController(), fenix: true);
   Get.lazyPut(() => LoginController(), fenix: true);
   runApp(MyApp());
@@ -39,10 +43,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: const Size(428, 926), // iPhone 12 Pro Max design size
+      // designSize: const Size(428, 926), // iPhone 12 Pro Max design size
+      // designSize: const Size(600, 976), // Advan Tab Ginio design size
+      designSize: const Size(393, 857), // Xiaomi Redmi note 10s design size
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
+        // Debugging: Print current screen size
+        final screenSize = MediaQuery.of(context).size;
+        print('Current screen size: width=${screenSize.width}, height=${screenSize.height}');
+
         return GestureDetector(
           onTap: () {
             // Menutup keyboard jika area di luar TextField disentuh

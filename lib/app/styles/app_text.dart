@@ -226,8 +226,14 @@ class AppText {
 
   static TextStyle get descEmptyFilterResults => _poppinsStyle(fontSize: 16);
 
-  static TextStyle get titleDialog => _poppinsStyle(fontSize: 26, fontWeight: FontWeight.bold);
-  static TextStyle get bodyDialog => _poppinsStyle(fontSize: 16);
+  static TextStyle get titleDialog => _poppinsStyle(fontSize: 18, fontWeight: FontWeight.bold);
+
+  static TextStyle get bodyDialog => _poppinsStyle(fontSize: 12);
+
+  static TextStyle get TitleBottomSheet => _poppinsStyle(fontSize: 22);
+  
+  static TextStyle get BodyBottomSheet => _poppinsStyle(fontSize: 15);
+  
 
   /// Overline Text - For category labels, section headers
   static TextStyle get overline => _poppinsStyle(

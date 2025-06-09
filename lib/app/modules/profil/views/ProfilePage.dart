@@ -33,7 +33,7 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 18),
             Center(
               child: Text(
-                'More',
+                'Lainnya',
                 style: GoogleFonts.poppins(
                   fontSize: 18,
                   color: Colors.black,

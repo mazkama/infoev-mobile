@@ -26,7 +26,7 @@ class _FavoritVehiclesPageState extends State<FavoritVehiclesPage> {
     // Add this at the start of build method
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.clearAndRefreshData();
-      
+
       // Listener untuk mengupdate search controller ketika nilai search berubah dari controller
       controller.searchQuery.listen((query) {
         if (_searchController.text != query) {
@@ -46,10 +46,25 @@ class _FavoritVehiclesPageState extends State<FavoritVehiclesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        title: const Text(
+        backgroundColor: AppColors.cardBackgroundColor,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_rounded,
+            color: AppColors.textColor,
+          ),
+          onPressed: () {
+            Navigator.of(context).pop(); // Kembali ke halaman sebelumnya
+          },
+        ),
+        title: Text(
           "Kendaraan Favorit",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: GoogleFonts.poppins(
+            fontSize: 21,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textColor,
+          ),
         ),
         actions: [
           IconButton(
@@ -70,11 +85,13 @@ class _FavoritVehiclesPageState extends State<FavoritVehiclesPage> {
       body: Column(
         children: [
           // Search bar
-          Obx(() => controller.isSearching.value 
-              ? _buildSearchBar() 
-              : const SizedBox.shrink()
+          Obx(
+            () =>
+                controller.isSearching.value
+                    ? _buildSearchBar()
+                    : const SizedBox.shrink(),
           ),
-          
+
           // Main content
           Expanded(
             child: RefreshIndicator(
@@ -85,28 +102,33 @@ class _FavoritVehiclesPageState extends State<FavoritVehiclesPage> {
                 if (controller.isLoading.value) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                
-                final vehicles = controller.isSearching.value 
-                    ? controller.filteredVehicles 
-                    : controller.favoriteVehicles;
-                
+
+                final vehicles =
+                    controller.isSearching.value
+                        ? controller.filteredVehicles
+                        : controller.favoriteVehicles;
+
                 if (vehicles.isEmpty) {
-                  if (controller.isSearching.value && controller.searchQuery.value.isNotEmpty) {
+                  if (controller.isSearching.value &&
+                      controller.searchQuery.value.isNotEmpty) {
                     return _buildEmptySearchResults();
                   }
-                  return const Center(child: Text("Tidak ada kendaraan favorit."));
+                  return const Center(
+                    child: Text("Tidak ada kendaraan favorit."),
+                  );
                 }
 
                 return Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: GridView.builder(
                     itemCount: vehicles.length,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 0.75,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.75,
+                        ),
                     itemBuilder: (context, index) {
                       final vehicle = vehicles[index];
                       return _buildVehicleCard(vehicle, controller);
@@ -138,7 +160,7 @@ class _FavoritVehiclesPageState extends State<FavoritVehiclesPage> {
           hintStyle: GoogleFonts.poppins(color: AppColors.textTertiary),
           prefixIcon: IconButton(
             icon: const Icon(
-              Icons.arrow_back_ios,
+              Icons.arrow_back_ios_rounded,
               color: AppColors.textSecondary,
             ),
             onPressed: () {
@@ -188,7 +210,7 @@ class _FavoritVehiclesPageState extends State<FavoritVehiclesPage> {
       ),
     );
   }
-  
+
   Widget _buildEmptySearchResults() {
     return Center(
       child: Column(
@@ -326,8 +348,8 @@ class _FavoritVehiclesPageState extends State<FavoritVehiclesPage> {
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [ 
-                     Text(
+                  children: [
+                    Text(
                       vehicle.name,
                       style: GoogleFonts.poppins(
                         color: AppColors.textOnPrimary,

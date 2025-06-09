@@ -157,7 +157,10 @@ class _JelajahPageState extends State<JelajahPage> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios_rounded, color: AppColors.primaryColor),
+            icon: const Icon(
+              Icons.arrow_back_ios_rounded,
+              color: AppColors.primaryColor,
+            ),
             onPressed: () {
               controller.resetSearch();
               controller.resetFilters(); // Reset filter saat tombol back diklik
@@ -311,10 +314,23 @@ class _JelajahPageState extends State<JelajahPage> {
   }
 
   Widget _buildTypeFilterChips() {
+    // Get screen width for responsive design
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600;
+    final isLargeScreen = screenWidth > 1200;
+    
+    // Responsive values
+    final double chipHeight = isLargeScreen ? 44 : isTablet ? 42 : 40;
+    final double horizontalPadding = isLargeScreen ? 20 : isTablet ? 18 : 16;
+    final double verticalPadding = isLargeScreen ? 10 : isTablet ? 9 : 8;
+    final double leftMargin = isLargeScreen ? 20 : isTablet ? 18 : 16;
+    final double rightMargin = isLargeScreen ? 10 : isTablet ? 9 : 8;
+    final double bottomSpacing = isLargeScreen ? 16 : isTablet ? 14 : 12;
+    
     return Column(
       children: [
         Container(
-          height: 40,
+          height: chipHeight,
           // Keep background full width, no margin here!
           decoration: BoxDecoration(
             color: AppColors.cardBackgroundColor,
@@ -363,11 +379,11 @@ class _JelajahPageState extends State<JelajahPage> {
                                 controller.filterOptions['typeId'] == 0
                             : controller.filterOptions['typeId'] == id;
 
-                    // Only add left margin for the first chip ("Semua")
+                    // Responsive padding for chips
                     final chipPadding =
                         idx == 0
-                            ? const EdgeInsets.only(left: 16, right: 8)
-                            : const EdgeInsets.only(right: 8);
+                            ? EdgeInsets.only(left: leftMargin, right: rightMargin)
+                            : EdgeInsets.only(right: rightMargin);
 
                     return Padding(
                       padding: chipPadding,
@@ -387,9 +403,9 @@ class _JelajahPageState extends State<JelajahPage> {
                             isSelected: isSelected,
                           ),
                           elevation: 0,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: horizontalPadding,
+                            vertical: verticalPadding,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -400,7 +416,7 @@ class _JelajahPageState extends State<JelajahPage> {
                           style: AppText.filterChipStyle(
                             isSelected: isSelected,
                             color: AppColors.ChipTextColor(
-                              isSelected: isSelected
+                              isSelected: isSelected,
                             ),
                           ),
                         ),
@@ -410,7 +426,7 @@ class _JelajahPageState extends State<JelajahPage> {
             );
           }),
         ),
-        const SizedBox(height: 12), // Adds spacing below the filter
+        SizedBox(height: bottomSpacing), // Responsive spacing below the filter
       ],
     );
   }
@@ -433,9 +449,7 @@ class _JelajahPageState extends State<JelajahPage> {
         return Center(
           child: Text(
             'Tidak ditemukan hasil',
-            style: AppText.info.copyWith(
-              color: AppColors.textTertiary,
-            ),
+            style: AppText.info.copyWith(color: AppColors.textTertiary),
           ),
         );
       }
@@ -455,7 +469,7 @@ class _JelajahPageState extends State<JelajahPage> {
                 child: Text(
                   sectionTitle,
                   style: AppText.sectionHeader.copyWith(
-                    color: AppColors.secondaryColor
+                    color: AppColors.secondaryColor,
                   ),
                 ),
               ),
@@ -482,9 +496,7 @@ class _JelajahPageState extends State<JelajahPage> {
         return Center(
           child: Text(
             'Belum ada riwayat pencarian',
-            style: AppText.info.copyWith(
-              color: AppColors.textTertiary
-            ),
+            style: AppText.info.copyWith(color: AppColors.textTertiary),
           ),
         );
       }
@@ -509,7 +521,7 @@ class _JelajahPageState extends State<JelajahPage> {
                   child: Text(
                     'Hapus Semua',
                     style: AppText.titleMedium.copyWith(
-                      color: AppColors.secondaryColor
+                      color: AppColors.secondaryColor,
                     ),
                   ),
                 ),
@@ -530,7 +542,7 @@ class _JelajahPageState extends State<JelajahPage> {
                   title: Text(
                     query,
                     style: AppText.titleLarge.copyWith(
-                      color: AppColors.textColor
+                      color: AppColors.textColor,
                     ),
                   ),
                   trailing: IconButton(
@@ -753,13 +765,29 @@ class _JelajahPageState extends State<JelajahPage> {
     double screenWidth,
     List<MerekModel> displayList,
   ) {
+    // Responsive grid configuration similar to home_view.dart
+    final isTablet = screenWidth >= 600;
+    final isLargeScreen = screenWidth > 1200;
+    final crossAxisCount = isLargeScreen 
+        ? 4 // 4 columns for very large screens (desktop)
+        : isTablet 
+            ? 3 // 3 columns for tablets
+            : 2; // 2 columns for mobile
+    
+    // Debug print untuk membantu troubleshooting
+    debugPrint('JelajahPage Grid Debug: screenWidth=$screenWidth, isTablet=$isTablet, isLargeScreen=$isLargeScreen, crossAxisCount=$crossAxisCount');
+    
+    // Responsive spacing and aspect ratio
+    final spacing = isTablet ? 16.0 : 12.0;
+    final aspectRatio = isLargeScreen ? 1.3 : isTablet ? 1.25 : 1.2;
+    
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(spacing),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: screenWidth > 600 ? 3 : 2,
-        childAspectRatio: 1.2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
+        crossAxisCount: crossAxisCount,
+        childAspectRatio: aspectRatio,
+        crossAxisSpacing: spacing,
+        mainAxisSpacing: spacing,
       ),
       itemCount: displayList.length,
       itemBuilder: (context, index) {
@@ -817,6 +845,16 @@ class _JelajahPageState extends State<JelajahPage> {
     MerekModel merek,
     ImageProvider imageProvider,
   ) {
+    // Get screen width for responsive design
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600;
+    final isLargeScreen = screenWidth > 1200;
+    
+    // Responsive padding and font sizes
+    final cardPadding = isLargeScreen ? 16.0 : isTablet ? 14.0 : 12.0;
+    final titleFontSize = isLargeScreen ? 20.0 : isTablet ? 18.0 : 16.0;
+    final subtitleFontSize = isLargeScreen ? 16.0 : isTablet ? 14.0 : 12.0;
+    
     return Stack(
       children: [
         // Background color
@@ -869,7 +907,7 @@ class _JelajahPageState extends State<JelajahPage> {
           left: 0,
           right: 0,
           child: Container(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(cardPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -877,6 +915,7 @@ class _JelajahPageState extends State<JelajahPage> {
                   merek.name,
                   style: AppText.brandCardTitle.copyWith(
                     color: AppColors.textOnPrimary,
+                    fontSize: titleFontSize,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -885,6 +924,7 @@ class _JelajahPageState extends State<JelajahPage> {
                   '${merek.vehiclesCount} kendaraan',
                   style: AppText.vehicleCount.copyWith(
                     color: AppColors.textOnPrimary,
+                    fontSize: subtitleFontSize,
                   ),
                 ),
               ],
@@ -972,14 +1012,26 @@ class _JelajahPageState extends State<JelajahPage> {
   }
 
   Widget _buildShimmer(double screenWidth) {
+    // Use same responsive configuration as main grid
+    final isTablet = screenWidth >= 600;
+    final isLargeScreen = screenWidth > 1200;
+    final crossAxisCount = isLargeScreen 
+        ? 4 // 4 columns for very large screens (desktop)
+        : isTablet 
+            ? 3 // 3 columns for tablets
+            : 2; // 2 columns for mobile
+    
+    final spacing = isTablet ? 16.0 : 12.0;
+    final aspectRatio = isLargeScreen ? 1.3 : isTablet ? 1.25 : 1.2;
+    
     return GridView.builder(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(spacing),
       itemCount: 6,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: screenWidth > 600 ? 3 : 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 0.9,
+        crossAxisCount: crossAxisCount,
+        crossAxisSpacing: spacing,
+        mainAxisSpacing: spacing,
+        childAspectRatio: aspectRatio,
       ),
       itemBuilder: (context, index) {
         return Shimmer.fromColors(
@@ -1014,7 +1066,7 @@ class _JelajahPageState extends State<JelajahPage> {
             'Tidak ada merek yang sesuai',
             textAlign: TextAlign.center,
             style: AppText.titleEmptyFilterResults.copyWith(
-              color: AppColors.textTertiary
+              color: AppColors.textTertiary,
             ),
           ),
           const SizedBox(height: 8),
@@ -1068,9 +1120,7 @@ class _JelajahPageState extends State<JelajahPage> {
           Text(
             'Periksa koneksi internet Anda\ndan coba lagi',
             textAlign: TextAlign.center,
-            style: AppText.bodyLarge.copyWith(
-              color: AppColors.textTertiary
-            ),
+            style: AppText.bodyLarge.copyWith(color: AppColors.textTertiary),
           ),
           const SizedBox(height: 24),
           ElevatedButton(
@@ -1105,6 +1155,13 @@ class _JelajahPageState extends State<JelajahPage> {
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (context, setState) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            final isTablet = screenWidth >= 600;
+            
+            // Responsive font sizes
+            final titleFontSize = isTablet ? 18.sp : 20.sp; // Default tablet: 18.sp, Mobile: 20.sp
+            final bodyFontSize = isTablet ? 12.sp : 14.sp;   // Default tablet: 12.sp, Mobile: 14.sp
+
             return AlertDialog(
               backgroundColor: AppColors.cardBackgroundColor,
               title: Text(
@@ -1112,162 +1169,183 @@ class _JelajahPageState extends State<JelajahPage> {
                 style: AppText.titleDialog.copyWith(
                   color: AppColors.textColor,
                   fontWeight: FontWeight.bold,
+                  fontSize: titleFontSize,
                 ),
               ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 16),
-                  Text(
-                    'Jumlah Kendaraan Minimal',
-                    style: AppText.bodyDialog.copyWith(color: AppColors.textColor),
-                  ),
-                  const SizedBox(height: 8),
-                  SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: AppColors.primaryColor,
-                      inactiveTrackColor: AppColors.primaryColor.withAlpha(77),
-                      thumbColor: AppColors.primaryColor,
-                      overlayColor: AppColors.primaryColor.withAlpha(25),
-                      valueIndicatorColor: AppColors.primaryColor,
-                      valueIndicatorTextStyle: const TextStyle(
-                        color: AppColors.textOnPrimary,
+              content: SizedBox(
+                width: isTablet ? 400 : screenWidth * 0.9,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 16),
+                    Text(
+                      'Jumlah Kendaraan Minimal',
+                      style: AppText.bodyDialog.copyWith(
+                        color: AppColors.textColor,
+                        fontSize: bodyFontSize,
                       ),
                     ),
-                    child: Slider(
-                      value: minProductCount.toDouble(),
-                      min: 0,
-                      max: 10,
-                      divisions: 10,
-                      label: minProductCount.toString(),
-                      onChanged: (value) {
-                        setState(() {
-                          minProductCount = value.round();
-                        });
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Urutkan Berdasarkan',
-                    style: AppText.bodyDialog.copyWith(color: AppColors.textColor),
-                  ),
-                  const SizedBox(height: 8),
-                  Theme(
-                    data: Theme.of(context).copyWith(
-                      unselectedWidgetColor: AppColors.primaryColor.withAlpha(
-                        128,
-                      ),
-                      radioTheme: RadioThemeData(
-                        fillColor: MaterialStateProperty.all(
-                          AppColors.primaryColor,
+                    const SizedBox(height: 8),
+                    SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        activeTrackColor: AppColors.primaryColor,
+                        inactiveTrackColor: AppColors.primaryColor.withAlpha(
+                          77,
+                        ),
+                        thumbColor: AppColors.primaryColor,
+                        overlayColor: AppColors.primaryColor.withAlpha(25),
+                        valueIndicatorColor: AppColors.primaryColor,
+                        valueIndicatorTextStyle: const TextStyle(
+                          color: AppColors.textOnPrimary,
                         ),
                       ),
+                      child: Slider(
+                        value: minProductCount.toDouble(),
+                        min: 0,
+                        max: 10,
+                        divisions: 10,
+                        label: minProductCount.toString(),
+                        onChanged: (value) {
+                          setState(() {
+                            minProductCount = value.round();
+                          });
+                        },
+                      ),
                     ),
-                    child: Column(
+                    const SizedBox(height: 16),
+                    Text(
+                      'Urutkan Berdasarkan',
+                      style: AppText.bodyDialog.copyWith(
+                        color: AppColors.textColor,
+                        fontSize: bodyFontSize,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Theme(
+                      data: Theme.of(context).copyWith(
+                        unselectedWidgetColor: AppColors.primaryColor.withAlpha(
+                          128,
+                        ),
+                        radioTheme: RadioThemeData(
+                          fillColor: MaterialStateProperty.all(
+                            AppColors.primaryColor,
+                          ),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(
+                              'Nama',
+                              style: AppText.bodyDialog.copyWith(
+                                color: AppColors.textColor,
+                                fontSize: bodyFontSize,
+                              ),
+                            ),
+                            leading: Radio<String>(
+                              value: 'name',
+                              groupValue: sortBy,
+                              onChanged: (value) {
+                                setState(() {
+                                  sortBy = value!;
+                                });
+                              },
+                            ),
+                          ),
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(
+                              'Jumlah Kendaraan',
+                              style: AppText.bodyDialog.copyWith(
+                                color: AppColors.textColor,
+                                fontSize: bodyFontSize,
+                              ),
+                            ),
+                            leading: Radio<String>(
+                              value: 'vehicles_count',
+                              groupValue: sortBy,
+                              onChanged: (value) {
+                                setState(() {
+                                  sortBy = value!;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Urutan',
+                      style: AppText.bodyDialog.copyWith(
+                        color: AppColors.textColor,
+                        fontSize: bodyFontSize,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
                       children: [
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(
-                            'Nama',
-                            style: AppText.bodyDialog.copyWith(
-                              color: AppColors.textColor,
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  sortOrder == 'asc'
+                                      ? AppColors.primaryColor
+                                      : AppColors.cardBackgroundColor,
+                              foregroundColor:
+                                  sortOrder == 'asc'
+                                      ? AppColors.cardBackgroundColor
+                                      : AppColors.primaryColor,
                             ),
-                          ),
-                          leading: Radio<String>(
-                            value: 'name',
-                            groupValue: sortBy,
-                            onChanged: (value) {
+                            onPressed: () {
                               setState(() {
-                                sortBy = value!;
+                                sortOrder = 'asc';
                               });
                             },
+                            child: Text(
+                              'A-Z ↑',
+                              style: GoogleFonts.poppins(fontSize: 14.sp),
+                            ),
                           ),
                         ),
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(
-                            'Jumlah Kendaraan',
-                            style: AppText.bodyDialog.copyWith(
-                              color: AppColors.textColor,
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  sortOrder == 'desc'
+                                      ? AppColors.primaryColor
+                                      : AppColors.cardBackgroundColor,
+                              foregroundColor:
+                                  sortOrder == 'desc'
+                                      ? AppColors.cardBackgroundColor
+                                      : AppColors.primaryColor,
                             ),
-                          ),
-                          leading: Radio<String>(
-                            value: 'vehicles_count',
-                            groupValue: sortBy,
-                            onChanged: (value) {
+                            onPressed: () {
                               setState(() {
-                                sortBy = value!;
+                                sortOrder = 'desc';
                               });
                             },
+                            child: Text(
+                              'Z-A ↓',
+                              style: GoogleFonts.poppins(fontSize: 14.sp),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Urutan',
-                    style: AppText.bodyDialog.copyWith(color: AppColors.textColor),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                sortOrder == 'asc'
-                                    ? AppColors.primaryColor
-                                    : AppColors.cardBackgroundColor,
-                            foregroundColor:
-                                sortOrder == 'asc'
-                                    ? AppColors.cardBackgroundColor
-                                    : AppColors.primaryColor,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              sortOrder = 'asc';
-                            });
-                          },
-                          child: Text('A-Z ↑', style: GoogleFonts.poppins(
-                            fontSize: 14.sp,
-                          )                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                sortOrder == 'desc'
-                                    ? AppColors.primaryColor
-                                    : AppColors.cardBackgroundColor,
-                            foregroundColor: 
-                                sortOrder == 'desc'
-                                    ? AppColors.cardBackgroundColor
-                                    : AppColors.primaryColor,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              sortOrder = 'desc';
-                            });
-                          },
-                          child: Text('Z-A ↓', style: GoogleFonts.poppins(
-                            fontSize: 14.sp,
-                          )),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
               actions: [
                 TextButton(
                   child: Text(
                     'Reset',
-                    style: AppText.bodyDialog.copyWith(color: AppColors.textSecondary),
+                    style: AppText.bodyDialog.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                   onPressed: () {
                     // Reset hanya nilai pada dialog, bukan nilai filter sebenarnya
@@ -1286,7 +1364,10 @@ class _JelajahPageState extends State<JelajahPage> {
                   ),
                   child: Text(
                     'Terapkan',
-                    style: AppText.bodyDialog.copyWith(fontWeight: FontWeight.bold),
+                    style: AppText.bodyDialog.copyWith(
+                      color: AppColors.textOnPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   onPressed: () {
                     // Apply type filter if not 'All'
