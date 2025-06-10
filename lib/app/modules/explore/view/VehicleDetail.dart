@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:infoev/app/modules/explore/controllers/VehicleDetailController.dart';
 import 'package:flutter/services.dart';
@@ -277,14 +278,26 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                       // Highlight Cards with animation
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: GridView.count(
-                          crossAxisCount: 2,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 1.3,
-                          children: [
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final screenWidth = MediaQuery.of(context).size.width;
+                            final isTablet = screenWidth >= 600;
+                            final isLargeScreen = screenWidth > 1200;
+                            
+                            // Responsive grid configuration
+                            final crossAxisCount = isTablet ? 4 : 2;
+                            final childAspectRatio = isTablet ? (isLargeScreen ? 1.1 : 1.0) : 1.3;
+                            final crossAxisSpacing = isTablet ? (isLargeScreen ? 16.0 : 12.0) : 12.0;
+                            final mainAxisSpacing = isTablet ? (isLargeScreen ? 16.0 : 12.0) : 12.0;
+                            
+                            return GridView.count(
+                              crossAxisCount: crossAxisCount,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              crossAxisSpacing: crossAxisSpacing,
+                              mainAxisSpacing: mainAxisSpacing,
+                              childAspectRatio: childAspectRatio,
+                              children: [
                             _buildAnimatedHighlightCard(
                               icon: Icons.speed_rounded,
                               title: 'Kecepatan',
@@ -337,6 +350,8 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                               ),
                             ),
                           ],
+                        );
+                          },
                         ),
                       ),
 
@@ -1046,9 +1061,22 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
     required String unit,
     required Gradient gradient,
   }) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600;
+    final isLargeScreen = screenWidth > 1200;
+    
+    // Responsive sizing
+    final cardWidth = isTablet ? null : 160.0; // Let it flex for tablets
+    final iconSize = isTablet ? (isLargeScreen ? 28.0 : 32.0) : 32.0;
+    final titleFontSize = isTablet ? (isLargeScreen ? 12.sp : 8.sp) : 14.0;
+    final valueFontSize = isTablet ? (isLargeScreen ? 16.sp : 12.sp) : 20.0;
+    final descFontSize = isTablet ? (isLargeScreen ? 10.0 : 9.0) : 11.0;
+    final cardPadding = isTablet ? (isLargeScreen ? 14.0 : 12.0) : 16.0;
+    final horizontalMargin = isTablet ? 2.0 : 4.0;
+    
     return Container(
-      width: 160,
-      margin: const EdgeInsets.symmetric(horizontal: 4),
+      width: cardWidth,
+      margin: EdgeInsets.symmetric(horizontal: horizontalMargin),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -1057,7 +1085,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
           },
           borderRadius: BorderRadius.circular(16),
           child: Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(cardPadding),
             decoration: BoxDecoration(
               gradient: gradient,
               borderRadius: BorderRadius.circular(16),
@@ -1072,13 +1100,13 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(icon, color: AppColors.cardBackgroundColor, size: 32),
+                Icon(icon, color: AppColors.cardBackgroundColor, size: iconSize),
                 const Spacer(),
                 Text(
                   title,
                   style: GoogleFonts.poppins(
                     color: AppColors.textOnPrimary,
-                    fontSize: 14,
+                    fontSize: titleFontSize,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -1087,7 +1115,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                   value != '0' ? '$value $unit' : '-',
                   style: GoogleFonts.poppins(
                     color: AppColors.textOnPrimary,
-                    fontSize: 20,
+                    fontSize: valueFontSize,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -1100,7 +1128,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                       controller.getHighlightDesc('charge') ?? '',
                       style: GoogleFonts.poppins(
                         color: AppColors.textOnPrimary,
-                        fontSize: 11,
+                        fontSize: descFontSize,
                         fontWeight: FontWeight.w400,
                       ),
                       overflow: TextOverflow.ellipsis,

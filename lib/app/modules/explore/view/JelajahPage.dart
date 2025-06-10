@@ -130,7 +130,7 @@ class _JelajahPageState extends State<JelajahPage> {
                         ? _buildSearchAppBar()
                         : Column(
                           children: [
-                            _buildNormalAppBar(),
+                            _buildNormalAppBar(context),
                             _buildTypeFilterChips(),
                           ],
                         ),
@@ -236,7 +236,13 @@ class _JelajahPageState extends State<JelajahPage> {
     );
   }
 
-  Widget _buildNormalAppBar() {
+  Widget _buildNormalAppBar(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600;
+    final isLargeScreen = screenWidth > 1200;
+
+    final double bodysmall = isLargeScreen ? 15 : isTablet ? 14 : 13;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       decoration: BoxDecoration(
@@ -306,7 +312,9 @@ class _JelajahPageState extends State<JelajahPage> {
           const SizedBox(height: 8),
           Text(
             'Temukan berbagai kendaraan listrik favorit Anda',
-            style: AppText.bodySmall.copyWith(color: AppColors.textSecondary),
+            style: AppText.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+              fontSize: bodysmall,),
           ),
         ],
       ),
@@ -418,6 +426,8 @@ class _JelajahPageState extends State<JelajahPage> {
                             color: AppColors.ChipTextColor(
                               isSelected: isSelected,
                             ),
+                          ).copyWith(
+                            fontSize: isTablet ? 8.sp : 13.sp,
                           ),
                         ),
                       ),
@@ -651,7 +661,7 @@ class _JelajahPageState extends State<JelajahPage> {
                   ),
                   Text(
                     '${brand.vehiclesCount} kendaraan',
-                    style: AppText.descListSearchItems.copyWith(
+                    style: AppText.descriptionListSearchItems.copyWith(
                       color: AppColors.textSecondary,
                     ),
                   ),
@@ -717,7 +727,7 @@ class _JelajahPageState extends State<JelajahPage> {
                   if (vehicle['brand'] != null)
                     Text(
                       vehicle['brand']['name'] ?? '',
-                      style: AppText.descListSearchItems.copyWith(
+                      style: AppText.descriptionListSearchItems.copyWith(
                         color: AppColors.textSecondary,
                       ),
                     ),
@@ -1073,7 +1083,7 @@ class _JelajahPageState extends State<JelajahPage> {
           Text(
             'Coba ubah kriteria pencarian atau filter Anda',
             textAlign: TextAlign.center,
-            style: AppText.descEmptyFilterResults.copyWith(
+            style: AppText.descriptionEmptyFilterResults.copyWith(
               color: AppColors.textTertiary,
             ),
           ),

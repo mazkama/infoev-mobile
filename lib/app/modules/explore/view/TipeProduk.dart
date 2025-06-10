@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:infoev/app/modules/explore/controllers/BrandDetailController.dart';
 import 'package:infoev/app/modules/explore/controllers/MerekController.dart';
 import 'package:infoev/app/modules/explore/model/VehicleModel.dart';
 import 'package:infoev/app/styles/app_colors.dart';
+import 'package:infoev/app/styles/app_text.dart';
 import 'package:shimmer/shimmer.dart';
 
 class TipeProdukPage extends StatefulWidget {
@@ -115,8 +117,17 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
   }
 
   Widget _buildAppBar(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600;
+    final isLargeScreen = screenWidth > 1200;
+    
+    // Responsive values
+    final double titleFontSize = isLargeScreen ? 22 : isTablet ? 21 : 20;
+    final double countFontSize = isLargeScreen ? 15 : isTablet ? 14 : 13;
+    final double padding = isLargeScreen ? 20 : isTablet ? 18 : 16;
+    
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      padding: EdgeInsets.fromLTRB(padding, padding, padding, 8),
       decoration: BoxDecoration(
         color: AppColors.cardBackgroundColor,
         boxShadow: [
@@ -135,9 +146,10 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.arrow_back_ios,
                       color: AppColors.textColor,
+                      size: isTablet ? 24 : 20,
                     ),
                     onPressed: () {
                       Get.back();
@@ -149,10 +161,10 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                   Obx(
                     () => Text(
                       controller.brandDetail.value?.nameBrand ?? 'Detail Merek',
-                      style: GoogleFonts.poppins(
-                        fontSize: 22,
+                      style: AppText.appBarTitle.copyWith(
                         fontWeight: FontWeight.bold,
                         color: AppColors.textColor,
+                        fontSize: titleFontSize,
                       ),
                     ),
                   ),
@@ -161,9 +173,10 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.search,
                       color: AppColors.primaryColor,
+                      size: isTablet ? 24 : 20,
                     ),
                     onPressed: () {
                       controller.toggleSearch();
@@ -176,9 +189,10 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                     },
                   ),
                   IconButton(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.filter_list,
                       color: AppColors.primaryColor,
+                      size: isTablet ? 24 : 20,
                     ),
                     onPressed: () {
                       _showFilterDialog(context);
@@ -197,9 +211,9 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                   controller.sortOrder.value != 'asc',
               child: Container(
                 margin: const EdgeInsets.only(top: 8),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
+                padding: EdgeInsets.symmetric(
+                  horizontal: isTablet ? 16 : 12,
+                  vertical: isTablet ? 10 : 8,
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.backgroundSecondary,
@@ -210,9 +224,9 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                     Expanded(
                       child: Text(
                         _buildFilterInfoText(),
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
+                        style: AppText.bodySmall.copyWith(
                           color: AppColors.textSecondary,
+                          fontSize: isTablet ? 14 : 12,
                         ),
                       ),
                     ),
@@ -220,12 +234,12 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                       onTap: () {
                         controller.resetFilters();
                       },
-                      child: const Padding(
-                        padding: EdgeInsets.all(4.0),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
                         child: Icon(
                           Icons.close,
                           color: AppColors.textSecondary,
-                          size: 16,
+                          size: isTablet ? 18 : 16,
                         ),
                       ),
                     ),
@@ -238,9 +252,9 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
           Obx(
             () => Text(
               'Menampilkan ${controller.filteredVehicles.length} dari ${controller.brandDetail.value?.vehicles.length ?? 0} kendaraan',
-              style: GoogleFonts.poppins(
-                fontSize: 12,
+              style: AppText.bodySmall.copyWith(
                 color: AppColors.textSecondary,
+                fontSize: countFontSize,
               ),
             ),
           ),
@@ -250,6 +264,9 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
   }
 
   Widget _buildSearchBar() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600;
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       color: AppColors.cardBackgroundColor,
@@ -264,14 +281,22 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
         },
         autofocus: true,
         focusNode: _searchFocusNode,
-        style: GoogleFonts.poppins(color: AppColors.textColor),
+        style: AppText.searchPageTitle.copyWith(
+          color: AppColors.textColor, 
+          fontSize: isTablet ? 18 : 16,
+        ),
         decoration: InputDecoration(
+          fillColor: AppColors.cardBackgroundColor,
           hintText: 'Cari kendaraan...',
-          hintStyle: GoogleFonts.poppins(color: AppColors.textTertiary),
+          hintStyle: AppText.searchPageTitle.copyWith(
+            color: AppColors.textTertiary, 
+            fontSize: isTablet ? 18 : 16,
+          ),
           prefixIcon: IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_back_ios,
               color: AppColors.textSecondary,
+              size: isTablet ? 24 : 20,
             ),
             onPressed: () {
               controller.isSearching.value = false;
@@ -284,9 +309,10 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
             builder: (context, value, child) {
               return value.text.isNotEmpty
                   ? IconButton(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.close,
                       color: AppColors.textSecondary,
+                      size: isTablet ? 24 : 20,
                     ),
                     onPressed: () {
                       _searchController.clear();
@@ -303,9 +329,9 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
             },
           ),
           filled: true,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 10,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: isTablet ? 18 : 16,
+            vertical: isTablet ? 12 : 10,
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
@@ -413,7 +439,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
               padding: const EdgeInsets.all(12),
               sliver: SliverGrid(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: screenWidth > 600 ? 3 : 2,
+                  crossAxisCount: screenWidth >= 600 ? 4 : 2,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
                   childAspectRatio: 0.7,
@@ -506,10 +532,8 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
               right: 16,
               child: Text(
                 controller.brandDetail.value?.nameBrand ?? '',
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
+                style: AppText.displaySmall.copyWith(
+                  color: AppColors.textOnPrimary,
                   shadows: [
                     Shadow(blurRadius: 10, color: AppColors.shadowMedium),
                   ],
@@ -523,8 +547,18 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
   }
 
   Widget _buildTypeFilterChips() {
+    // Get screen width for responsive design
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600;
+    final isLargeScreen = screenWidth > 1200;
+    
+    // Responsive values
+    final double chipHeight = isLargeScreen ? 44 : isTablet ? 42 : 40;
+    final double horizontalPadding = isLargeScreen ? 20 : isTablet ? 18 : 16;
+    final double verticalPadding = isLargeScreen ? 10 : isTablet ? 9 : 8;
+    
     return Container(
-      height: 40,
+      height: chipHeight,
       margin: const EdgeInsets.symmetric(horizontal: 12),
       child: Obx(() {
         if (controller.vehicleTypes.isEmpty) {
@@ -583,18 +617,14 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            controller.filterByTypeId.value == id
-                                ? AppColors.secondaryColor.withAlpha(45)
-                                : AppColors.backgroundSecondary,
-                        foregroundColor:
-                            controller.filterByTypeId.value == id
-                                ? AppColors.secondaryColor
-                                : AppColors.textColor,
+                        backgroundColor: AppColors.ChipButtonColor(
+                          isSelected: controller.filterByTypeId.value == id),
+                        foregroundColor: AppColors.ChipTextColor(
+                          isSelected: controller.filterByTypeId.value == id),
                         elevation: 0,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: horizontalPadding,
+                          vertical: verticalPadding,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -602,13 +632,14 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                       ),
                       child: Text(
                         id == 0 ? name : '$name ($count)',
-                        style: GoogleFonts.poppins(
-                          fontWeight:
-                              controller.filterByTypeId.value == id
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                          fontSize: 12,
-                        ),
+                        style: AppText.filterChipStyle(
+                            isSelected: controller.filterByTypeId.value == id,
+                            color: AppColors.ChipTextColor(
+                              isSelected: controller.filterByTypeId.value == id,
+                            ),
+                          ).copyWith(
+                            fontSize: isTablet ? 8.sp : 13.sp,
+                          ),
                       ),
                     ),
                   );
@@ -709,27 +740,33 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                     ),
                     // Type badge
                     if (typeName.isNotEmpty)
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryColor.withAlpha(179),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            typeName,
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
+                      Builder(
+                        builder: (context) {
+                          final screenWidth = MediaQuery.of(context).size.width;
+                          final isTablet = screenWidth >= 600;
+                          
+                          return Positioned(
+                            top: isTablet ? 6 : 8,
+                            right: isTablet ? 6 : 8,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: isTablet ? 6 : 8,
+                                vertical: isTablet ? 3 : 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryColor.withAlpha(179),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                typeName,
+                                style: AppText.labelSmall.copyWith(
+                                  color: Colors.white,
+                                  fontSize: isTablet ? 5.sp : 10.sp,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       ),
                   ],
                 ),
@@ -742,19 +779,25 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (year.isNotEmpty)
-                      Text(
-                        year,
-                        style: GoogleFonts.poppins(
-                          color: AppColors.textOnPrimary,
-                          fontSize: 12,
-                        ),
+                      Builder(
+                        builder: (context) {
+                          final screenWidth = MediaQuery.of(context).size.width;
+                          final isTablet = screenWidth >= 600;
+                          
+                          return Text(
+                            year,
+                            style: AppText.vehicleCount.copyWith(
+                              color: AppColors.textOnPrimary,
+                              fontSize: isTablet ? 8.sp : 14.sp,
+                            ),
+                          );
+                        },
                       ),
                     Text(
                       vehicle.name,
-                      style: GoogleFonts.poppins(
-                        color: AppColors.textOnPrimary,
-                        fontWeight: FontWeight.bold,
+                      style: AppText.brandCardTitle.copyWith(
                         fontSize: 14,
+                        color: AppColors.textOnPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -770,35 +813,49 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
   }
 
   Widget _buildEmptyFilterResults() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600;
+    final isLargeScreen = screenWidth > 1200;
+    
+    // Responsive values
+    final double iconSize = isLargeScreen ? 80 : isTablet ? 72 : 64;
+    final double titleFontSize = isLargeScreen ? 18.sp : isTablet ? 16.sp : 16.sp;
+    final double descriptionFontSize = isLargeScreen ? 14.sp : isTablet ? 10.sp : 10.sp;
+    final double spacing1 = isLargeScreen ? 20 : isTablet ? 18 : 16;
+    final double spacing2 = isLargeScreen ? 12 : isTablet ? 10 : 8;
+    final double spacing3 = isLargeScreen ? 32 : isTablet ? 28 : 24;
+    final double buttonPaddingH = isLargeScreen ? 32 : isTablet ? 28 : 24;
+    final double buttonPaddingV = isLargeScreen ? 16 : isTablet ? 14 : 12;
+    final double retryButton = isLargeScreen ? 14.sp : isTablet ? 12.sp : 12.sp;
+    
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.filter_alt_off,
-            size: 64,
+            size: iconSize,
             color: AppColors.secondaryColor,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: spacing1),
           Text(
             'Tidak ada kendaraan yang sesuai',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+            style: AppText.titleEmptyFilterResults.copyWith(
               color: AppColors.textTertiary,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+              fontSize: titleFontSize,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: spacing2),
           Text(
             'Coba ubah kriteria pencarian atau filter Anda',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+            style: AppText.descriptionEmptyFilterResults.copyWith(
               color: AppColors.textTertiary,
-              fontSize: 14,
+              fontSize: descriptionFontSize,
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: spacing3),
           ElevatedButton(
             onPressed: () {
               controller.resetFilters();
@@ -806,14 +863,19 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: Colors.black,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: EdgeInsets.symmetric(
+                horizontal: buttonPaddingH,
+                vertical: buttonPaddingV,
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
             child: Text(
               'Reset Filter',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+              style: AppText.buttonPrimary.copyWith(
+                fontSize: retryButton,
+                color: AppColors.textColor),
             ),
           ),
         ],
@@ -822,48 +884,69 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
   }
 
   Widget _buildErrorState() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600;
+    final isLargeScreen = screenWidth > 1200;
+    
+    // Responsive values
+    final double iconSize = isLargeScreen ? 80 : isTablet ? 72 : 64;
+    final double titleFontSize = isLargeScreen ? 18.sp : isTablet ? 16.sp : 16.sp;
+    final double descriptionFontSize = isLargeScreen ? 14.sp : isTablet ? 10.sp : 10.sp;
+    final double spacing1 = isLargeScreen ? 20 : isTablet ? 18 : 16;
+    final double spacing2 = isLargeScreen ? 12 : isTablet ? 10 : 8;
+    final double spacing3 = isLargeScreen ? 32 : isTablet ? 28 : 24;
+    final double buttonPaddingH = isLargeScreen ? 32 : isTablet ? 28 : 24;
+    final double buttonPaddingV = isLargeScreen ? 16 : isTablet ? 14 : 12;
+    final double retryButton = isLargeScreen ? 14.sp : isTablet ? 12.sp : 12.sp;
+    
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.signal_wifi_off,
-            size: 64,
+            size: iconSize,
             color: AppColors.secondaryColor,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: spacing1),
           Text(
             'Gagal memuat data',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+             style: AppText.bodyLarge.copyWith(
               color: AppColors.textTertiary,
-              fontSize: 16,
+              fontSize: titleFontSize,
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: spacing2),
           Text(
-            controller.errorMessage.value,
+            // controller.errorMessage.value,
+            'Pastikan koneksi internet Anda stabil',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+            style: AppText.bodyLarge.copyWith(
               color: AppColors.textTertiary,
-              fontSize: 14,
+              fontSize: descriptionFontSize,
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: spacing3),
           ElevatedButton(
             onPressed: () => controller.refreshData(),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: Colors.black,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: EdgeInsets.symmetric(
+                horizontal: buttonPaddingH,
+                vertical: buttonPaddingV,
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
             child: Text(
               'Coba Lagi',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+              style: AppText.buttonPrimary.copyWith(
+                fontSize: retryButton,
+                color: AppColors.textColor),
             ),
           ),
         ],
@@ -908,7 +991,7 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
           padding: const EdgeInsets.all(12),
           sliver: SliverGrid(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: screenWidth > 600 ? 3 : 2,
+              crossAxisCount: screenWidth >= 600 ? 4 : 2,
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
               childAspectRatio: 0.7,
@@ -932,6 +1015,14 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
   }
 
   void _showFilterDialog(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600;
+    final isLargeScreen = screenWidth > 1200;
+    
+    // Responsive values for dialog
+    final double titleFontSize = isLargeScreen ? 28 : isTablet ? 24 : 16;
+    final double bodyFontSize = isLargeScreen ? 16 : isTablet ? 14 : 14;
+    
     String sortBy = controller.sortBy.value;
     String sortOrder = controller.sortOrder.value;
 
@@ -944,9 +1035,10 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
               backgroundColor: AppColors.cardBackgroundColor,
               title: Text(
                 'Filter Kendaraan',
-                style: GoogleFonts.poppins(
+                style: AppText.titleDialog.copyWith(
                   color: AppColors.textColor,
                   fontWeight: FontWeight.bold,
+                  fontSize: titleFontSize,
                 ),
               ),
               content: Column(
@@ -955,7 +1047,10 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                 children: [
                   Text(
                     'Urutkan Berdasarkan',
-                    style: GoogleFonts.poppins(color: AppColors.textColor),
+                    style: AppText.bodyDialog.copyWith(
+                      color: AppColors.textColor,
+                      fontSize: bodyFontSize,
+                      ),
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -964,19 +1059,23 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                         'Nama',
                         sortBy == 'name',
                         () => setState(() => sortBy = 'name'),
+                        isTablet,
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: isTablet ? 12 : 16),
                       _buildSortOption(
                         'Tahun',
                         sortBy == 'year',
                         () => setState(() => sortBy = 'year'),
+                        isTablet,
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'Arah Urutan',
-                    style: GoogleFonts.poppins(color: AppColors.textColor),
+                    style: AppText.bodyDialog.copyWith(
+                      fontSize: bodyFontSize,
+                      color: AppColors.textColor),
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -985,12 +1084,14 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                         'Naik ↑',
                         sortOrder == 'asc',
                         () => setState(() => sortOrder = 'asc'),
+                        isTablet,
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: isTablet ? 12 : 16),
                       _buildSortOption(
                         'Turun ↓',
                         sortOrder == 'desc',
                         () => setState(() => sortOrder = 'desc'),
+                        isTablet,
                       ),
                     ],
                   ),
@@ -1000,7 +1101,9 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                 TextButton(
                   child: Text(
                     'Reset',
-                    style: GoogleFonts.poppins(color: AppColors.textSecondary),
+                    style: AppText.bodyDialog.copyWith(
+                      fontSize: bodyFontSize,
+                      color: AppColors.textSecondary),
                   ),
                   onPressed: () {
                     setState(() {
@@ -1016,7 +1119,11 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
                   ),
                   child: Text(
                     'Terapkan',
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+                    style: AppText.bodyDialog.copyWith(
+                      fontSize: bodyFontSize,
+                      color: AppColors.textOnPrimary,
+                      fontWeight: FontWeight.bold
+                      ),
                   ),
                   onPressed: () {
                     controller.sortVehicles(sortBy, sortOrder);
@@ -1031,24 +1138,27 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
     );
   }
 
-  Widget _buildSortOption(String label, bool isSelected, VoidCallback onTap) {
+  Widget _buildSortOption(String label, bool isSelected, VoidCallback onTap, bool isTablet) {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: EdgeInsets.symmetric(
+          horizontal: isTablet ? 16 : 12,
+          vertical: isTablet ? 6 : 8,
+        ),
         decoration: BoxDecoration(
           color:
               isSelected
                   ? AppColors.primaryColor
                   : AppColors.backgroundSecondary,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
           label,
           style: GoogleFonts.poppins(
             color: isSelected ? AppColors.textOnPrimary : AppColors.textColor,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            fontSize: 12,
+            fontSize: isTablet ? 8.sp : 14.sp,
           ),
         ),
       ),

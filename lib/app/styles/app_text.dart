@@ -52,12 +52,7 @@ class AppText {
   );
 
   /// Display Small - For subsection titles
-  static TextStyle get displaySmall => _poppinsStyle(
-    fontSize: 24,
-    fontWeight: FontWeight.w600,
-    height: 1.3,
-    letterSpacing: -0.2,
-  );
+  static TextStyle get displaySmall => _poppinsStyle(fontSize: 24, fontWeight: FontWeight.bold);
 
   // ============================================================================
   // HEADLINE TEXT STYLES (Page titles, card headers)
@@ -131,9 +126,7 @@ class AppText {
   /// Label Small - For small labels and captions
   static TextStyle get labelSmall => _poppinsStyle(
     fontSize: 10,
-    fontWeight: FontWeight.w500,
-    height: 1.3,
-    letterSpacing: 0.5,
+    fontWeight: FontWeight.w500
   );
 
   // ============================================================================
@@ -220,11 +213,11 @@ class AppText {
 
   static TextStyle get titleListSearchItems => _poppinsStyle(fontSize: 16, fontWeight: FontWeight.w600);
 
-  static TextStyle get descListSearchItems => _poppinsStyle(fontSize: 14);
+  static TextStyle get descriptionListSearchItems => _poppinsStyle(fontSize: 14);
 
   static TextStyle get titleEmptyFilterResults => _poppinsStyle(fontSize: 16, fontWeight: FontWeight.w600);
 
-  static TextStyle get descEmptyFilterResults => _poppinsStyle(fontSize: 16);
+  static TextStyle get descriptionEmptyFilterResults => _poppinsStyle(fontSize: 16);
 
   static TextStyle get titleDialog => _poppinsStyle(fontSize: 18, fontWeight: FontWeight.bold);
 
