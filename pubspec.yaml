@@ -49,6 +49,7 @@ dependencies:
   google_maps_flutter: ^2.12.1 
   firebase_core: ^3.13.1
   firebase_messaging: ^15.2.6
+  firebase_remote_config: ^5.4.5
   flutter_local_notifications: ^19.2.1
   path_provider: ^2.1.1
   carousel_slider: ^5.0.0

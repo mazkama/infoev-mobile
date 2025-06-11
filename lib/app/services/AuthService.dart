@@ -126,7 +126,7 @@ class AuthService {
   }
 
   // Endpoint logout pada backend
-  static const String logoutUrl =
+  static String logoutUrl =
       "$baseUrlDev/auth/logout";
 
   // Fungsi logout untuk menghapus data dan mengarahkan ke halaman login

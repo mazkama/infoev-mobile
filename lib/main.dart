@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:infoev/app/modules/explore/controllers/MerekController.dart';
 import 'package:infoev/app/modules/login/controllers/LoginController.dart';
+import 'package:infoev/app/modules/maintenance/views/maintenance_view.dart'; // Import view maintenance
 import 'package:infoev/app/routes/app_pages.dart';
+import 'package:infoev/app/services/ConfigService.dart';
 import 'package:infoev/app/styles/app_colors.dart';
 import 'package:infoev/core/local_db.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -16,16 +18,22 @@ void main() async {
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Initialize Notification Service
-  await NotificationService().init();
+  // Initialize ConfigService
+  bool configSuccess = await ConfigService().initialize();
 
-  // Subscribe to topics (customize these based on your needs)
-  await NotificationService().subscribeToTopic('infoev_news');
-  await NotificationService().subscribeToTopic('infoev_vehicle');
+  // Initialize other services only if config was successful
+  if (configSuccess) {
+    // Initialize Notification Service
+    await NotificationService().init();
 
-  // Get FCM token for device
-  String? token = await NotificationService().getToken();
-  print('FCM Token: $token'); // You can send this token to your backend
+    // Subscribe to topics
+    await NotificationService().subscribeToTopic('infoev_news');
+    await NotificationService().subscribeToTopic('infoev_vehicle');
+
+    // Get FCM token for device
+    String? token = await NotificationService().getToken();
+    print('FCM Token: $token');
+  }
 
   await LocalDB.init();
   
@@ -43,19 +51,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      // designSize: const Size(428, 926), // iPhone 12 Pro Max design size
-      // designSize: const Size(600, 976), // Advan Tab Ginio design size
-      designSize: const Size(393, 857), // Xiaomi Redmi note 10s design size
+      designSize: const Size(393, 857),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        // Debugging: Print current screen size
-        final screenSize = MediaQuery.of(context).size;
-        print('Current screen size: width=${screenSize.width}, height=${screenSize.height}');
-
         return GestureDetector(
           onTap: () {
-            // Menutup keyboard jika area di luar TextField disentuh
             FocusScope.of(context).unfocus();
           },
           child: GetMaterialApp(
@@ -67,7 +68,7 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
               colorScheme: AppColors.lightColorScheme,
               useMaterial3: true,
-              // Additional theme configurations using AppColors
+              // Additional theme configurations
               scaffoldBackgroundColor: AppColors.backgroundColor,
               cardColor: AppColors.cardBackgroundColor,
               dividerColor: AppColors.dividerColor,
@@ -77,20 +78,29 @@ class MyApp extends StatelessWidget {
                 foregroundColor: AppColors.textColor,
                 elevation: 0,
               ),
-              // ElevatedButton theme
+              // Button themes
               elevatedButtonTheme: ElevatedButtonThemeData(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.buttonPrimary,
                   foregroundColor: AppColors.textOnPrimary,
                 ),
               ),
-              // TextButton theme
               textButtonTheme: TextButtonThemeData(
                 style: TextButton.styleFrom(foregroundColor: AppColors.linkColor),
               ),
             ),
-            initialRoute: AppPages.INITIAL,
-            getPages: AppPages.routes,
+            // Cek maintenance mode dan tentukan route awal
+            initialRoute: ConfigService().isInMaintenanceMode 
+                ? '/maintenance' 
+                : AppPages.INITIAL,
+            getPages: [
+              ...AppPages.routes,
+              // Tambahkan route maintenance
+              GetPage(
+                name: '/maintenance',
+                page: () => const MaintenanceView(),
+              ),
+            ],
           ),
         );
       },

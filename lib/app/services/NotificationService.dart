@@ -17,9 +17,10 @@ class NotificationService {
     // Request permissions for iOS
     await _firebaseMessaging.requestPermission();
 
-    // Initialize local notifications
+    // Gunakan icon kustom jika tersedia di drawable
     const AndroidInitializationSettings androidInitSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@mipmap/launcher_icon'); 
+    
     const InitializationSettings initSettings = InitializationSettings(
       android: androidInitSettings,
     );
@@ -30,7 +31,7 @@ class NotificationService {
       _showNotification(message);
     });
 
-    // Handle background & terminated messages (when app is opened via notification)
+    // Handle when app is opened via notification
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       // Handle navigation or other logic here
     });
@@ -71,6 +72,7 @@ class NotificationService {
             importance: Importance.max,
             priority: Priority.high,
             showWhen: true,
+            icon: '@mipmap/launcher_icon', // Gunakan icon kustom
             styleInformation: BigPictureStyleInformation(
               FilePathAndroidBitmap(tempImagePath),
               hideExpandedLargeIcon: true,
@@ -85,6 +87,7 @@ class NotificationService {
             importance: Importance.max,
             priority: Priority.high,
             showWhen: true,
+            icon: '@mipmap/launcher_icon', // Gunakan icon kustom
           );
         }
 

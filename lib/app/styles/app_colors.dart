@@ -149,12 +149,10 @@ class AppColors {
     primary: primaryColor,
     secondary: secondaryColor,
     surface: surfaceColor,
-    background: backgroundColor,
     error: errorColor,
     onPrimary: textOnPrimary,
     onSecondary: textOnPrimary,
     onSurface: textColor,
-    onBackground: textColor,
     onError: textOnPrimary,
   );
 
@@ -164,12 +162,10 @@ class AppColors {
     primary: primaryLight,
     secondary: secondaryColor,
     surface: const Color(0xFF1F1F1F),
-    background: const Color(0xFF121212),
     error: errorColor,
     onPrimary: textOnPrimary,
     onSecondary: textColor,
     onSurface: textOnPrimary,
-    onBackground: textOnPrimary,
     onError: textOnPrimary,
   );
 }

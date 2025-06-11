@@ -1238,7 +1238,7 @@ class _JelajahPageState extends State<JelajahPage> {
                           128,
                         ),
                         radioTheme: RadioThemeData(
-                          fillColor: MaterialStateProperty.all(
+                          fillColor: WidgetStateProperty.all(
                             AppColors.primaryColor,
                           ),
                         ),
