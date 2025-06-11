@@ -69,7 +69,7 @@ class AuthService {
   ) async {
     try {
       final Uri url = Uri.parse(
-        "$baseUrlDev/auth/google/login",
+        "$prodUrl/auth/google/login",
       );
 
       final response = await http.post(
@@ -100,7 +100,7 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    final Uri url = Uri.parse("$baseUrlDev/auth/login");
+    final Uri url = Uri.parse("$prodUrl/auth/login");
 
     try {
       final response = await http.post(
@@ -127,7 +127,7 @@ class AuthService {
 
   // Endpoint logout pada backend
   static String logoutUrl =
-      "$baseUrlDev/auth/logout";
+      "$prodUrl/auth/logout";
 
   // Fungsi logout untuk menghapus data dan mengarahkan ke halaman login
   static Future<void> logout(BuildContext context) async {

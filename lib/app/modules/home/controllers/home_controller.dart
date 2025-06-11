@@ -78,7 +78,7 @@ class HomeController extends GetxController {
 
       // Lakukan satu API call untuk semua data
       final response = await http.get(
-        Uri.parse("$baseUrlDev"),
+        Uri.parse("$prodUrl"),
         headers: {'x-app-key': appKey},
       );
 

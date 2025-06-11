@@ -25,7 +25,7 @@ class RegisterController extends GetxController {
 
     try {
       final response = await http.post(
-        Uri.parse('$baseUrlDev/auth/register'),
+        Uri.parse('$prodUrl/auth/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'name': nameC.text.trim(),

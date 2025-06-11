@@ -170,7 +170,7 @@ class EVComparisonController extends GetxController {
       }
 
       final encodedQuery = Uri.encodeComponent(query);
-      final url = Uri.parse('$baseUrlDev/cari?q=$encodedQuery');
+      final url = Uri.parse('$prodUrl/cari?q=$encodedQuery');
       final res = await http.get(url, headers: {'x-app-key': appKey});
 
       if (res.statusCode == 200) {
@@ -211,7 +211,7 @@ class EVComparisonController extends GetxController {
       throw Exception('Gagal mendapatkan app_key');
     }
 
-    final url = Uri.parse('$baseUrlDev/$slug');
+    final url = Uri.parse('$prodUrl/$slug');
     final res = await http.get(url, headers: {'x-app-key': appKey});
     if (res.statusCode == 200) {
       return json.decode(res.body);

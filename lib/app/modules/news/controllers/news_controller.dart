@@ -132,7 +132,7 @@ class NewsController extends GetxController {
         isLoadingMoreAll.value = false;
         return;
       }
-      String url = "$baseUrlDev/berita?page=$currentPageAll";
+      String url = "$prodUrl/berita?page=$currentPageAll";
       print('[ENDPOINT] Fetch all news: $url');
       final response = await http.get(
         Uri.parse(url),
@@ -179,7 +179,7 @@ class NewsController extends GetxController {
         isLoadingMoreForYou.value = false;
         return;
       }
-      final url = "$baseUrlDev/berita?type=sticky&page=$currentPageForYou";
+      final url = "$prodUrl/berita?type=sticky&page=$currentPageForYou";
       print('[ENDPOINT] Fetch news for you: $url');
       final response = await http.get(
         Uri.parse(url),
@@ -227,7 +227,7 @@ class NewsController extends GetxController {
         return;
       }
       final url =
-          "$baseUrlDev/berita?type=tips_and_tricks&page=$currentPageTips";
+          "$prodUrl/berita?type=tips_and_tricks&page=$currentPageTips";
       print('[ENDPOINT] Fetch news tips and tricks: $url');
       final response = await http.get(
         Uri.parse(url),
@@ -269,7 +269,7 @@ class NewsController extends GetxController {
         isLoading.value = false;
         return;
       }
-      final url = "$baseUrlDev/berita?q=$query";
+      final url = "$prodUrl/berita?q=$query";
       print('[ENDPOINT] Search news: $url');
       final response = await http.get(
         Uri.parse(url),

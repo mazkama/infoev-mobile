@@ -75,7 +75,7 @@ class VehicleDetailController extends GetxController {
       return false;
     }
 
-    final url = Uri.parse('$baseUrlDev/comment/store');
+    final url = Uri.parse('$prodUrl/comment/store');
     
     // Dapatkan headers dengan app_key dan token
     final headers = await _getAuthHeaders();
@@ -121,7 +121,7 @@ class VehicleDetailController extends GetxController {
       final headers = await _getAuthHeaders();
 
       final response = await http.get(
-        Uri.parse('$baseUrlDev/$slug'),
+        Uri.parse('$prodUrl/$slug'),
         headers: headers,
       );
 
@@ -154,7 +154,7 @@ class VehicleDetailController extends GetxController {
               (vehicleData['pictures'] as List)
                   .map(
                     (pic) =>
-                        '$baseUrlDevOri/storage/${pic['path']}',
+                        '$baseUrl/storage/${pic['path']}',
                   )
                   .toList();
         }

@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:infoev/app/modules/charger_station/model/ChargerStationModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:infoev/app/services/app_token_service.dart'; // Tambahkan import ini
-import 'package:infoev/core/halper.dart'; // Jika butuh baseUrlDev
+import 'package:infoev/core/halper.dart'; // Jika butuh prodUrl
 
 // City suggestion model
 class CitySuggestion {
@@ -111,7 +111,7 @@ class ChargerStationController extends GetxController {
 
       final response = await http
           .get(
-            Uri.parse('$baseUrlDev/charger/search?wilayah=$encodedLocation'),
+            Uri.parse('$prodUrl/charger/search?wilayah=$encodedLocation'),
             headers: {'Accept': 'application/json', 'x-app-key': appKey},
           )
           .timeout(const Duration(seconds: 15));
@@ -237,7 +237,7 @@ class ChargerStationController extends GetxController {
 
       final response = await http
           .get(
-            Uri.parse('$baseUrlDev/cities/search?cari=$encodedQuery'),
+            Uri.parse('$prodUrl/cities/search?cari=$encodedQuery'),
             headers: {'Accept': 'application/json', 'x-app-key': appKey},
           )
           .timeout(const Duration(seconds: 10));

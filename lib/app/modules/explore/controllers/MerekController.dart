@@ -166,7 +166,7 @@ class MerekController extends GetxController {
         final typeSlug = getTypeSlug(typeId);
         if (typeSlug != null) {
           final response = await http.get(
-            Uri.parse('$baseUrlDev/tipe/$typeSlug'),
+            Uri.parse('$prodUrl/tipe/$typeSlug'),
             headers: headers, // Gunakan headers dengan app_key
           );
           if (response.statusCode == 200) {
@@ -415,7 +415,7 @@ class MerekController extends GetxController {
       final headers = await _getAuthHeaders(); // Tambahkan app_key header
       
       final response = await http.get(
-        Uri.parse('$baseUrlDev/merek'),
+        Uri.parse('$prodUrl/merek'),
         headers: headers, // Gunakan headers dengan app_key
       );
 
@@ -561,7 +561,7 @@ class MerekController extends GetxController {
           final headers = await _getAuthHeaders(); // Tambahkan app_key header
           
           final response = await http.get(
-            Uri.parse('$baseUrlDev/tipe/$typeSlug'),
+            Uri.parse('$prodUrl/tipe/$typeSlug'),
             headers: headers, // Gunakan headers dengan app_key
           );
           if (response.statusCode == 200) {
@@ -717,7 +717,7 @@ class MerekController extends GetxController {
       final headers = await _getAuthHeaders(); // Tambahkan app_key header
       
       final response = await http.get(
-        Uri.parse('$baseUrlDev/merek/$slug'),
+        Uri.parse('$prodUrl/merek/$slug'),
         headers: headers, // Gunakan headers dengan app_key
       );
 
@@ -910,10 +910,10 @@ class MerekController extends GetxController {
   }
 
   final Map<String, String> typeEndpoints = {
-    'mobil': '$baseUrlDev/tipe/mobil',
-    'sepeda-motor': '$baseUrlDev/tipe/sepeda-motor',
-    'sepeda': '$baseUrlDev/tipe/sepeda',
-    'skuter': '$baseUrlDev/tipe/skuter',
+    'mobil': '$prodUrl/tipe/mobil',
+    'sepeda-motor': '$prodUrl/tipe/sepeda-motor',
+    'sepeda': '$prodUrl/tipe/sepeda',
+    'skuter': '$prodUrl/tipe/skuter',
   };
 
   // Method untuk load data tipe yang dipanggil dari jelajah.dart

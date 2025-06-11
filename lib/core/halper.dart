@@ -2,18 +2,13 @@ import 'package:http/http.dart' as http;
 import 'package:infoev/app/services/ConfigService.dart'; 
 
 // Tambahkan getter untuk nilai dinamis
-String get baseUrlDev => ConfigService().apiUrl;
-String get baseUrlDevOri => ConfigService().baseUrl;
-String get baseUrl => ConfigService().prodUrl;
-
-// Untuk backward compatibility, tetap pertahankan konstanta
-const String _baseUrlDevStatic = "https://infoev.mazkama.web.id/api";
-const String _baseUrlDevOriStatic = "https://infoev.mazkama.web.id";
-const String _baseUrlStatic = "https://infoev.id/api";
+String get devUrl => ConfigService().devUrl;
+String get baseUrl => ConfigService().baseUrl;
+String get prodUrl => ConfigService().prodUrl; 
 
 // Function for environment-specific URL
-String getApiUrl({bool isProduction = false}) {
-  return isProduction ? ConfigService().prodUrl : ConfigService().apiUrl;
+String getDevUrl({bool isProduction = false}) {
+  return isProduction ? ConfigService().prodUrl : ConfigService().devUrl;
 }
 
 extension HttpResponseExtension on http.Response {

@@ -132,7 +132,7 @@ class FavoriteVehicleController extends GetxController {
       }
 
       final response = await http.get(
-        Uri.parse('$baseUrlDev/favorites?page=$currentPage'),
+        Uri.parse('$prodUrl/favorites?page=$currentPage'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
@@ -187,7 +187,7 @@ class FavoriteVehicleController extends GetxController {
 
     try {
       final response = await http.post(
-        Uri.parse('$baseUrlDev/favorites'),
+        Uri.parse('$prodUrl/favorites'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
@@ -227,7 +227,7 @@ class FavoriteVehicleController extends GetxController {
 
     try {
       final response = await http.delete(
-        Uri.parse('$baseUrlDev/favorites/$vehicleId'),
+        Uri.parse('$prodUrl/favorites/$vehicleId'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',

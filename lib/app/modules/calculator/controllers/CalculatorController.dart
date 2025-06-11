@@ -109,7 +109,7 @@ class CalculatorController extends GetxController {
       }
 
       final response = await http.get(
-        Uri.parse('$baseUrlDev/cari?q=$query'),
+        Uri.parse('$prodUrl/cari?q=$query'),
         headers: {'Accept': 'application/json', 'x-app-key': appKey},
       );
 
@@ -181,7 +181,7 @@ class CalculatorController extends GetxController {
       }
 
       final response = await http.get(
-        Uri.parse('$baseUrlDev/$slug'),
+        Uri.parse('$prodUrl/$slug'),
         headers: {'Accept': 'application/json', 'x-app-key': appKey},
       );
 

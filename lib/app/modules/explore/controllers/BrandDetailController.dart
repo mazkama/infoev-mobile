@@ -40,10 +40,10 @@ class BrandDetailController extends GetxController {
 
   // List of endpoints
   final Map<String, String> typeEndpoints = {
-    'mobil': '$baseUrlDev/tipe/mobil',
-    'sepeda-motor': '$baseUrlDev/tipe/sepeda-motor',
-    'sepeda': '$baseUrlDev/tipe/sepeda',
-    'skuter': '$baseUrlDev/tipe/skuter',
+    'mobil': '$prodUrl/tipe/mobil',
+    'sepeda-motor': '$prodUrl/tipe/sepeda-motor',
+    'sepeda': '$prodUrl/tipe/sepeda',
+    'skuter': '$prodUrl/tipe/skuter',
   };
 
   // Mendapatkan kisaran harga kendaraan berdasarkan slug
@@ -90,7 +90,7 @@ class BrandDetailController extends GetxController {
         try {
           final headers = await _getAuthHeaders();
           final response = await http.get(
-            Uri.parse("$baseUrlDev/merek"), 
+            Uri.parse("$prodUrl/merek"), 
             headers: headers
           );
           
@@ -202,7 +202,7 @@ class BrandDetailController extends GetxController {
     // Get brand details
     try {
       final brandResponse = await http.get(
-        Uri.parse("$baseUrlDev/merek/$brandSlug"),
+        Uri.parse("$prodUrl/merek/$brandSlug"),
         headers: headers,
       );
       if (brandResponse.statusCode == 200) {
@@ -293,7 +293,7 @@ class BrandDetailController extends GetxController {
       // Jika tidak ada cache atau cache tidak valid, fetch dari API dengan app_key
       final headers = await _getAuthHeaders();
       final response = await http.get(
-        Uri.parse("$baseUrlDev/tipe"),
+        Uri.parse("$prodUrl/tipe"),
         headers: headers
       );
 
@@ -442,7 +442,7 @@ class BrandDetailController extends GetxController {
     try {
       final headers = await _getAuthHeaders();
       final response = await http.get(
-        Uri.parse('$baseUrlDev/${vehicle.slug}'),
+        Uri.parse('$prodUrl/${vehicle.slug}'),
         headers: headers
       );
       if (response.statusCode == 200) {
@@ -793,7 +793,7 @@ class BrandDetailController extends GetxController {
     try {
       final headers = await _getAuthHeaders();
       final response = await http.get(
-        Uri.parse("$baseUrlDev/tipe/$typeSlug"),
+        Uri.parse("$prodUrl/tipe/$typeSlug"),
         headers: headers
       );
 
