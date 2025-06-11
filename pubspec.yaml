@@ -94,6 +94,8 @@ flutter:
   assets:
   - assets/images/icon_google.png
   - assets/images/logo_infoev.png
+  - assets/images/ChargerStations.jpg
+  - assets/images/EVCalculator_Refine.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

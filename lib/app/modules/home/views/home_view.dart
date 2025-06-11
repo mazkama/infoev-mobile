@@ -746,18 +746,6 @@ class _HomePageState extends State<HomePage> {
                                             : 120,
                                     margin: const EdgeInsets.only(right: 8),
                                     decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          AppColors.primaryColor.withOpacity(
-                                            0.1,
-                                          ),
-                                          AppColors.secondaryColor.withOpacity(
-                                            0.05,
-                                          ),
-                                        ],
-                                      ),
                                       borderRadius: BorderRadius.circular(20),
                                       boxShadow: [
                                         BoxShadow(
@@ -774,72 +762,77 @@ class _HomePageState extends State<HomePage> {
                                         width: 1,
                                       ),
                                     ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: Stack(
                                         children: [
-                                          Container(
-                                            padding: const EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.primaryColor
-                                                  .withOpacity(0.1),
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
+                                          // Background Image
+                                          Positioned.fill(
+                                            child: Image.asset(
+                                              'assets/images/ChargerStations.jpg',
+                                              fit: MediaQuery.of(context).size.width >= 1200 
+                                                  ? BoxFit.none 
+                                                  : BoxFit.cover,
+                                              alignment: Alignment.center,
                                             ),
-                                            // TODO: Replace with custom image
-                                            // Optimal image size: 48x48 px (white background)
-                                            // For tablet: 56x56 px (white background)
-                                            child: Text(
-                                              '⚡',
-                                              style: TextStyle(
-                                                fontSize:
-                                                    MediaQuery.of(
-                                                              context,
-                                                            ).size.width >
-                                                            600
-                                                        ? 24
-                                                        : 20,
+                                          ),
+                                          // Gradient Overlay
+                                          Positioned.fill(
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.bottomCenter,
+                                                  end: Alignment.topCenter,
+                                                  colors: [
+                                                    AppColors.cardBackgroundColor.withOpacity(0.9),
+                                                    AppColors.cardBackgroundColor.withOpacity(0.7),
+                                                    Colors.transparent,
+                                                  ],
+                                                  stops: const [0.0, 0.4, 1.0],
+                                                ),
                                               ),
                                             ),
                                           ),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Charging Stations',
-                                                style: GoogleFonts.poppins(
-                                                  fontSize:
-                                                      MediaQuery.of(
-                                                                context,
-                                                              ).size.width >
-                                                              600
-                                                          ? 14
-                                                          : 13,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: AppColors.textColor,
+                                          // Content
+                                          Padding(
+                                            padding: const EdgeInsets.all(16),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                Text(
+                                                  'Charger Stations',
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize:
+                                                        MediaQuery.of(
+                                                                  context,
+                                                                ).size.width >
+                                                                600
+                                                            ? 14
+                                                            : 13,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: AppColors.textColor,
+                                                  ),
                                                 ),
-                                              ),
-                                              Text(
-                                                'Temukan lokasi charging',
-                                                style: GoogleFonts.poppins(
-                                                  fontSize:
-                                                      MediaQuery.of(
-                                                                context,
-                                                              ).size.width >
-                                                              600
-                                                          ? 10
-                                                          : 9,
-                                                  fontWeight: FontWeight.w400,
-                                                  color:
-                                                      AppColors.textSecondary,
+                                                Text(
+                                                  'Temukan lokasi charger',
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize:
+                                                        MediaQuery.of(
+                                                                  context,
+                                                                ).size.width >
+                                                                600
+                                                            ? 10
+                                                            : 9,
+                                                    fontWeight: FontWeight.w400,
+                                                    color:
+                                                        AppColors.textSecondary,
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -862,18 +855,6 @@ class _HomePageState extends State<HomePage> {
                                             : 120,
                                     margin: const EdgeInsets.only(left: 8),
                                     decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          AppColors.secondaryColor.withOpacity(
-                                            0.1,
-                                          ),
-                                          AppColors.primaryColor.withOpacity(
-                                            0.05,
-                                          ),
-                                        ],
-                                      ),
                                       borderRadius: BorderRadius.circular(20),
                                       boxShadow: [
                                         BoxShadow(
@@ -890,72 +871,77 @@ class _HomePageState extends State<HomePage> {
                                         width: 1,
                                       ),
                                     ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: Stack(
                                         children: [
-                                          Container(
-                                            padding: const EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.secondaryColor
-                                                  .withOpacity(0.1),
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
+                                          // Background Image
+                                          Positioned.fill(
+                                            child: Image.asset(
+                                              'assets/images/EVCalculator_Refine.jpg',
+                                              fit: MediaQuery.of(context).size.width >= 1200 
+                                                  ? BoxFit.none 
+                                                  : BoxFit.cover,
+                                              alignment: Alignment.center,
                                             ),
-                                            // TODO: Replace with custom image
-                                            // Optimal image size: 48x48 px (white background)
-                                            // For tablet: 56x56 px (white background)
-                                            child: Text(
-                                              '🧮',
-                                              style: TextStyle(
-                                                fontSize:
-                                                    MediaQuery.of(
-                                                              context,
-                                                            ).size.width >
-                                                            600
-                                                        ? 24
-                                                        : 20,
+                                          ),
+                                          // Gradient Overlay
+                                          Positioned.fill(
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.bottomCenter,
+                                                  end: Alignment.topCenter,
+                                                  colors: [
+                                                    AppColors.cardBackgroundColor.withOpacity(0.9),
+                                                    AppColors.cardBackgroundColor.withOpacity(0.7),
+                                                    Colors.transparent,
+                                                  ],
+                                                  stops: const [0.0, 0.4, 1.0],
+                                                ),
                                               ),
                                             ),
                                           ),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Kalkulator EV',
-                                                style: GoogleFonts.poppins(
-                                                  fontSize:
-                                                      MediaQuery.of(
-                                                                context,
-                                                              ).size.width >
-                                                              600
-                                                          ? 14
-                                                          : 13,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: AppColors.textColor,
+                                          // Content
+                                          Padding(
+                                            padding: const EdgeInsets.all(16),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                Text(
+                                                  'Kalkulator EV',
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize:
+                                                        MediaQuery.of(
+                                                                  context,
+                                                                ).size.width >
+                                                                600
+                                                            ? 14
+                                                            : 13,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: AppColors.textColor,
+                                                  ),
                                                 ),
-                                              ),
-                                              Text(
-                                                'Hitung biaya listrik',
-                                                style: GoogleFonts.poppins(
-                                                  fontSize:
-                                                      MediaQuery.of(
-                                                                context,
-                                                              ).size.width >
-                                                              600
-                                                          ? 10
-                                                          : 9,
-                                                  fontWeight: FontWeight.w400,
-                                                  color:
-                                                      AppColors.textSecondary,
+                                                Text(
+                                                  'Hitung biaya listrik',
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize:
+                                                        MediaQuery.of(
+                                                                  context,
+                                                                ).size.width >
+                                                                600
+                                                            ? 10
+                                                            : 9,
+                                                    fontWeight: FontWeight.w400,
+                                                    color:
+                                                        AppColors.textSecondary,
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ],
                                       ),
