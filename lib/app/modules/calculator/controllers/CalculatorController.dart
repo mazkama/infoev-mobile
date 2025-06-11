@@ -1,13 +1,19 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:infoev/app/widgets/login_alert_widget.dart';
 import 'package:infoev/core/halper.dart';
 import 'package:infoev/app/services/app_token_service.dart';
+import 'package:infoev/core/local_db.dart';
 
 class CalculatorController extends GetxController {
   final isLoading = false.obs;
   final hasError = false.obs;
   final errorMessage = ''.obs;
+  // Getter untuk status login
+  bool get isLoggedIn => LocalDB.getToken() != null;
 
   // Tambahkan AppTokenService
   late final AppTokenService _appTokenService;
@@ -48,6 +54,8 @@ class CalculatorController extends GetxController {
   void onInit() {
     super.onInit();
     _appTokenService = AppTokenService();
+    // Cek login status saat controller diinisialisasi
+    checkLoginStatus();
   }
 
   // Methods for search
@@ -62,6 +70,24 @@ class CalculatorController extends GetxController {
     isSearching.value = false;
     searchResults.clear();
     hasSearched.value = false;
+  }
+
+  // Metode untuk memeriksa status login
+  void checkLoginStatus() {
+    if (!isLoggedIn) {
+      // Tutup halaman kalkulator jika belum login
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Kembali ke halaman sebelumnya
+        Get.back();
+        
+        // Tampilkan dialog login
+        LoginAlertWidget.show(
+          title: 'Masuk untuk Menggunakan Kalkulator',
+          subtitle: 'Untuk mengakses kalkulator biaya, silakan login terlebih dahulu',
+          icon: Icons.calculate_rounded,
+        );
+      });
+    }
   }
 
   Future<void> performSearch(String query) async {

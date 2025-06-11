@@ -734,11 +734,10 @@ class _HomePageState extends State<HomePage> {
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
-                                    Get.put(
-                                      BottomNavController().changemenuselection(
-                                        2,
-                                      ),
-                                    );
+                                    // Menggunakan instance yang sudah terdaftar di Get
+                                    final navController =
+                                        Get.find<BottomNavController>();
+                                    navController.changemenuselection(2);
                                   },
                                   child: Container(
                                     height:
