@@ -100,17 +100,7 @@ class MerekController extends GetxController {
     _initializeData();
   }
   
-  // Helper method untuk mendapatkan header dengan app_key
-  Future<Map<String, String>> _getAuthHeaders() async {
-    final appKey = await _appTokenService.getAppKey();
-    if (appKey == null) {
-      throw Exception('Failed to get app_key');
-    }
-    return {
-      'Accept': 'application/json',
-      'x-app-key': appKey,
-    };
-  }
+  // Hapus/matikan _getAuthHeaders(), tidak perlu lagi
 
   Future<void> _initializeData() async {
     try {
@@ -159,15 +149,17 @@ class MerekController extends GetxController {
     try {
       Map<int, int> counts = {};
       final prefs = await SharedPreferences.getInstance();
-      final headers = await _getAuthHeaders(); // Tambahkan app_key header
 
       // Fetch counts for all types
       for (var typeId in [1, 2, 3, 5]) {
         final typeSlug = getTypeSlug(typeId);
         if (typeSlug != null) {
-          final response = await http.get(
-            Uri.parse('$prodUrl/tipe/$typeSlug'),
-            headers: headers, // Gunakan headers dengan app_key
+          final response = await _appTokenService.requestWithAutoRefresh(
+            requestFn: (appKey) => http.get(
+              Uri.parse('$prodUrl/tipe/$typeSlug'),
+              headers: {'Accept': 'application/json', 'x-app-key': appKey},
+            ),
+            platform: "android",
           );
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
@@ -412,11 +404,12 @@ class MerekController extends GetxController {
     isLoading.value = true;
 
     try {
-      final headers = await _getAuthHeaders(); // Tambahkan app_key header
-      
-      final response = await http.get(
-        Uri.parse('$prodUrl/merek'),
-        headers: headers, // Gunakan headers dengan app_key
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.get(
+          Uri.parse('$prodUrl/merek'),
+          headers: {'Accept': 'application/json', 'x-app-key': appKey},
+        ),
+        platform: "android",
       );
 
       if (response.statusCode == 200) {
@@ -558,11 +551,12 @@ class MerekController extends GetxController {
         }
 
         if (brandIds.isEmpty) {
-          final headers = await _getAuthHeaders(); // Tambahkan app_key header
-          
-          final response = await http.get(
-            Uri.parse('$prodUrl/tipe/$typeSlug'),
-            headers: headers, // Gunakan headers dengan app_key
+          final response = await _appTokenService.requestWithAutoRefresh(
+            requestFn: (appKey) => http.get(
+              Uri.parse('$prodUrl/tipe/$typeSlug'),
+              headers: {'Accept': 'application/json', 'x-app-key': appKey},
+            ),
+            platform: "android",
           );
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
@@ -714,11 +708,12 @@ class MerekController extends GetxController {
       }
 
       // Ambil dari API jika cache tidak ada atau sudah expired
-      final headers = await _getAuthHeaders(); // Tambahkan app_key header
-      
-      final response = await http.get(
-        Uri.parse('$prodUrl/merek/$slug'),
-        headers: headers, // Gunakan headers dengan app_key
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.get(
+          Uri.parse('$prodUrl/merek/$slug'),
+          headers: {'Accept': 'application/json', 'x-app-key': appKey},
+        ),
+        platform: "android",
       );
 
       if (response.statusCode == 200) {
@@ -783,8 +778,6 @@ class MerekController extends GetxController {
     searchQuery.value = query;
 
     try {
-      final headers = await _getAuthHeaders(); // Tambahkan app_key header
-      
       // Add to history
       addToSearchHistory(query);
 
@@ -806,9 +799,12 @@ class MerekController extends GetxController {
       final vehicleResults = <Map<String, dynamic>>[];
       for (var endpoint in typeEndpoints.entries) {
         try {
-          final response = await http.get(
-            Uri.parse('${endpoint.value}?search=$query'),
-            headers: headers, // Gunakan headers dengan app_key
+          final response = await _appTokenService.requestWithAutoRefresh(
+            requestFn: (appKey) => http.get(
+              Uri.parse('${endpoint.value}?search=$query'),
+              headers: {'Accept': 'application/json', 'x-app-key': appKey},
+            ),
+            platform: "android",
           );
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);

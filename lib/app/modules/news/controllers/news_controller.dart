@@ -125,18 +125,14 @@ class NewsController extends GetxController {
     if (!hasMoreAll.value || isLoadingMoreAll.value) return;
     isLoadingMoreAll.value = true;
     try {
-      // Ambil app_key dari service
-      final appKey = await _appTokenService.getAppKey();
-      if (appKey == null) {
-        isError.value = true;
-        isLoadingMoreAll.value = false;
-        return;
-      }
       String url = "$prodUrl/berita?page=$currentPageAll";
       print('[ENDPOINT] Fetch all news: $url');
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {'x-app-key': appKey},
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.get(
+          Uri.parse(url),
+          headers: {'x-app-key': appKey},
+        ),
+        platform: "android",
       );
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -172,18 +168,14 @@ class NewsController extends GetxController {
     if (!hasMoreForYou.value || isLoadingMoreForYou.value) return;
     isLoadingMoreForYou.value = true;
     try {
-      // Ambil app_key dari service
-      final appKey = await _appTokenService.getAppKey();
-      if (appKey == null) {
-        isError.value = true;
-        isLoadingMoreForYou.value = false;
-        return;
-      }
       final url = "$prodUrl/berita?type=sticky&page=$currentPageForYou";
       print('[ENDPOINT] Fetch news for you: $url');
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {'x-app-key': appKey},
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.get(
+          Uri.parse(url),
+          headers: {'x-app-key': appKey},
+        ),
+        platform: "android",
       );
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -219,19 +211,15 @@ class NewsController extends GetxController {
     if (!hasMoreTips.value || isLoadingMoreTips.value) return;
     isLoadingMoreTips.value = true;
     try {
-      // Ambil app_key dari service
-      final appKey = await _appTokenService.getAppKey();
-      if (appKey == null) {
-        isError.value = true;
-        isLoadingMoreTips.value = false;
-        return;
-      }
       final url =
           "$prodUrl/berita?type=tips_and_tricks&page=$currentPageTips";
       print('[ENDPOINT] Fetch news tips and tricks: $url');
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {'x-app-key': appKey},
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.get(
+          Uri.parse(url),
+          headers: {'x-app-key': appKey},
+        ),
+        platform: "android",
       );
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -262,18 +250,14 @@ class NewsController extends GetxController {
     searchQuery.value = query;
     currentFilter.value = 'all';
     try {
-      // Ambil app_key dari service
-      final appKey = await _appTokenService.getAppKey();
-      if (appKey == null) {
-        isError.value = true;
-        isLoading.value = false;
-        return;
-      }
       final url = "$prodUrl/berita?q=$query";
       print('[ENDPOINT] Search news: $url');
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {'x-app-key': appKey},
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.get(
+          Uri.parse(url),
+          headers: {'x-app-key': appKey},
+        ),
+        platform: "android",
       );
 
       if (response.statusCode == 200) {

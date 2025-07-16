@@ -43,21 +43,17 @@ class VehicleDetailController extends GetxController {
       fetchVehicleDetails(slug);
     }
   }
-  
-  // Helper method untuk mendapatkan header dengan app_key
-  Future<Map<String, String>> _getAuthHeaders() async {
-    final appKey = await _appTokenService.getAppKey();
+
+  // Helper untuk header Authorization (khusus jika butuh Bearer token user)
+  Future<Map<String, String>> _getAuthHeadersWithToken(String appKey) async {
     final token = LocalDB.getToken();
-    
     Map<String, String> headers = {
       'Accept': 'application/json',
-      'x-app-key': appKey ?? '',
+      'x-app-key': appKey,
     };
-    
     if (token != null && token.isNotEmpty) {
       headers['Authorization'] = 'Bearer $token';
     }
-    
     return headers;
   }
 
@@ -76,26 +72,23 @@ class VehicleDetailController extends GetxController {
     }
 
     final url = Uri.parse('$prodUrl/comment/store');
-    
-    // Dapatkan headers dengan app_key dan token
-    final headers = await _getAuthHeaders();
-    headers['Content-Type'] = 'application/json';
-
-    final body = jsonEncode({
-      'type': type,
-      'id': id,
-      'name': name,
-      'comment': comment,
-      'parent': parent,
-    });
-
-    print('Posting comment: $body');
 
     try {
-      final response = await http.post(
-        url,
-        headers: headers,
-        body: body,
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) async {
+          final headers = await _getAuthHeadersWithToken(appKey);
+          headers['Content-Type'] = 'application/json';
+          final body = jsonEncode({
+            'type': type,
+            'id': id,
+            'name': name,
+            'comment': comment,
+            'parent': parent,
+          });
+          print('Posting comment: $body');
+          return await http.post(url, headers: headers, body: body);
+        },
+        platform: "android",
       );
 
       if (response.statusCode == 201) {
@@ -117,12 +110,15 @@ class VehicleDetailController extends GetxController {
     hasError.value = false;
 
     try {
-      // Dapatkan headers dengan app_key dan token
-      final headers = await _getAuthHeaders();
-
-      final response = await http.get(
-        Uri.parse('$prodUrl/$slug'),
-        headers: headers,
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) async {
+          final headers = await _getAuthHeadersWithToken(appKey);
+          return await http.get(
+            Uri.parse('$prodUrl/$slug'),
+            headers: headers,
+          );
+        },
+        platform: "android",
       );
 
       if (response.statusCode == 200) {

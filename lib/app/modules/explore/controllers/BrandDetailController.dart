@@ -56,18 +56,6 @@ class BrandDetailController extends GetxController {
     fetchVehicleTypes();
   }
 
-  // Helper method to get headers with app_key
-  Future<Map<String, String>> _getAuthHeaders() async {
-    final appKey = await _appTokenService.getAppKey();
-    if (appKey == null) {
-      throw Exception('Failed to get app_key');
-    }
-    return {
-      'Accept': 'application/json',
-      'x-app-key': appKey,
-    };
-  }
-
   // Memuat detail merek berdasarkan brand ID
   Future<void> fetchBrandDetail(int brandId) async {
     String cacheKey = "${redisCacheKey}brand_$brandId";
@@ -88,12 +76,13 @@ class BrandDetailController extends GetxController {
       } else {
         // If not in cache, get from API with app_key
         try {
-          final headers = await _getAuthHeaders();
-          final response = await http.get(
-            Uri.parse("$prodUrl/merek"), 
-            headers: headers
+          final response = await _appTokenService.requestWithAutoRefresh(
+            requestFn: (appKey) => http.get(
+              Uri.parse("$prodUrl/merek"),
+              headers: {'Accept': 'application/json', 'x-app-key': appKey},
+            ),
+            platform: "android",
           );
-          
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
             final List<dynamic> items = data['items'] ?? [];
@@ -177,14 +166,16 @@ class BrandDetailController extends GetxController {
   Future<void> _fetchFreshData(int brandId, String brandSlug) async {
     debugPrint('Fetching fresh data for brand ID: $brandId');
     List<VehicleModel> allVehicles = [];
-    final headers = await _getAuthHeaders();
 
     // Fetch vehicles from all endpoints
     for (var endpoint in typeEndpoints.values) {
       try {
-        final response = await http.get(
-          Uri.parse(endpoint),
-          headers: headers
+        final response = await _appTokenService.requestWithAutoRefresh(
+          requestFn: (appKey) => http.get(
+            Uri.parse(endpoint),
+            headers: {'Accept': 'application/json', 'x-app-key': appKey},
+          ),
+          platform: "android",
         );
         if (response.statusCode == 200) {
           final data = jsonDecode(response.body);
@@ -201,9 +192,12 @@ class BrandDetailController extends GetxController {
 
     // Get brand details
     try {
-      final brandResponse = await http.get(
-        Uri.parse("$prodUrl/merek/$brandSlug"),
-        headers: headers,
+      final brandResponse = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.get(
+          Uri.parse("$prodUrl/merek/$brandSlug"),
+          headers: {'Accept': 'application/json', 'x-app-key': appKey},
+        ),
+        platform: "android",
       );
       if (brandResponse.statusCode == 200) {
         final brandData = jsonDecode(brandResponse.body);
@@ -291,10 +285,12 @@ class BrandDetailController extends GetxController {
       }
 
       // Jika tidak ada cache atau cache tidak valid, fetch dari API dengan app_key
-      final headers = await _getAuthHeaders();
-      final response = await http.get(
-        Uri.parse("$prodUrl/tipe"),
-        headers: headers
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.get(
+          Uri.parse("$prodUrl/tipe"),
+          headers: {'Accept': 'application/json', 'x-app-key': appKey},
+        ),
+        platform: "android",
       );
 
       if (response.statusCode == 200) {
@@ -440,10 +436,12 @@ class BrandDetailController extends GetxController {
   // Helper method to load year for a single vehicle
   Future<void> _loadSingleVehicleYear(VehicleModel vehicle) async {
     try {
-      final headers = await _getAuthHeaders();
-      final response = await http.get(
-        Uri.parse('$prodUrl/${vehicle.slug}'),
-        headers: headers
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.get(
+          Uri.parse('$prodUrl/${vehicle.slug}'),
+          headers: {'Accept': 'application/json', 'x-app-key': appKey},
+        ),
+        platform: "android",
       );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -791,10 +789,12 @@ class BrandDetailController extends GetxController {
   // Mendapatkan kendaraan berdasarkan tipe spesifik
   Future<void> fetchVehiclesByType(String typeSlug) async {
     try {
-      final headers = await _getAuthHeaders();
-      final response = await http.get(
-        Uri.parse("$prodUrl/tipe/$typeSlug"),
-        headers: headers
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.get(
+          Uri.parse("$prodUrl/tipe/$typeSlug"),
+          headers: {'Accept': 'application/json', 'x-app-key': appKey},
+        ),
+        platform: "android",
       );
 
       if (response.statusCode == 200) {
@@ -811,9 +811,7 @@ class BrandDetailController extends GetxController {
 
           // Filter berdasarkan brand_id agar hanya menampilkan kendaraan dari merek yang sedang dilihat
           final filteredByBrand =
-              allVehiclesOfType.where((vehicle) {
-                return vehicle.brandId == brandId;
-              }).toList();
+              allVehiclesOfType.where((vehicle) => vehicle.brandId == brandId).toList();
 
           // Update filtered vehicles
           filteredVehicles.value = filteredByBrand;

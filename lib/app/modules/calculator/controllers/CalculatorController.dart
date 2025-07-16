@@ -100,17 +100,13 @@ class CalculatorController extends GetxController {
     try {
       isSearchLoading.value = true;
 
-      // Ambil app_key dari service
-      final appKey = await _appTokenService.getAppKey();
-      if (appKey == null) {
-        hasError.value = true;
-        errorMessage.value = 'Gagal mendapatkan app_key';
-        return;
-      }
-
-      final response = await http.get(
-        Uri.parse('$prodUrl/cari?q=$query'),
-        headers: {'Accept': 'application/json', 'x-app-key': appKey},
+      final url = "$prodUrl/cari?q=$query";
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.get(
+          Uri.parse(url),
+          headers: {'Accept': 'application/json', 'x-app-key': appKey},
+        ),
+        platform: "android",
       );
 
       if (response.statusCode == 200) {
@@ -172,17 +168,13 @@ class CalculatorController extends GetxController {
     try {
       isLoading.value = true;
 
-      // Ambil app_key dari service
-      final appKey = await _appTokenService.getAppKey();
-      if (appKey == null) {
-        hasError.value = true;
-        errorMessage.value = 'Gagal mendapatkan app_key';
-        return;
-      }
-
-      final response = await http.get(
-        Uri.parse('$prodUrl/$slug'),
-        headers: {'Accept': 'application/json', 'x-app-key': appKey},
+      final url = "$prodUrl/$slug";
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.get(
+          Uri.parse(url),
+          headers: {'Accept': 'application/json', 'x-app-key': appKey},
+        ),
+        platform: "android",
       );
 
       if (response.statusCode == 200) {

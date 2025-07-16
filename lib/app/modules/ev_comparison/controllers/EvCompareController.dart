@@ -162,16 +162,15 @@ class EVComparisonController extends GetxController {
         }
       }
 
-      // Ambil app_key dari service
-      final appKey = await _appTokenService.getAppKey();
-      if (appKey == null) {
-        _showError('Gagal mendapatkan app_key');
-        return [];
-      }
-
       final encodedQuery = Uri.encodeComponent(query);
       final url = Uri.parse('$prodUrl/cari?q=$encodedQuery');
-      final res = await http.get(url, headers: {'x-app-key': appKey});
+      final res = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.get(
+          url,
+          headers: {'x-app-key': appKey},
+        ),
+        platform: "android",
+      );
 
       if (res.statusCode == 200) {
         final body = json.decode(res.body);
@@ -205,14 +204,14 @@ class EVComparisonController extends GetxController {
 
   // ────────────────────────────────────────────────────────────
   Future<Map<String, dynamic>> _fetchVehicleDetail(String slug) async {
-    // Ambil app_key dari service
-    final appKey = await _appTokenService.getAppKey();
-    if (appKey == null) {
-      throw Exception('Gagal mendapatkan app_key');
-    }
-
     final url = Uri.parse('$prodUrl/$slug');
-    final res = await http.get(url, headers: {'x-app-key': appKey});
+    final res = await _appTokenService.requestWithAutoRefresh(
+      requestFn: (appKey) => http.get(
+        url,
+        headers: {'x-app-key': appKey},
+      ),
+      platform: "android",
+    );
     if (res.statusCode == 200) {
       return json.decode(res.body);
     } else {

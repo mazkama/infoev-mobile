@@ -27,16 +27,46 @@ android {
         // Ganti applicationId sesuai dengan ID aplikasi yang unik
         applicationId = "id.ginio.infoev"
         // Pastikan ini sesuai dengan kebutuhan aplikasi Anda
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        minSdk = 21
+        targetSdk = 35
+        versionCode = 7
+        versionName = "1.0.7"
     }
+
+    signingConfigs {
+        val storePassword = System.getenv("KEYSTORE_PASSWORD")
+        val keyAlias = System.getenv("KEY_ALIAS")
+        val keyPassword = System.getenv("KEY_PASSWORD")
+
+        if (!storePassword.isNullOrEmpty() && !keyAlias.isNullOrEmpty() && !keyPassword.isNullOrEmpty()) {
+            val keystorePath = System.getenv("KEYSTORE_PATH") ?: "../../infoev-release.jks"
+
+            create("release") {
+                storeFile = file(keystorePath)
+                this.storePassword = storePassword
+                this.keyAlias = keyAlias
+                this.keyPassword = keyPassword
+            }
+        }
+    }
+
+
 
     buildTypes {
         release {
-            // Konfigurasi untuk release, jika perlu tambahkan signingConfig sesuai dengan keperluan
-            signingConfig = signingConfigs.getByName("debug")
+            // Enable these optimizations
+            isMinifyEnabled = true 
+            isShrinkResources = true
+            
+            // Recommended Play Store settings
+            // signingConfig = signingConfigs.getByName("release")
+
+            // Apply signingConfig only if it's defined
+            if (signingConfigs.findByName("release") != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     } 
 }

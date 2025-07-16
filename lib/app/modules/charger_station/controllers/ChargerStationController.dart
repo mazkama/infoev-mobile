@@ -100,21 +100,15 @@ class ChargerStationController extends GetxController {
 
       final encodedLocation = Uri.encodeComponent(location);
 
-      // Ambil app_key dari service
-      final appKey = await _appTokenService.getAppKey();
-      if (appKey == null) {
-        isLoading(false);
-        hasError(true);
-        errorMessage.value = "Gagal mendapatkan app_key";
-        return;
-      }
+      final url = "$prodUrl/charger/search?wilayah=$encodedLocation";
 
-      final response = await http
-          .get(
-            Uri.parse('$prodUrl/charger/search?wilayah=$encodedLocation'),
-            headers: {'Accept': 'application/json', 'x-app-key': appKey},
-          )
-          .timeout(const Duration(seconds: 15));
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.get(
+          Uri.parse(url),
+          headers: {'Accept': 'application/json', 'x-app-key': appKey},
+        ),
+        platform: "android",
+      );
 
       print("API Response status: ${response.statusCode}");
 
@@ -226,21 +220,15 @@ class ChargerStationController extends GetxController {
 
       final encodedQuery = Uri.encodeComponent(query);
 
-      // Ambil app_key dari service
-      final appKey = await _appTokenService.getAppKey();
-      if (appKey == null) {
-        citySuggestions.clear();
-        suggestionSource.value = "error";
-        print("Gagal mendapatkan app_key");
-        return;
-      }
+      final url = "$prodUrl/cities/search?cari=$encodedQuery";
 
-      final response = await http
-          .get(
-            Uri.parse('$prodUrl/cities/search?cari=$encodedQuery'),
-            headers: {'Accept': 'application/json', 'x-app-key': appKey},
-          )
-          .timeout(const Duration(seconds: 10));
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.get(
+          Uri.parse(url),
+          headers: {'Accept': 'application/json', 'x-app-key': appKey},
+        ),
+        platform: "android",
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);

@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:infoev/app/modules/explore/controllers/MerekController.dart';
 import 'package:infoev/app/modules/login/controllers/LoginController.dart';
-import 'package:infoev/app/modules/maintenance/views/maintenance_view.dart'; // Import view maintenance
+import 'package:infoev/app/modules/maintenance/views/maintenance_view.dart';
 import 'package:infoev/app/routes/app_pages.dart';
 import 'package:infoev/app/services/ConfigService.dart';
 import 'package:infoev/app/styles/app_colors.dart';
@@ -20,6 +20,12 @@ void main() async {
 
   // Initialize ConfigService
   bool configSuccess = await ConfigService().initialize();
+  
+  // Log current config values
+  ConfigService().debugConfig();
+  
+  // Debug main values
+  debugPrint("Main initialization: maintenance mode = ${ConfigService().isInMaintenanceMode}");
 
   // Initialize other services only if config was successful
   if (configSuccess) {
@@ -32,7 +38,7 @@ void main() async {
 
     // Get FCM token for device
     String? token = await NotificationService().getToken();
-    print('FCM Token: $token');
+    debugPrint('FCM Token: $token');
   }
 
   await LocalDB.init();

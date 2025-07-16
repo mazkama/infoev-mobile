@@ -69,17 +69,12 @@ class HomeController extends GetxController {
 
   Future<void> fetchAllHomeData() async {
     try {
-      // Ambil app_key dari service
-      final appKey = await _appTokenService.getAppKey();
-      if (appKey == null) {
-        isError.value = true;
-        return;
-      }
-
-      // Lakukan satu API call untuk semua data
-      final response = await http.get(
-        Uri.parse("$prodUrl"),
-        headers: {'x-app-key': appKey},
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.get(
+          Uri.parse("$prodUrl"),
+          headers: {'x-app-key': appKey},
+        ),
+        platform: "android",
       );
 
       if (response.statusCode == 200) {

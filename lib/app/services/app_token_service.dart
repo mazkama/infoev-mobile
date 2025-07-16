@@ -15,6 +15,25 @@ class AppTokenService {
 
   AppTokenService();
 
+  /// Helper universal untuk request dengan auto-refresh token jika expired
+  Future<http.Response> requestWithAutoRefresh({
+    required Future<http.Response> Function(String appKey) requestFn,
+    String platform = "android",
+  }) async {
+    String? appKey = await getAppKey();
+
+    http.Response response = await requestFn(appKey ?? '');
+
+    // Jika token expired/invalid, refresh dan ulangi sekali
+    if (response.statusCode == 401 || response.statusCode == 403) {
+      appKey = await fetchNewAppKey(platform: platform);
+      if (appKey != null) {
+        response = await requestFn(appKey);
+      }
+    }
+    return response;
+  }
+
   /// Get device id or create new one and save
   Future<String> getDeviceId() async {
     String? deviceId = await _storage.read(key: _deviceIdKey);

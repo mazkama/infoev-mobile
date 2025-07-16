@@ -41,50 +41,51 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyC7Wr13cCD347Khl8CV4KqZ_ZqpAA78Luo',
-    appId: '1:972401900948:web:dfcc3df7c9bd3301552381',
-    messagingSenderId: '972401900948',
-    projectId: 'infoev-456907',
-    authDomain: 'infoev-456907.firebaseapp.com',
-    storageBucket: 'infoev-456907.firebasestorage.app',
+    apiKey: 'AIzaSyBd2JRRLH97iMxgaSC5gkosjmG0yZhv_6Y',
+    appId: '1:769140553684:web:91e2f551ade16b506e4841',
+    messagingSenderId: '769140553684',
+    projectId: 'celtic-volt-462608-h5',
+    authDomain: 'celtic-volt-462608-h5.firebaseapp.com',
+    storageBucket: 'celtic-volt-462608-h5.firebasestorage.app',
+    measurementId: 'G-S0FSLFEH4R',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyD_a1bBEkFSAMMfRO6UgMvqA_Fb_8Ensd0',
-    appId: '1:972401900948:android:e343b9874d8bf02d552381',
-    messagingSenderId: '972401900948',
-    projectId: 'infoev-456907',
-    storageBucket: 'infoev-456907.firebasestorage.app',
+    apiKey: 'AIzaSyALwIklfJ089DHj10lko1j5Ajxc1DfBJfk',
+    appId: '1:769140553684:android:e336135f76803d1e6e4841',
+    messagingSenderId: '769140553684',
+    projectId: 'celtic-volt-462608-h5',
+    storageBucket: 'celtic-volt-462608-h5.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCjZhTPf4BgHbYk0gOwU50EJKoKpQ82RfU',
-    appId: '1:972401900948:ios:1e2c2352db51e75a552381',
-    messagingSenderId: '972401900948',
-    projectId: 'infoev-456907',
-    storageBucket: 'infoev-456907.firebasestorage.app',
-    androidClientId:
-        '972401900948-1bf48oentfq96pmtuq32hc44mbdio66e.apps.googleusercontent.com',
+    apiKey: 'AIzaSyAXbPoqDI2DpXAa5tK4xPcTRN4G4NoNesc',
+    appId: '1:769140553684:ios:6b6d2b94ca38fbfc6e4841',
+    messagingSenderId: '769140553684',
+    projectId: 'celtic-volt-462608-h5',
+    storageBucket: 'celtic-volt-462608-h5.firebasestorage.app',
+    androidClientId: '769140553684-76qk2u5kor561s1klo7gpvr0an34oahg.apps.googleusercontent.com',
     iosBundleId: 'id.ginio.infoev',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCjZhTPf4BgHbYk0gOwU50EJKoKpQ82RfU',
-    appId: '1:972401900948:ios:ebd0a97f256c8aa1552381',
-    messagingSenderId: '972401900948',
-    projectId: 'infoev-456907',
-    storageBucket: 'infoev-456907.firebasestorage.app',
-    androidClientId:
-        '972401900948-1bf48oentfq96pmtuq32hc44mbdio66e.apps.googleusercontent.com',
+    apiKey: 'AIzaSyAXbPoqDI2DpXAa5tK4xPcTRN4G4NoNesc',
+    appId: '1:769140553684:ios:ea8ed64f9f0b9b596e4841',
+    messagingSenderId: '769140553684',
+    projectId: 'celtic-volt-462608-h5',
+    storageBucket: 'celtic-volt-462608-h5.firebasestorage.app',
+    androidClientId: '769140553684-76qk2u5kor561s1klo7gpvr0an34oahg.apps.googleusercontent.com',
     iosBundleId: 'com.example.infoev',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyC7Wr13cCD347Khl8CV4KqZ_ZqpAA78Luo',
-    appId: '1:972401900948:web:2890bfafd221b127552381',
-    messagingSenderId: '972401900948',
-    projectId: 'infoev-456907',
-    authDomain: 'infoev-456907.firebaseapp.com',
-    storageBucket: 'infoev-456907.firebasestorage.app',
+    apiKey: 'AIzaSyBd2JRRLH97iMxgaSC5gkosjmG0yZhv_6Y',
+    appId: '1:769140553684:web:73ecf3cce6cd29016e4841',
+    messagingSenderId: '769140553684',
+    projectId: 'celtic-volt-462608-h5',
+    authDomain: 'celtic-volt-462608-h5.firebaseapp.com',
+    storageBucket: 'celtic-volt-462608-h5.firebasestorage.app',
+    measurementId: 'G-0JE6T48ZEX',
   );
+
 }

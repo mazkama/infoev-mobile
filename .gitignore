@@ -33,6 +33,9 @@ migrate_working_dir/
 .pub/
 /build/
 
+#key-release
+**/infoev-release.jks
+
 # Symbolication related
 app.*.symbols
 

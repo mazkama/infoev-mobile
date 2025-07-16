@@ -99,7 +99,6 @@ class FavoriteVehicleController extends GetxController {
 
   // Ambil daftar kendaraan favorit user
   Future<void> fetchFavoriteVehicles({bool reset = false}) async {
-    // Cegah fetch bersamaan, baik loading biasa atau loading more
     if (isLoading.value || isLoadingMore.value) return;
 
     if (reset) {
@@ -124,20 +123,16 @@ class FavoriteVehicleController extends GetxController {
         return;
       }
 
-      // Ambil app_key dari service
-      final appKey = await _appTokenService.getAppKey();
-      if (appKey == null) {
-        errorMessage.value = 'Gagal mendapatkan app_key';
-        return;
-      }
-
-      final response = await http.get(
-        Uri.parse('$prodUrl/favorites?page=$currentPage'),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-app-key': appKey,
-        },
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.get(
+          Uri.parse('$prodUrl/favorites?page=$currentPage'),
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer $token',
+            'x-app-key': appKey,
+          },
+        ),
+        platform: "android",
       );
 
       if (response.statusCode == 200) {
@@ -178,23 +173,19 @@ class FavoriteVehicleController extends GetxController {
       return;
     }
 
-    // Ambil app_key dari service
-    final appKey = await _appTokenService.getAppKey();
-    if (appKey == null) {
-      errorMessage.value = 'Gagal mendapatkan app_key';
-      return;
-    }
-
     try {
-      final response = await http.post(
-        Uri.parse('$prodUrl/favorites'),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-          'x-app-key': appKey,
-        },
-        body: json.encode({'vehicle_id': vehicleId}),
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.post(
+          Uri.parse('$prodUrl/favorites'),
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+            'x-app-key': appKey,
+          },
+          body: json.encode({'vehicle_id': vehicleId}),
+        ),
+        platform: "android",
       );
 
       if (response.statusCode == 201) {
@@ -218,21 +209,17 @@ class FavoriteVehicleController extends GetxController {
       return;
     }
 
-    // Ambil app_key dari service
-    final appKey = await _appTokenService.getAppKey();
-    if (appKey == null) {
-      errorMessage.value = 'Gagal mendapatkan app_key';
-      return;
-    }
-
     try {
-      final response = await http.delete(
-        Uri.parse('$prodUrl/favorites/$vehicleId'),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-app-key': appKey,
-        },
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.delete(
+          Uri.parse('$prodUrl/favorites/$vehicleId'),
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer $token',
+            'x-app-key': appKey,
+          },
+        ),
+        platform: "android",
       );
 
       if (response.statusCode == 200) {
