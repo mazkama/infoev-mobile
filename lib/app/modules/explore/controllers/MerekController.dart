@@ -125,6 +125,43 @@ class MerekController extends GetxController {
     }
   }
 
+  // Tambahkan fungsi cast<T> jika belum ada di file ini
+  T cast<T>(dynamic value, String fieldName) {
+    if (value == null) return null as T;
+    
+    // Handle int conversion
+    if ((T == int || RegExp(r'^int(\?|)$').hasMatch(T.toString()))) {
+      if (value is int) return value as T;
+      if (value is String) {
+        final intValue = int.tryParse(value);
+        if (intValue != null) return intValue as T;
+      }
+      // Jika gagal convert ke int dan tipe membolehkan null, return null
+      if (T.toString().contains('?')) return null as T;
+      // Jika tidak, gunakan nilai default untuk mencegah error
+      debugPrint('Warning: Failed to cast "$value" to int for field "$fieldName"');
+      return 0 as T; // Return default value daripada mencoba cast
+    }
+    
+    // Handle String dan tipe lainnya seperti sebelumnya
+    if ((T == String || RegExp(r'^String(\?|)$').hasMatch(T.toString()))) {
+      return value.toString() as T;
+    }
+    
+    if (value is T) return value;
+    
+    // Tambahkan try-catch untuk mencegah crash
+    try {
+      return value as T;
+    } catch (e) {
+      debugPrint('Cast error for field "$fieldName": $e');
+      if (T == int) return 0 as T;
+      if (T == String) return '' as T;
+      if (T == bool) return false as T;
+      throw Exception('Cannot cast ${value.runtimeType} to $T for field "$fieldName"');
+    }
+  }
+
   Future<void> _loadTypeCountsFromCache() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -134,7 +171,12 @@ class MerekController extends GetxController {
       if (countsStr != null && timestamp != null) {
         final cacheAge = DateTime.now().millisecondsSinceEpoch - timestamp;
         if (cacheAge < cacheValidity.inMilliseconds) {
-          final counts = Map<int, int>.from(jsonDecode(countsStr));
+          // Perbaikan: parsing Map<String, dynamic> lalu konversi ke Map<int, int>
+          final rawMap = Map<String, dynamic>.from(jsonDecode(countsStr));
+          final counts = <int, int>{};
+          rawMap.forEach((key, value) {
+            counts[cast<int>(key, 'brand_id')] = cast<int>(value, 'count');
+          });
           filterOptions['brandCounts'] = counts;
           update();
           return;
@@ -168,7 +210,7 @@ class MerekController extends GetxController {
             final Set<int> uniqueBrandIds = {};
             for (var vehicle in vehicles) {
               if (vehicle['brand_id'] != null) {
-                uniqueBrandIds.add(vehicle['brand_id'] as int);
+                uniqueBrandIds.add(cast<int>(vehicle['brand_id'], 'brand_id'));
               }
             }
 
@@ -178,16 +220,14 @@ class MerekController extends GetxController {
       }
 
       if (counts.isNotEmpty) {
-        // Update state
         filterOptions['brandCounts'] = counts;
-
-        // Save to cache
-        await prefs.setString('type_counts', jsonEncode(counts));
+        // Konversi key ke String agar bisa di-encode ke JSON
+        final countsStringKey = counts.map((k, v) => MapEntry(k.toString(), v));
+        await prefs.setString('type_counts', jsonEncode(countsStringKey));
         await prefs.setInt(
           'type_counts_timestamp',
           DateTime.now().millisecondsSinceEpoch,
         );
-
         update();
       }
     } catch (e) {
@@ -517,22 +557,39 @@ class MerekController extends GetxController {
       filterOptions['brandCounts'] = brandCounts;
     }
 
-    _applyFilters();
-    _saveFilterSettings();
+    // If typeId filter is applied and it's different from current, fetch type-specific brands first
+    if (options.containsKey('typeId') && options['typeId'] != null && options['typeId'] > 0) {
+      filterBrandsByType(options['typeId']).then((_) {
+        // Then apply other filters on top of type-filtered results
+        _applyFilters();
+        _saveFilterSettings();
+      });
+    } else if (options.containsKey('typeId') && (options['typeId'] == null || options['typeId'] == 0)) {
+      // Reset type filter - show all brands and apply other filters
+      filterOptions['typeId'] = 0;
+      filteredMerekList.clear();
+      _applyFilters();
+      _saveFilterSettings();
+    } else {
+      // No type filter change, just apply other filters
+      _applyFilters();
+      _saveFilterSettings();
+    }
   }
 
   Future<void> filterBrandsByType(int typeId) async {
     filterOptions['typeId'] = typeId;
 
     if (typeId == 0) {
+      // Reset to show all brands
       filteredMerekList.clear();
+      _applyFilters(); // Apply other filters to the full list
       return;
     }
 
     final typeSlug = getTypeSlug(typeId);
     if (typeSlug != null) {
       try {
-        // Cek cache dulu
         final prefs = await SharedPreferences.getInstance();
         final cacheKey = 'type_brands_$typeId';
         final cacheStr = prefs.getString(cacheKey);
@@ -545,7 +602,7 @@ class MerekController extends GetxController {
           if (cacheAge < cacheValidity.inMilliseconds) {
             brandIds =
                 (jsonDecode(cacheStr) as List<dynamic>)
-                    .map((id) => id as int)
+                    .map((id) => cast<int>(id, 'brand_id'))
                     .toSet();
           }
         }
@@ -564,7 +621,7 @@ class MerekController extends GetxController {
 
             for (var vehicle in vehicles) {
               if (vehicle['brand_id'] != null) {
-                brandIds.add(vehicle['brand_id'] as int);
+                brandIds.add(cast<int>(vehicle['brand_id'], 'brand_id'));
               }
             }
 
@@ -577,11 +634,9 @@ class MerekController extends GetxController {
           }
         }
 
-        // Filter merek list
         filteredMerekList.value =
             merekList.where((brand) => brandIds.contains(brand.id)).toList();
 
-        // Update count in brandCounts
         final counts =
             (filterOptions['brandCounts'] ?? {}) as Map<dynamic, dynamic>;
         counts[typeId] = brandIds.length;
@@ -633,7 +688,16 @@ class MerekController extends GetxController {
 
   // Apply all active filters
   void _applyFilters() {
-    List<MerekModel> filtered = List<MerekModel>.from(merekList);
+    List<MerekModel> filtered;
+
+    // Start with appropriate base list based on type filter
+    if (filterOptions.containsKey('typeId') && filterOptions['typeId'] != null && filterOptions['typeId'] > 0) {
+      // Use type-filtered list as base if type filter is active
+      filtered = List<MerekModel>.from(filteredMerekList.isEmpty ? merekList : filteredMerekList);
+    } else {
+      // Use full list as base if no type filter
+      filtered = List<MerekModel>.from(merekList);
+    }
 
     // Apply search filter
     if (searchQuery.value.isNotEmpty) {

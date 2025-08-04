@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:infoev/app/modules/explore/model/BrandDetailModel.dart';
+import 'package:infoev/app/modules/explore/model/BrandDetailModel.dart' as modelDetailBrand;
 import 'package:infoev/app/modules/explore/model/VehicleModel.dart';
 import 'package:infoev/app/modules/explore/model/VehicleTipeModel.dart';
 import 'package:infoev/core/halper.dart';
@@ -24,7 +24,7 @@ class BrandDetailController extends GetxController {
   final int cacheExpiration = 24 * 60 * 60 * 1000;
 
   // Brand data
-  var brandDetail = Rxn<BrandDetailModel>();
+  var brandDetail = Rxn<modelDetailBrand.BrandDetailModel>();
   var vehicleTypes = <VehicleTypeModel>[].obs;
 
   // Filter and sorting state
@@ -85,6 +85,7 @@ class BrandDetailController extends GetxController {
           );
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
+            debugPrint('Brand slug API response: $data');
             final List<dynamic> items = data['items'] ?? [];
             final brandItem = items
                 .cast<Map<String, dynamic>>()
@@ -122,7 +123,7 @@ class BrandDetailController extends GetxController {
           allVehicles = VehicleModel.fromJsonList(cachedData['vehicles']);
 
           // Load brand details from cache
-          brandDetail.value = BrandDetailModel(
+          brandDetail.value = modelDetailBrand.BrandDetailModel(
             vehicles: allVehicles,
             nameBrand: cachedData['name_brand'] ?? '',
             banner: cachedData['banner'] ?? '',
@@ -179,10 +180,20 @@ class BrandDetailController extends GetxController {
         );
         if (response.statusCode == 200) {
           final data = jsonDecode(response.body);
-          final vehicles =
-              (data['vehicles'] as List)
-                  .where((v) => v['brand_id'] == brandId)
-                  .toList();
+          debugPrint('Vehicle API response: $data');
+          final vehiclesRaw = data['vehicles'] ?? [];
+          debugPrint('Raw vehicles: $vehiclesRaw');
+
+          // Filter dengan cast pada brand_id
+          final vehicles = vehiclesRaw
+              .where((v) {
+                final id = modelDetailBrand.cast<int>(v['brand_id'], 'brand_id');
+                return id != null && id == brandId;
+              })
+              .toList();
+          debugPrint('Filtered vehicles: $vehicles');
+
+          // Gabungkan hasil dari setiap endpoint
           allVehicles.addAll(VehicleModel.fromJsonList(vehicles));
         }
       } catch (e) {
@@ -203,7 +214,7 @@ class BrandDetailController extends GetxController {
         final brandData = jsonDecode(brandResponse.body);
 
         // Update brandDetail
-        brandDetail.value = BrandDetailModel(
+        brandDetail.value = modelDetailBrand.BrandDetailModel(
           vehicles: allVehicles,
           nameBrand: brandData['name_brand'] ?? '',
           banner: brandData['banner'] ?? '',
@@ -280,32 +291,41 @@ class BrandDetailController extends GetxController {
       if (cacheData != null &&
           (currentTime - cacheTimestamp < cacheExpiration)) {
         final data = jsonDecode(cacheData);
-        vehicleTypes.value = VehicleTypeModel.fromJsonList(data['items']);
-        return;
-      }
+        final items = data['items'];
+        if (items is List) {
+          vehicleTypes.value = VehicleTypeModel.fromJsonList(
+            items.whereType<Map<String, dynamic>>().toList(),
+          );
+        } else {
+          vehicleTypes.value = [];
+        }
 
-      // Jika tidak ada cache atau cache tidak valid, fetch dari API dengan app_key
-      final response = await _appTokenService.requestWithAutoRefresh(
-        requestFn: (appKey) => http.get(
-          Uri.parse("$prodUrl/tipe"),
-          headers: {'Accept': 'application/json', 'x-app-key': appKey},
-        ),
-        platform: "android",
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        vehicleTypes.value = VehicleTypeModel.fromJsonList(data['items']);
-
-        // Simpan ke cache
-        await prefs.setString("vehicle_types_cache", response.body);
+        // Data sudah dari cache, tidak perlu menyimpan ulang response.body
         await prefs.setInt("vehicle_types_cache_timestamp", currentTime);
       } else {
-        debugPrint(
-          "Error fetching vehicle types: API returned status ${response.statusCode}",
+        // Jika tidak ada cache atau cache tidak valid, fetch dari API dengan app_key
+        final response = await _appTokenService.requestWithAutoRefresh(
+          requestFn: (appKey) => http.get(
+            Uri.parse("$prodUrl/tipe"),
+            headers: {'Accept': 'application/json', 'x-app-key': appKey},
+          ),
+          platform: "android",
         );
-        // Gunakan data default jika ada error
-        vehicleTypes.value = _getDefaultVehicleTypes();
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          vehicleTypes.value = VehicleTypeModel.fromJsonList(data['items']);
+
+          // Simpan ke cache
+          await prefs.setString("vehicle_types_cache", response.body);
+          await prefs.setInt("vehicle_types_cache_timestamp", currentTime);
+        } else {
+          debugPrint(
+            "Error fetching vehicle types: API returned status ${response.statusCode}",
+          );
+          // Gunakan data default jika ada error
+          vehicleTypes.value = _getDefaultVehicleTypes();
+        }
       }
     } catch (e) {
       debugPrint("Error fetching vehicle types: ${e.toString()}");

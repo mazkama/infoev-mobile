@@ -1,3 +1,25 @@
+T cast<T>(dynamic value, String fieldName) {
+  if (value == null) return null as T;
+
+  // Handle int and int? from String or int (universal)
+  if ((T == int || RegExp(r'^int(\?|)$').hasMatch(T.toString())) && (value is String || value is int)) {
+    if (value is int) return value as T;
+    final intValue = int.tryParse(value.toString());
+    if (intValue != null) return intValue as T;
+    if (T.toString().contains('?')) return null as T;
+  }
+
+  // Handle String and String? from int or String
+  if ((T == String || RegExp(r'^String(\?|)$').hasMatch(T.toString())) && (value is int || value is String)) {
+    return value.toString() as T;
+  }
+
+  if (value is T) return value;
+
+  // print('Warning: field "$fieldName" expected $T but got ${value.runtimeType}');
+  return value as T;
+}
+
 class VehicleTypeModel {
   final int id;
   final String name;
@@ -17,12 +39,12 @@ class VehicleTypeModel {
 
   factory VehicleTypeModel.fromJson(Map<String, dynamic> json) {
     return VehicleTypeModel(
-      id: json['id'],
-      name: json['name'],
-      slug: json['slug'],
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
-      vehiclesCount: json['vehicles_count'],
+      id: cast<int>(json['id'], 'id'),
+      name: cast<String>(json['name'], 'name'),
+      slug: cast<String>(json['slug'], 'slug'),
+      createdAt: cast<String>(json['created_at'], 'created_at'),
+      updatedAt: cast<String>(json['updated_at'], 'updated_at'),
+      vehiclesCount: cast<int>(json['vehicles_count'], 'vehicles_count'),
     );
   }
 

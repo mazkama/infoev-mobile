@@ -208,13 +208,17 @@ class EVComparisonController extends GetxController {
     final res = await _appTokenService.requestWithAutoRefresh(
       requestFn: (appKey) => http.get(
         url,
-        headers: {'x-app-key': appKey},
+        headers: {'x-app-key': appKey, 'Accept': 'application/json'},
       ),
       platform: "android",
     );
+    
     if (res.statusCode == 200) {
-      return json.decode(res.body);
+      final data = jsonDecode(res.body);
+      debugPrint('Fetched vehicle detail for $slug: ${data.keys}');
+      return data;
     } else {
+      debugPrint('Error fetching vehicle: ${res.statusCode}, ${res.body}');
       throw Exception('Gagal mengambil detail kendaraan');
     }
   }

@@ -1,3 +1,29 @@
+T cast<T>(dynamic value, String fieldName) {
+  // Debug print opsional
+  // print('DEBUG cast: $fieldName, value=$value, T=$T, value.runtimeType=${value?.runtimeType}');
+  if (value == null) return null as T;
+
+  // Handle int and int? from String or int (universal)
+  if ((T == int || RegExp(r'^int(\?|)$').hasMatch(T.toString())) &&
+      (value is String || value is int)) {
+    if (value is int) return value as T;
+    final intValue = int.tryParse(value.toString());
+    if (intValue != null) return intValue as T;
+    if (T.toString().contains('?')) return null as T;
+  }
+
+  // Handle String and String? from int or String
+  if ((T == String || RegExp(r'^String(\?|)$').hasMatch(T.toString())) &&
+      (value is int || value is String)) {
+    return value.toString() as T;
+  }
+
+  if (value is T) return value;
+
+  // print('Warning: field "$fieldName" expected $T but got ${value.runtimeType}');
+  return value as T;
+}
+
 class SpecCategory {
   final int id;
   final String name;
@@ -13,11 +39,10 @@ class SpecCategory {
 
   factory SpecCategory.fromJson(Map<String, dynamic> json) {
     return SpecCategory(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      priority: json['priority'] as int? ?? 0,
-      specs:
-          (json['specs'] as List<dynamic>?)
+      id: cast<int>(json['id'], 'id'),
+      name: cast<String>(json['name'], 'name'),
+      priority: cast<int>(json['priority'], 'priority'),
+      specs: (json['specs'] as List<dynamic>?)
               ?.map((spec) => SpecItem.fromJson(spec))
               .toList() ??
           [],
@@ -33,7 +58,7 @@ class SpecItem {
   final String? value;
   final String? valueDesc;
   final bool? valueBool;
-  final List<String>? listItems; // Add this field
+  final List<String>? listItems;
 
   SpecItem({
     required this.id,
@@ -43,11 +68,10 @@ class SpecItem {
     this.value,
     this.valueDesc,
     this.valueBool,
-    this.listItems, // Add this parameter
+    this.listItems,
   });
 
   factory SpecItem.fromJson(Map<String, dynamic> json) {
-    // Dapatkan nilai dari vehicle jika ada
     String? value;
     String? valueDesc;
     bool? valueBool;
@@ -60,8 +84,6 @@ class SpecItem {
         value = pivot['value']?.toString();
         valueDesc = pivot['value_desc'];
         valueBool = pivot['value_bool'] == 1;
-        
-        // Parse list_items from pivot
         if (pivot['list_items'] != null) {
           listItems = List<String>.from(pivot['list_items']);
         }
@@ -69,10 +91,10 @@ class SpecItem {
     }
 
     return SpecItem(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      unit: json['unit'] as String?,
-      type: json['type'] as String?,
+      id: cast<int>(json['id'], 'id'),
+      name: cast<String>(json['name'], 'name'),
+      unit: cast<String?>(json['unit'], 'unit'),
+      type: cast<String?>(json['type'], 'type'),
       value: value,
       valueDesc: valueDesc,
       valueBool: valueBool,
@@ -81,23 +103,18 @@ class SpecItem {
   }
 
   String? getValue() {
-    // Handle list type first
     if (type == 'list' && listItems != null) {
       return listItems!.join(', ');
     }
-
     if (type == 'availability') {
       return valueBool == true ? 'Ya' : 'Tidak';
     }
-
     if (name == 'Pengisian Daya AC' && value != null && valueDesc != null) {
       return '$value jam ($valueDesc)';
     }
-
     if (valueDesc != null && valueDesc!.isNotEmpty) {
       return valueDesc;
     }
-
     if (value == null) return null;
     if (unit != null && unit!.isNotEmpty) {
       if (type == 'price') {

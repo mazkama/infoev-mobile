@@ -36,12 +36,13 @@ class AppTokenService {
 
   /// Get device id or create new one and save
   Future<String> getDeviceId() async {
-    String? deviceId = await _storage.read(key: _deviceIdKey);
-    if (deviceId == null) {
-      deviceId = _uuid.v4();
-      await _storage.write(key: _deviceIdKey, value: deviceId);
-    }
-    return deviceId;
+    // String? deviceId = await _storage.read(key: _deviceIdKey);
+    // if (deviceId == null) {
+    //   deviceId = _uuid.v4();
+    //   await _storage.write(key: _deviceIdKey, value: deviceId);
+    // }
+    // return deviceId;
+    return '09989b8b-1f7a-494c-a0ee-6586d7d70c8e';
   }
 
   /// Get app key if available
@@ -51,14 +52,22 @@ class AppTokenService {
 
   /// Save app key
   Future<void> saveAppKey(String appKey) async {
-    await _storage.write(key: _appKeyKey, value: appKey);
-
-    // Simpan waktu kedaluwarsa (7 hari dari sekarang)
-    final expiryDate = DateTime.now().add(const Duration(days: 7));
-    await _storage.write(
-      key: _appKeyExpiryKey,
-      value: expiryDate.toIso8601String(),
-    );
+    int retry = 0;
+    while (retry < 3) {
+      try {
+        await _storage.write(key: _appKeyKey, value: appKey);
+        final expiryDate = DateTime.now().add(const Duration(days: 7));
+        await _storage.write(
+          key: _appKeyExpiryKey,
+          value: expiryDate.toIso8601String(),
+        );
+        break;
+      } catch (e) {
+        retry++;
+        await Future.delayed(const Duration(milliseconds: 200));
+        if (retry == 3) rethrow;
+      }
+    }
   }
 
   /// Delete app key (e.g. logout or revoke)

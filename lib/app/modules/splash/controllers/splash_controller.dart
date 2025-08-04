@@ -1,37 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:infoev/app/services/app_token_service.dart'; 
+import 'package:infoev/app/services/app_token_service.dart';
 import '../../../routes/app_pages.dart';
 
 class SplashController extends GetxController {
   late final AppTokenService _appTokenService;
+  var isLoading = true.obs;
 
   @override
   void onInit() {
     super.onInit();
-    initialiazed();
+    _appTokenService = AppTokenService();
+    // Pastikan spinner muncul dulu, baru inisialisasi berjalan
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      initialiazed();
+    });
   }
 
   void initialiazed() async {
-    WidgetsFlutterBinding.ensureInitialized();
+    isLoading.value = true;
 
-    // Inisialisasi AppTokenService cukup dengan base URL backend
-    _appTokenService = AppTokenService();
-  
-    // Ambil atau generate app_key
-    final appKey = await _appTokenService.initialize(platform: "android");
+    String? appKey;
+    try {
+      appKey = await _appTokenService.initialize(platform: "android");
+    } catch (e) {
+      appKey = null;
+      debugPrint("Error handshake: $e");
+    }
 
     if (appKey == null) {
-      // Jika gagal ambil app_key, tampilkan error atau arahkan ke error screen
-      debugPrint("Gagal mengambil app_key");
-      // Bisa juga arahkan ke halaman error khusus
-      Get.snackbar("Error", "Gagal menginisialisasi aplikasi");
+      isLoading.value = false;
+      await Future.delayed(const Duration(milliseconds: 100));
+      Get.defaultDialog(
+        title: "Koneksi Gagal",
+        middleText: "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
+        textConfirm: "Coba Lagi",
+        onConfirm: () async {
+          Get.back();
+          await Future.delayed(const Duration(milliseconds: 300));
+          await _appTokenService.deleteAppKey();
+          initialiazed();
+        },
+        barrierDismissible: false,
+      );
       return;
     }
 
-    await Future.delayed(const Duration(milliseconds: 1850));
-
-    // Navigasi ke halaman utama
+    await Future.delayed(const Duration(milliseconds: 1000));
+    isLoading.value = false;
     Get.offAllNamed(Routes.NAVBAR);
   }
 }

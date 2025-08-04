@@ -1,3 +1,4 @@
+import 'package:infoev/core/halper.dart';
 import 'package:intl/intl.dart';
 
 T cast<T>(dynamic value, String fieldName) {
@@ -51,7 +52,7 @@ class VehicleModel {
       name: name,
       slug: cast<String>(vehicle['slug'], 'slug'),
       brand: brand,
-      thumbnailUrl: 'https://infoev.mazkama.web.id/storage/$thumbnail',
+      thumbnailUrl: '$baseUrl/storage/$thumbnail',
       highlightSpecs:
           (json['highlightSpecs'] as List)
               .map((e) => HighlightSpec.fromJson(e))
@@ -119,6 +120,7 @@ class SpecItem {
   final String name;
   final String? unit;
   final String? type;
+  final String? valueDesc; // Tambahkan ini
   final List<SpecVehicleValue> vehicles;
 
   SpecItem({
@@ -126,19 +128,27 @@ class SpecItem {
     required this.name,
     this.unit,
     this.type,
+    this.valueDesc, // Tambahkan ini
     required this.vehicles,
   });
 
   factory SpecItem.fromJson(Map<String, dynamic> json) {
+    List<SpecVehicleValue> vehicleValues = [];
+    String? valueDesc;
+    
+    if (json['vehicles'] != null) {
+      vehicleValues = (json['vehicles'] as List)
+          .map((e) => SpecVehicleValue.fromJson(e))
+          .toList();
+    }
+
     return SpecItem(
       id: cast<int>(json['id'], 'id'),
       name: cast<String>(json['name'], 'name'),
       unit: cast<String?>(json['unit'], 'unit'),
       type: cast<String?>(json['type'], 'type'),
-      vehicles:
-          (json['vehicles'] as List)
-              .map((e) => SpecVehicleValue.fromJson(e))
-              .toList(),
+      valueDesc: valueDesc, // Tambahkan field ini
+      vehicles: vehicleValues,
     );
   }
 
@@ -148,7 +158,7 @@ class SpecItem {
       (v) => v.vehicleSlug == slug,
       orElse: () => SpecVehicleValue.empty(),
     );
-    return match.getDisplayWithUnit(itemUnit: unit, itemType: type);
+    return match.getDisplayWithUnit(itemUnit: unit, itemType: type, itemName: name);
   }
 }
 
@@ -156,54 +166,73 @@ class SpecVehicleValue {
   final int vehicleId;
   final String vehicleSlug;
   final String? value;
+  final String? valueDesc; // Tambahkan ini
   final String? unit;
   final bool? valueBool;
-  final List<String>? listItems; // Add this field
+  final List<String>? listItems;
 
   SpecVehicleValue({
     required this.vehicleId,
     required this.vehicleSlug,
     this.value,
+    this.valueDesc, // Tambahkan ini 
     this.unit,
     this.valueBool,
-    this.listItems, // Add this parameter
+    this.listItems,
   });
 
   factory SpecVehicleValue.fromJson(Map<String, dynamic> json) {
     final pivot = json['pivot'];
     final rawValue = pivot['value'];
-    final listItems = pivot['list_items']; // Get list_items from pivot
-
-    // Use cast for vehicle_id as int
-    final vehicleId = cast<int>(pivot['vehicle_id'], 'vehicle_id');
-    final vehicleSlug = cast<String>(json['slug'], 'slug');
+    final valueDesc = pivot['value_desc']; // Ambil value_desc
+    final listItems = pivot['list_items'];
 
     return SpecVehicleValue(
-      vehicleId: vehicleId,
-      vehicleSlug: vehicleSlug,
+      vehicleId: cast<int>(pivot['vehicle_id'], 'vehicle_id'),
+      vehicleSlug: cast<String>(json['slug'], 'slug'),
       value: _parseNumber(rawValue),
+      valueDesc: valueDesc, // Tambahkan ini
       unit: cast<String?>(json['unit'], 'unit'),
       valueBool: _parseBool(pivot['value_bool']),
       listItems: listItems != null ? List<String>.from(listItems) : null,
     );
   }
 
-  String? getDisplayWithUnit({String? itemUnit, String? itemType}) {
+  String? getDisplayWithUnit({String? itemUnit, String? itemType, String? itemName}) {
     // Handle list type first
     if (itemType == 'list' && listItems != null) {
-      return listItems!.join(', '); // Join list items with comma
+      return listItems!.join(', ');
     }
 
+    // Handle availability type
+    if (itemType == 'availability') {
+      return valueBool == true ? 'Ya' : 'Tidak';
+    }
+    
+    // Prioritaskan valueDesc jika ada
+    if (valueDesc != null && valueDesc!.isNotEmpty) {
+      return valueDesc;
+    }
+
+    // Handle empty values
     if (valueBool != null) return valueBool! ? '✓' : '✗';
     if (value == null || value.toString().toLowerCase() == "null") return null;
 
+    // Handle price type
     if (itemType == 'price') {
       final number = double.tryParse(value!.replaceAll(RegExp(r'[^0-9]'), ''));
       if (number != null) return _formatRupiah(number);
       return 'Rp $value';
     }
 
+    // Handle normal values with unit
     final suffix = (itemUnit?.isNotEmpty ?? false) ? itemUnit! : (unit ?? '');
+    
+    // Special case for charging time (like in VehicleDetail)
+    if (itemName == 'Pengisian Daya AC' && value != null && valueDesc != null) {
+      return '$value jam ($valueDesc)';
+    }
+    
     return suffix.isNotEmpty ? '$value $suffix' : value;
   }
 

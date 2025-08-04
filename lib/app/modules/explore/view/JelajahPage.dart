@@ -400,7 +400,12 @@ class _JelajahPageState extends State<JelajahPage> {
                           if (id == 0) {
                             controller.resetFilters();
                           } else {
-                            controller.filterBrandsByType(id);
+                            // Preserve existing filter settings and only change typeId
+                            final currentMinProductCount = controller.filterOptions['minProductCount'] ?? 0;
+                            controller.filterBrands({
+                              'minProductCount': currentMinProductCount,
+                              'typeId': id,
+                            });
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -1380,18 +1385,13 @@ class _JelajahPageState extends State<JelajahPage> {
                     ),
                   ),
                   onPressed: () {
-                    // Apply type filter if not 'All'
-                    if (selectedTypeId > 0) {
-                      controller.filterBrandsByType(selectedTypeId);
-                    } else {
-                      // Tidak perlu reset full filter, cukup terapkan filter lainnya
-                      // controller.resetFilters();
-                      // Reapply other filters below
-                      controller.filterBrands({
-                        'minProductCount': minProductCount,
-                      });
-                      controller.sortBrands(sortBy, sortOrder);
-                    }
+                    // Apply all filters together
+                    controller.filterBrands({
+                      'minProductCount': minProductCount,
+                      'typeId': selectedTypeId,
+                    });
+                    controller.sortBrands(sortBy, sortOrder);
+                    
                     // Close dialog
                     Navigator.of(context).pop();
                   },

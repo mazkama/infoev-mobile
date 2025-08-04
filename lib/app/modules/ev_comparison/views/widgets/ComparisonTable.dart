@@ -118,71 +118,88 @@ class ComparisonTable extends StatelessWidget {
               ),
               child: Column(
                 children: mergedSpecs.map((spec) {
-                  final valueA = spec.getVehicleValueBySlug(vehicleA!.slug);
-                  final valueB = spec.getVehicleValueBySlug(vehicleB!.slug);
-
-                  return Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 14,
-                      horizontal: 16,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        top: BorderSide(
-                          color: AppColors.dividerColor,
-                          width: 0.5,
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        // Spec Name
-                        Expanded(
-                          flex: 4,
-                          child: Text(
-                            spec.name,
-                            style: GoogleFonts.poppins(
-                              color: AppColors.textColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        // Vehicle A Value
-                        Expanded(
-                          flex: 4,
-                          child: Text(
-                            valueA ?? '-',
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.poppins(
-                              color: AppColors.textColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        // Vehicle B Value
-                        Expanded(
-                          flex: 4,
-                          child: Text(
-                            valueB ?? '-',
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.poppins(
-                              color: AppColors.textColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
+                  return _buildSpecRow(spec, vehicleA!.slug, vehicleB!.slug);
                 }).toList(),
               ),
             ),
           ],
         );
       }).toList(),
+    );
+  }
+
+  Widget _buildSpecRow(SpecItem spec, String slug1, String slug2) {
+    final valueA = spec.getVehicleValueBySlug(slug1);
+    final valueB = spec.getVehicleValueBySlug(slug2);
+    final type = spec.type?.toLowerCase() ?? '';
+
+    // Style khusus sesuai tipe data
+    TextStyle valueStyle = GoogleFonts.poppins(
+      color: AppColors.textColor,
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
+    );
+
+    // Warna khusus untuk tipe boolean/availability
+    Widget valueAWidget = Text(
+      valueA ?? '-',
+      textAlign: TextAlign.center,
+      style: valueStyle.copyWith(
+        color: type == 'availability' && valueA == 'Ya'
+            ? AppColors.successColor
+            : AppColors.textColor,
+      ),
+    );
+
+    Widget valueBWidget = Text(
+      valueB ?? '-',
+      textAlign: TextAlign.center,
+      style: valueStyle.copyWith(
+        color: type == 'availability' && valueB == 'Ya'
+            ? AppColors.successColor
+            : AppColors.textColor,
+      ),
+    );
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        vertical: 14,
+        horizontal: 16,
+      ),
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: AppColors.dividerColor,
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          // Spec Name
+          Expanded(
+            flex: 4,
+            child: Text(
+              spec.name,
+              style: GoogleFonts.poppins(
+                color: AppColors.textColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          // Vehicle A Value
+          Expanded(
+            flex: 4,
+            child: valueAWidget,
+          ),
+          // Vehicle B Value
+          Expanded(
+            flex: 4,
+            child: valueBWidget,
+          ),
+        ],
+      ),
     );
   }
 }
