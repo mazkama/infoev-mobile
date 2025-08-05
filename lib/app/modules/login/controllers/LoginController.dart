@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:infoev/app/modules/login/model/UserModel.dart';
 import 'package:infoev/app/services/AuthService.dart';
+import 'package:infoev/app/services/AppException.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../routes/app_pages.dart';
 
@@ -24,11 +26,12 @@ class LoginController extends GetxController {
   // Handle regular email/password login
   Future<void> login() async {
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      Get.snackbar(
-        "Error",
-        "Email and password are required",
-        backgroundColor: Colors.redAccent,
-        colorText: Colors.white,
+      ErrorHandlerService.handleError(
+        AppException(
+          message: 'Email dan password wajib diisi.',
+          type: ErrorType.validation,
+        ),
+        showToUser: true,
       );
       return;
     }
@@ -40,14 +43,24 @@ class LoginController extends GetxController {
         email: emailController.text.trim(),
         password: passwordController.text,
       );
-
       handleAuthResponse(response);
+    } on PlatformException catch (_) {
+      // Tangkap error platform khusus (misal network error)
+      ErrorHandlerService.handleError(
+        AppException(
+          message: 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.',
+          type: ErrorType.network,
+        ),
+        showToUser: true,
+      );
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "An unexpected error occurred: $e",
-        backgroundColor: Colors.redAccent,
-        colorText: Colors.white,
+      ErrorHandlerService.handleError(
+        AppException(
+          message: 'Terjadi gangguan saat login. Silakan coba beberapa saat lagi.',
+          type: ErrorType.unknown,
+          originalError: e,
+        ),
+        showToUser: true,
       );
     } finally {
       isLoading.value = false;
@@ -61,12 +74,22 @@ class LoginController extends GetxController {
     try {
       final response = await AuthService.loginWithGoogle();
       handleAuthResponse(response);
+    } on PlatformException catch (_) {
+      ErrorHandlerService.handleError(
+        AppException(
+          message: 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.',
+          type: ErrorType.network,
+        ),
+        showToUser: true,
+      );
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "Google sign-in failed: $e",
-        backgroundColor: Colors.redAccent,
-        colorText: Colors.white,
+      ErrorHandlerService.handleError(
+        AppException(
+          message: 'Login Google gagal. Silakan coba beberapa saat lagi.',
+          type: ErrorType.unknown,
+          originalError: e,
+        ),
+        showToUser: true,
       );
     } finally {
       isGoogleLoading.value = false;
@@ -75,27 +98,31 @@ class LoginController extends GetxController {
 
   // Common method to handle authentication response
   void handleAuthResponse(Map<String, dynamic> response) {
-    if (response['success']) {
+    if (response['success'] == true) {
       saveUserSession(response);
 
-      // Get user info for welcome message
       final user = UserModel.fromJson(response['user']);
-
-      Get.snackbar(
-        "Success",
-        "Hi ${user.name}!",
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-
-      // Navigate to home screen
+      ErrorHandlerService.showSuccess("Selamat datang, ${user.name}!");
       Get.offAllNamed(Routes.NAVBAR);
     } else {
-      Get.snackbar(
-        "Error",
-        response['message'] ?? "Authentication failed",
-        backgroundColor: Colors.redAccent,
-        colorText: Colors.white,
+      // Deteksi error network/server/validation
+      final message = response['message']?.toString().toLowerCase() ?? '';
+      ErrorType errorType = ErrorType.validation;
+
+      if (message.contains('koneksi') || message.contains('network') || message.contains('socket')) {
+        errorType = ErrorType.network;
+      } else if (message.contains('server') || message.contains('internal')) {
+        errorType = ErrorType.server;
+      } else if (message.contains('token') || message.contains('expired')) {
+        errorType = ErrorType.authentication;
+      }
+
+      ErrorHandlerService.handleError(
+        AppException(
+          message: '', // biarkan handler menampilkan pesan ramah sesuai tipe
+          type: errorType,
+        ),
+        showToUser: true,
       );
     }
   }

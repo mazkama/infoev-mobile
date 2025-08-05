@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'dart:math'; // Tambahkan import ini di atas
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:infoev/app/modules/charger_station/model/ChargerStationModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:infoev/app/services/app_token_service.dart'; // Tambahkan import ini
 import 'package:infoev/core/halper.dart'; // Jika butuh prodUrl
+import 'package:infoev/app/services/AppException.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:infoev/core/ad_helper.dart';
 
 // City suggestion model
 class CitySuggestion {
@@ -40,12 +44,27 @@ class ChargerStationController extends GetxController {
 
   late final AppTokenService _appTokenService;
 
+  RewardedAd? _rewardedAd;
+  bool _isRewardedAdReady = false;
+  int _searchCount = 0;
+  InterstitialAd? _interstitialAd;
+  bool _isInterstitialAdReady = false;
+
   @override
   void onInit() async {
     super.onInit();
     _appTokenService = AppTokenService();
+    _loadRewardedAd();
+    _loadInterstitialAd();
     await _loadCachedData();
     fetchChargerStations("kediri");
+  }
+
+  @override
+  void onClose() {
+    _rewardedAd?.dispose();
+    _interstitialAd?.dispose();
+    super.onClose();
   }
 
   Future<void> _loadCachedData() async {
@@ -91,6 +110,38 @@ class ChargerStationController extends GetxController {
   }
 
   void fetchChargerStations(String location) async {
+    _searchCount++;
+    if (_searchCount % 2 == 1) {
+      // Ganjil: Random pilih Rewarded atau Interstitial
+      final random = Random();
+      final showRewarded = random.nextBool();
+
+      if (showRewarded && _isRewardedAdReady && _rewardedAd != null) {
+        _rewardedAd!.show(
+          onUserEarnedReward: (ad, reward) {},
+        );
+        _rewardedAd = null;
+        _isRewardedAdReady = false;
+        _loadRewardedAd();
+      } else if (_isInterstitialAdReady && _interstitialAd != null) {
+        _interstitialAd!.show();
+        _interstitialAd = null;
+        _isInterstitialAdReady = false;
+        _loadInterstitialAd();
+      } else {
+        // Jika Rewarded tidak ready, langsung coba tampilkan Interstitial jika ready
+        if (_isInterstitialAdReady && _interstitialAd != null) {
+          _interstitialAd!.show();
+          _interstitialAd = null;
+          _isInterstitialAdReady = false;
+          _loadInterstitialAd();
+        } else {
+          // Jika dua-duanya belum ready, langsung load Interstitial
+          _loadInterstitialAd();
+        }
+      }
+    }
+
     try {
       isLoading(true);
       hasError(false);
@@ -123,24 +174,35 @@ class ChargerStationController extends GetxController {
       } else {
         isLoading(false);
         hasError(true);
-        print("API Response status: ${response.statusCode}");
         chargerStations.clear();
 
-        print(
-          "Failed to load charger stations. Status: ${response.statusCode}",
-        );
+        // Gunakan handler ramah
         if (response.statusCode == 404) {
+          ErrorHandlerService.handleError(
+            AppException(
+              message: "Stasiun tidak ditemukan untuk lokasi ini.",
+              type: ErrorType.validation,
+            ),
+            showToUser: true,
+          );
           errorMessage.value = "Stasiun tidak ditemukan untuk lokasi ini.";
         } else {
-          errorMessage.value =
-              "Terjadi kesalahan saat memuat data stasiun. Coba lagi nanti.";
+          ErrorHandlerService.handleError(
+            AppException(
+              message: "Terjadi kesalahan saat memuat data stasiun. Coba lagi nanti.",
+              type: ErrorType.server,
+            ),
+            showToUser: true,
+          );
+          errorMessage.value = "Terjadi kesalahan saat memuat data stasiun. Coba lagi nanti.";
         }
       }
     } catch (e) {
       isLoading(false);
       hasError(true);
-      errorMessage.value = "Terjadi kesalahan: $e";
-      print("Exception during fetchChargerStations: $e");
+      // Handler ramah, biarkan mapping otomatis
+      ErrorHandlerService.handleError(e, showToUser: true);
+      errorMessage.value = "Terjadi kesalahan. Silakan cek koneksi internet Anda.";
     } finally {
       isLoading(false);
     }
@@ -249,17 +311,53 @@ class ChargerStationController extends GetxController {
       } else {
         citySuggestions.clear();
         suggestionSource.value = "error";
-        print(
-          "Failed to load city suggestions. Status: ${response.statusCode}",
+        ErrorHandlerService.handleError(
+          AppException(
+            message: "Gagal memuat saran kota. Silakan coba lagi.",
+            type: ErrorType.server,
+          ),
+          showToUser: true,
         );
       }
     } catch (e) {
       citySuggestions.clear();
       suggestionSource.value = "error";
-      print("Exception during suggestCities: $e");
+      ErrorHandlerService.handleError(e, showToUser: true);
     } finally {
       isSuggestLoading(false);
     }
+  }
+
+  void _loadRewardedAd() {
+    RewardedAd.load(
+      adUnitId: AdHelper.rewardedAdUnitId(isTest: false),
+      request: const AdRequest(),
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
+        onAdLoaded: (ad) {
+          _rewardedAd = ad;
+          _isRewardedAdReady = true;
+        },
+        onAdFailedToLoad: (error) {
+          _isRewardedAdReady = false;
+        },
+      ),
+    );
+  }
+
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.interstitialAdUnitId(isTest: false),
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          _interstitialAd = ad;
+          _isInterstitialAdReady = true;
+        },
+        onAdFailedToLoad: (error) {
+          _isInterstitialAdReady = false;
+        },
+      ),
+    );
   }
 
   Future<void> clearCache() async {

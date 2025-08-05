@@ -21,6 +21,8 @@ import 'package:infoev/app/modules/explore/controllers/MerekController.dart';
 import 'package:infoev/app/modules/explore/model/MerekModel.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:infoev/core/ad_helper.dart'; // Import AdHelper untuk iklan
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,6 +38,9 @@ class _HomePageState extends State<HomePage> {
   Timer? _debounceTimer;
   String _lastSearchQuery = '';
   bool _shouldAutoFocus = true;
+
+  BannerAd? _bannerAdTop;
+  BannerAd? _bannerAdBottom;
 
   @override
   void initState() {
@@ -59,10 +64,34 @@ class _HomePageState extends State<HomePage> {
         _debounceTimer?.cancel();
       }
     });
+
+    // Banner atas
+    _bannerAdTop = BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId(isTest: false),
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (_) => setState(() {}),
+        onAdFailedToLoad: (ad, error) => ad.dispose(),
+      ),
+    )..load();
+
+    // Banner bawah
+    _bannerAdBottom = BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId(isTest: false),
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (_) => setState(() {}),
+        onAdFailedToLoad: (ad, error) => ad.dispose(),
+      ),
+    )..load();
   }
 
   @override
   void dispose() {
+    _bannerAdTop?.dispose();
+    _bannerAdBottom?.dispose();
     _debounceTimer?.cancel();
     _searchController.dispose();
     _searchFocusNode.dispose();
@@ -726,7 +755,8 @@ class _HomePageState extends State<HomePage> {
 
                           const SizedBox(
                             height: 20,
-                          ), // Spacing lebih besar untuk pemisahan
+                          ),
+
                           // Modern Action Cards Row
                           Row(
                             children: [
@@ -952,10 +982,18 @@ class _HomePageState extends State<HomePage> {
                             ],
                           ),
 
-                          const SizedBox(
-                            height: 40,
-                          ), // Spacing lebih besar untuk pemisahan
-
+                          if (_bannerAdTop != null) 
+                            Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 30),
+                                child: Center(
+                                  child: SizedBox(
+                                    width: _bannerAdTop!.size.width.toDouble(),
+                                    height: _bannerAdTop!.size.height.toDouble(),
+                                    child: AdWidget(ad: _bannerAdTop!),
+                                  ),
+                                ),
+                              ), 
+                              
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -1029,8 +1067,7 @@ class _HomePageState extends State<HomePage> {
                             } else {
                               return ListView.builder(
                                 shrinkWrap: true,
-                                physics:
-                                    const NeverScrollableScrollPhysics(), // agar tidak bentrok dengan SingleChildScrollView
+                                physics: const NeverScrollableScrollPhysics(),
                                 itemCount: homeController.newNewsList.length,
                                 itemBuilder: (context, index) {
                                   final e = homeController.newNewsList[index];
@@ -1052,6 +1089,14 @@ class _HomePageState extends State<HomePage> {
                               );
                             }
                           }),
+                          if (_bannerAdBottom != null)
+                              Center(
+                                child: SizedBox(
+                                  width: _bannerAdBottom!.size.width.toDouble(),
+                                  height: _bannerAdBottom!.size.height.toDouble(),
+                                  child: AdWidget(ad: _bannerAdBottom!),
+                                ),
+                              ),
                         ],
                       ),
                     ),

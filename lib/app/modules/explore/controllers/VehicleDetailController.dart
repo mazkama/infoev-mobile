@@ -7,6 +7,7 @@ import 'package:infoev/core/halper.dart';
 import 'package:infoev/core/local_db.dart';
 import 'package:infoev/app/modules/explore/model/CommentModel.dart';
 import 'package:infoev/app/services/app_token_service.dart'; // Import AppTokenService
+import 'package:infoev/app/services/AppException.dart';
 
 class VehicleDetailController extends GetxController {
   // Data state
@@ -174,12 +175,24 @@ class VehicleDetailController extends GetxController {
         affiliateLinks.value = data['affiliateLinks'] ?? [];
       } else {
         hasError.value = true;
-        errorMessage.value = "Error loading vehicle details";
+        errorMessage.value = "Gagal memuat detail kendaraan. Silakan coba lagi.";
+        ErrorHandlerService.handleError(
+          AppException(
+            message: "Gagal memuat detail kendaraan. Silakan coba lagi.",
+            type: ErrorType.server,
+            statusCode: response.statusCode,
+          ),
+          showToUser: true,
+        );
         debugPrint('Error response: ${response.body}');
       }
     } catch (e) {
       hasError.value = true;
-      errorMessage.value = "Network error occurred";
+      errorMessage.value = "Terjadi masalah jaringan atau server.";
+      ErrorHandlerService.handleError(
+        e,
+        showToUser: true,
+      );
       debugPrint('Error in fetchVehicleDetails: $e');
     } finally {
       isLoading.value = false;

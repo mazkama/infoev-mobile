@@ -9,6 +9,8 @@ import 'package:infoev/app/modules/explore/model/VehicleModel.dart';
 import 'package:infoev/app/styles/app_colors.dart';
 import 'package:infoev/app/styles/app_text.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:infoev/core/ad_helper.dart';
 
 class TipeProdukPage extends StatefulWidget {
   const TipeProdukPage({super.key});
@@ -21,6 +23,8 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   late BrandDetailController controller;
+
+  BannerAd? _bannerAd;
 
   @override
   void initState() {
@@ -48,12 +52,24 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
         }
       });
     });
+
+    // Inisialisasi Banner Ad
+    _bannerAd = BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId(isTest: false), // isTest: true untuk development
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (_) => setState(() {}),
+        onAdFailedToLoad: (ad, error) => ad.dispose(),
+      ),
+    )..load();
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     _searchFocusNode.dispose();
+    _bannerAd?.dispose();
     super.dispose();
   }
 
@@ -384,6 +400,22 @@ class _TipeProdukPageState extends State<TipeProdukPage> {
 
           // Chip filter tipe
           SliverToBoxAdapter(child: _buildTypeFilterChips()),
+
+          // Banner AdMob di bawah filter chips
+          SliverToBoxAdapter(
+            child: (_bannerAd != null)
+                ? Center(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 16), // Tambahkan margin atas & bawah
+                      child: SizedBox(
+                        width: _bannerAd!.size.width.toDouble(),
+                        height: _bannerAd!.size.height.toDouble(),
+                        child: AdWidget(ad: _bannerAd!),
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
 
           // Grid produk
           Obx(() {

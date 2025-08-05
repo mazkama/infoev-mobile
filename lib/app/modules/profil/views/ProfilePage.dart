@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:infoev/app/modules/login/views/Logout.dart';
 import 'package:get/get.dart';
 import '../../../../core/local_db.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:infoev/core/ad_helper.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -12,12 +14,34 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  BannerAd? _bannerAd;
+
   Future<Map<String, String?>> loadUserData() async {
     final token = LocalDB.getToken();
     if (token == null) return {'name': null, 'email': null};
     final name = LocalDB.getName();
     final email = LocalDB.getEmail();
     return {'name': name ?? 'User Noname', 'email': email ?? '-'};
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _bannerAd = BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId(isTest: false), // isTest: true untuk development
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (_) => setState(() {}),
+        onAdFailedToLoad: (ad, error) => ad.dispose(),
+      ),
+    )..load();
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
   }
 
   @override
@@ -228,6 +252,17 @@ class _ProfilePageState extends State<ProfilePage> {
                 ],
               ),
             ),
+            if (_bannerAd != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 30),
+                child: Center(
+                  child: SizedBox(
+                    width: _bannerAd!.size.width.toDouble(),
+                    height: _bannerAd!.size.height.toDouble(),
+                    child: AdWidget(ad: _bannerAd!),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,6 +10,8 @@ import 'package:infoev/app/modules/ev_comparison/views/widgets/ComparisonTable.d
 import 'package:infoev/app/modules/ev_comparison/views/widgets/EvCard.dart'; 
 import 'package:infoev/app/styles/app_colors.dart'; 
 import 'package:shimmer/shimmer.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:infoev/core/ad_helper.dart';
 
 class EVComparisonPage extends StatefulWidget {
   const EVComparisonPage({super.key});
@@ -22,14 +26,64 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
   final TextEditingController searchControllerA = TextEditingController();
   final TextEditingController searchControllerB = TextEditingController();
 
-  // State untuk hasil pencarian
+  final FocusNode focusNodeA = FocusNode();
+  final FocusNode focusNodeB = FocusNode();
+
   List<Map<String, dynamic>> searchResultsA = [];
   List<Map<String, dynamic>> searchResultsB = [];
 
+  Timer? _debounceA;
+  Timer? _debounceB;
+
+  InterstitialAd? _interstitialAd;
+  bool _isInterstitialAdReady = false;
+  int _compareClickCount = 0; // Tambahkan counter
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInterstitialAd();
+  }
+
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.interstitialAdUnitId(isTest: false),
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          setState(() {
+            _interstitialAd = ad;
+            _isInterstitialAdReady = true;
+          });
+        },
+        onAdFailedToLoad: (error) {
+          _isInterstitialAdReady = false;
+        },
+      ),
+    );
+  }
+
+  void _onComparePressed() {
+    _compareClickCount++;
+    // Tampilkan iklan setiap 4 kali klik
+    if (_compareClickCount % 4 == 0 && _isInterstitialAdReady && _interstitialAd != null) {
+      _interstitialAd!.show();
+      _interstitialAd = null;
+      _isInterstitialAdReady = false;
+      _loadInterstitialAd();
+    }
+    controller.compareNow();
+  }
+
   @override
   void dispose() {
+    _interstitialAd?.dispose();
     searchControllerA.dispose();
     searchControllerB.dispose();
+    focusNodeA.dispose();
+    focusNodeB.dispose();
+    _debounceA?.cancel();
+    _debounceB?.cancel();
     super.dispose();
   }
 
@@ -65,16 +119,19 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
                   setState(() => searchResultsA.clear());
                 },
                 searchController: searchControllerA,
-                isLoading:
-                    controller.isLoadingA.value || controller.isSearching.value,
-                onSearch: (query) async {
-                  if (query.isEmpty) {
-                    setState(() => searchResultsA.clear());
-                  } else {
-                    setState(() => searchResultsA = []);
-                    final results = await controller.searchVehicles(query);
-                    setState(() => searchResultsA = results);
-                  }
+                focusNode: focusNodeA,
+                isLoading: controller.isLoadingA.value,
+                onSearch: (query) {
+                  if (_debounceA?.isActive ?? false) _debounceA!.cancel();
+                  _debounceA = Timer(const Duration(milliseconds: 500), () async {
+                    if (query.isEmpty) {
+                      setState(() => searchResultsA.clear());
+                    } else {
+                      setState(() => searchResultsA = []);
+                      final results = await controller.searchVehiclesA(query);
+                      setState(() => searchResultsA = results);
+                    }
+                  });
                 },
                 searchResults: searchResultsA,
                 onSelected: (vehicle) {
@@ -93,16 +150,19 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
                   setState(() => searchResultsB.clear());
                 },
                 searchController: searchControllerB,
-                isLoading:
-                    controller.isLoadingB.value || controller.isSearching.value,
-                onSearch: (query) async {
-                  if (query.isEmpty) {
-                    setState(() => searchResultsB.clear());
-                  } else {
-                    setState(() => searchResultsB = []);
-                    final results = await controller.searchVehicles(query);
-                    setState(() => searchResultsB = results);
-                  }
+                focusNode: focusNodeB,
+                isLoading: controller.isLoadingB.value,
+                onSearch: (query) {
+                  if (_debounceB?.isActive ?? false) _debounceB!.cancel();
+                  _debounceB = Timer(const Duration(milliseconds: 500), () async {
+                    if (query.isEmpty) {
+                      setState(() => searchResultsB.clear());
+                    } else {
+                      setState(() => searchResultsB = []);
+                      final results = await controller.searchVehiclesB(query);
+                      setState(() => searchResultsB = results);
+                    }
+                  });
                 },
                 searchResults: searchResultsB,
                 onSelected: (vehicle) {
@@ -117,7 +177,7 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton.icon(
-                    onPressed: controller.compareNow,
+                    onPressed: _onComparePressed,
                     icon: const Icon(Icons.compare_arrows),
                     label: Text(
                       'Compare Sekarang',
@@ -200,6 +260,7 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
     required VehicleModel? selectedVehicle,
     required VoidCallback onChange,
     required TextEditingController searchController,
+    required FocusNode focusNode,
     required bool isLoading,
     required Function(Map<String, dynamic>) onSelected,
     required List<Map<String, dynamic>> searchResults,
@@ -283,17 +344,18 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
           SizedBox(height: isTablet ? 20 : 16),
           selectedVehicle != null
               ? _buildSelectedVehicleCard(
-                vehicle: selectedVehicle,
-                onChange: onChange,
-              )
+                  vehicle: selectedVehicle,
+                  onChange: onChange,
+                )
               : _buildVehicleSelectionButton(
-                controller: searchController,
-                isLoading: isLoading,
-                onSearch: onSearch,
-                searchResults: searchResults,
-                onSelected: onSelected,
-                isTablet: isTablet,
-              ),
+                  controller: searchController,
+                  focusNode: focusNode,
+                  isLoading: isLoading,
+                  onSearch: onSearch,
+                  searchResults: searchResults,
+                  onSelected: onSelected,
+                  isTablet: isTablet,
+                ),
         ],
       ),
     );
@@ -407,6 +469,7 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
 
   Widget _buildVehicleSelectionButton({
     required TextEditingController controller,
+    required FocusNode focusNode,
     required bool isLoading,
     required Function(String) onSearch,
     required List<Map<String, dynamic>> searchResults,
@@ -445,71 +508,76 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
             ),
             child: Padding(
               padding: EdgeInsets.all(isTablet ? 20 : 16),
-              child: Row(
-                children: [
-                  // Search icon with background
-                  Container(
-                    padding: EdgeInsets.all(isTablet ? 12 : 10),
-                    decoration: BoxDecoration(
-                      color: AppColors.secondaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: AppColors.secondaryColor.withOpacity(0.2),
-                        width: 1,
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () {
+                  FocusScope.of(context).requestFocus(focusNode);
+                },
+                child: Row(
+                  children: [
+                    // Search icon with background
+                    Container(
+                      padding: EdgeInsets.all(isTablet ? 12 : 10),
+                      decoration: BoxDecoration(
+                        color: AppColors.secondaryColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.secondaryColor.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.search_rounded,
+                        color: AppColors.secondaryColor,
+                        size: isTablet ? 24 : 20,
                       ),
                     ),
-                    child: Icon(
-                      Icons.search_rounded,
-                      color: AppColors.secondaryColor,
-                      size: isTablet ? 24 : 20,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  // Text field and content
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextField(
-                          controller: controller,
-                          style: GoogleFonts.poppins(
-                            color: AppColors.textColor,
-                            fontSize: isTablet ? 16 : 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: 'Cari kendaraan listrik...',
-                            hintStyle: GoogleFonts.poppins(
-                              color: AppColors.textTertiary,
+                    const SizedBox(width: 16),
+                    // Text field and content
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextField(
+                            controller: controller,
+                            focusNode: focusNode,
+                            style: GoogleFonts.poppins(
+                              color: AppColors.textColor,
                               fontSize: isTablet ? 16 : 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: 'Cari kendaraan listrik...',
+                              hintStyle: GoogleFonts.poppins(
+                                color: AppColors.textTertiary,
+                                fontSize: isTablet ? 16 : 14,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.zero,
+                              isDense: true,
+                            ),
+                            onChanged: onSearch,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Ketik nama atau merek kendaraan',
+                            style: GoogleFonts.poppins(
+                              color: AppColors.textTertiary.withOpacity(0.8),
+                              fontSize: isTablet ? 12 : 10,
                               fontWeight: FontWeight.w400,
                             ),
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            contentPadding: EdgeInsets.zero,
-                            isDense: true,
                           ),
-                          onChanged: onSearch,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Ketik nama atau merek kendaraan',
-                          style: GoogleFonts.poppins(
-                            color: AppColors.textTertiary.withOpacity(0.8),
-                            fontSize: isTablet ? 12 : 10,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  // Clear button or indicator
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 200),
-                    child:
-                        isLoading
-                            ? Container(
+                    // Clear button or indicator
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      child: isLoading
+                          ? Container(
                               key: const ValueKey('loading'),
                               padding: const EdgeInsets.all(8),
                               child: const SizedBox(
@@ -521,42 +589,42 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
                                 ),
                               ),
                             )
-                            : controller.text.isNotEmpty
-                            ? Container(
-                              key: const ValueKey('clear'),
-                              child: InkWell(
-                                onTap: () {
-                                  controller.clear();
-                                  onSearch('');
-                                },
-                                borderRadius: BorderRadius.circular(8),
-                                child: Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.errorColor.withOpacity(
-                                      0.1,
-                                    ),
+                          : controller.text.isNotEmpty
+                              ? Container(
+                                  key: const ValueKey('clear'),
+                                  child: InkWell(
+                                    onTap: () {
+                                      controller.clear();
+                                      onSearch('');
+                                    },
                                     borderRadius: BorderRadius.circular(8),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.errorColor
+                                            .withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Icon(
+                                        Icons.close_rounded,
+                                        color: AppColors.errorColor,
+                                        size: isTablet ? 20 : 16,
+                                      ),
+                                    ),
                                   ),
+                                )
+                              : Container(
+                                  key: const ValueKey('arrow'),
+                                  padding: const EdgeInsets.all(8),
                                   child: Icon(
-                                    Icons.close_rounded,
-                                    color: AppColors.errorColor,
-                                    size: isTablet ? 20 : 16,
+                                    Icons.keyboard_arrow_down_rounded,
+                                    color: AppColors.textSecondary,
+                                    size: isTablet ? 24 : 20,
                                   ),
                                 ),
-                              ),
-                            )
-                            : Container(
-                              key: const ValueKey('arrow'),
-                              padding: const EdgeInsets.all(8),
-                              child: Icon(
-                                Icons.keyboard_arrow_down_rounded,
-                                color: AppColors.textSecondary,
-                                size: isTablet ? 24 : 20,
-                              ),
-                            ),
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -575,9 +643,8 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
               padding: const EdgeInsets.symmetric(vertical: 8),
               shrinkWrap: true,
               itemCount: searchResults.length,
-              separatorBuilder:
-                  (context, index) =>
-                      Divider(color: AppColors.dividerColor, height: 1),
+              separatorBuilder: (context, index) =>
+                  Divider(color: AppColors.dividerColor, height: 1),
               itemBuilder: (context, index) {
                 final vehicle = searchResults[index];
                 final imageUrl = vehicle['thumbnail_url'] ?? '';
@@ -588,53 +655,50 @@ class _EVComparisonPageState extends State<EVComparisonPage> {
                     horizontal: 12,
                     vertical: 4,
                   ),
-                  leading:
-                      imageUrl.isNotEmpty
-                          ? Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: AppColors.cardBackgroundColor,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(6),
-                              child: CachedNetworkImage(
-                                imageUrl: imageUrl,
-                                fit: BoxFit.contain,
-                                placeholder:
-                                    (context, url) => Shimmer.fromColors(
-                                      baseColor: AppColors.shimmerBase,
-                                      highlightColor:
-                                          AppColors.shimmerHighlight,
-                                      child: Container(
-                                        color: AppColors.shimmerBase,
-                                      ),
-                                    ),
-                                errorWidget:
-                                    (context, url, error) => const Center(
-                                      child: Icon(
-                                        Icons.broken_image,
-                                        color: AppColors.secondaryColor,
-                                        size: 24,
-                                      ),
-                                    ),
+                  leading: imageUrl.isNotEmpty
+                      ? Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: AppColors.cardBackgroundColor,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              fit: BoxFit.contain,
+                              placeholder: (context, url) => Shimmer.fromColors(
+                                baseColor: AppColors.shimmerBase,
+                                highlightColor: AppColors.shimmerHighlight,
+                                child: Container(
+                                  color: AppColors.shimmerBase,
+                                ),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  const Center(
+                                child: Icon(
+                                  Icons.broken_image,
+                                  color: AppColors.secondaryColor,
+                                  size: 24,
+                                ),
                               ),
                             ),
-                          )
-                          : Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: AppColors.cardBackgroundColor,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: const Icon(
-                              Icons.directions_car,
-                              color: AppColors.secondaryColor,
-                              size: 30,
-                            ),
                           ),
+                        )
+                      : Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: AppColors.cardBackgroundColor,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Icon(
+                            Icons.directions_car,
+                            color: AppColors.secondaryColor,
+                            size: 30,
+                          ),
+                        ),
                   title: Text(
                     vehicle['name'] ?? '',
                     style: GoogleFonts.poppins(

@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:infoev/app/modules/favorite_vehicles/controllers/FavoriteVehiclesController.dart';
 import 'package:infoev/app/modules/favorite_vehicles/model/favoriteVehicleModel.dart';
 import 'package:infoev/app/styles/app_colors.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:infoev/core/ad_helper.dart';
 
 class FavoritVehiclesPage extends StatefulWidget {
   const FavoritVehiclesPage({super.key});
@@ -18,28 +20,39 @@ class _FavoritVehiclesPageState extends State<FavoritVehiclesPage> {
   final FocusNode _searchFocusNode = FocusNode();
   late FavoriteVehicleController controller;
 
+  BannerAd? _bannerAd;
+
   @override
   void initState() {
     super.initState();
     controller = Get.put(FavoriteVehicleController());
 
-    // Add this at the start of build method
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.clearAndRefreshData();
-
-      // Listener untuk mengupdate search controller ketika nilai search berubah dari controller
       controller.searchQuery.listen((query) {
         if (_searchController.text != query) {
           _searchController.text = query;
         }
       });
     });
+
+    // Inisialisasi Banner Ad
+    _bannerAd = BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId(isTest: false), // isTest: true untuk development
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (_) => setState(() {}),
+        onAdFailedToLoad: (ad, error) => ad.dispose(),
+      ),
+    )..load();
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     _searchFocusNode.dispose();
+    _bannerAd?.dispose();
     super.dispose();
   }
 
@@ -138,6 +151,17 @@ class _FavoritVehiclesPageState extends State<FavoritVehiclesPage> {
               }),
             ),
           ),
+          if (_bannerAd != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Center(
+                child: SizedBox(
+                  width: _bannerAd!.size.width.toDouble(),
+                  height: _bannerAd!.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd!),
+                ),
+              ),
+            ),
         ],
       ),
     );

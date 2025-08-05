@@ -34,6 +34,9 @@ class ConfigService {
       _devUrl = 'https://infoev.id/api';
       _baseUrl = 'https://infoev.id';
       _prodUrl = 'https://infoev.id/api';
+      // _devUrl = 'https://infoev.mazkama.web.id/api';
+      // _baseUrl = 'https://infoev.mazkama.web.id';
+      // _prodUrl = 'https://infoev.mazkama.web.id/api';
       _isInMaintenanceMode = false;
 
       // Validasi nilai yang dibutuhkan

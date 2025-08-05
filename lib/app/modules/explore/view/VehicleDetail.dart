@@ -11,6 +11,8 @@ import 'package:infoev/app/styles/app_colors.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:infoev/app/widgets/login_alert_widget.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:infoev/core/ad_helper.dart';
 
 class VehicleDetailPage extends StatefulWidget {
   const VehicleDetailPage({super.key});
@@ -31,6 +33,8 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
 
   Set<int> visibleReplies = {};
 
+  BannerAd? _bannerAd;
+
   @override
   void initState() {
     super.initState();
@@ -47,6 +51,17 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
     if (controller.isLoggedIn.value) {
       favoriteController = Get.put(FavoriteVehicleController());
     }
+
+    // Inisialisasi Banner Ad
+    _bannerAd = BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId(isTest: false), // isTest: true untuk development
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (_) => setState(() {}),
+        onAdFailedToLoad: (ad, error) => ad.dispose(),
+      ),
+    )..load();
   }
 
   void _sendReply(int parentCommentId, int vehicleId) async {
@@ -77,6 +92,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
   void dispose() {
     _replyController.dispose();
     _fadeController.dispose();
+    _bannerAd?.dispose();
     super.dispose();
   }
 
@@ -548,6 +564,16 @@ class _VehicleDetailPageState extends State<VehicleDetailPage>
                           textAlign: TextAlign.center,
                         ),
                       ),
+
+
+                      if (_bannerAd != null)
+                        Center(
+                          child: SizedBox(
+                            width: _bannerAd!.size.width.toDouble(),
+                            height: _bannerAd!.size.height.toDouble(),
+                            child: AdWidget(ad: _bannerAd!),
+                          ),
+                        ),
 
                       // Comments Section
                       Padding(

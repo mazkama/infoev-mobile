@@ -11,6 +11,7 @@ import 'package:infoev/app/styles/app_colors.dart';
 import 'widgets/search_bar_widget.dart';
 import 'widgets/shimmer_loading_stations.dart';
 import 'widgets/charger_stations_list.dart';
+import 'package:google_fonts/google_fonts.dart'; // Tambahkan import ini
 
 class ChargerStationPage extends StatefulWidget {
   const ChargerStationPage({super.key});
@@ -147,7 +148,7 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                       Text(
                         station.name,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: GoogleFonts.poppins(
                           fontWeight: FontWeight.bold,
                           fontSize: 20,
                           color: AppColors.textColor,
@@ -207,7 +208,7 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                                   const SizedBox(height: 2),
                                   Text(
                                     station.vicinity,
-                                    style: const TextStyle(
+                                    style: GoogleFonts.poppins(
                                       fontSize: 14,
                                       color: AppColors.textColor,
                                       fontWeight: FontWeight.w500,
@@ -342,11 +343,12 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
         elevation: 0,
         scrolledUnderElevation: 0,
         backgroundColor: AppColors.backgroundColor,
-        title: const Text(
+        title: Text(
           "Charger Stations",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
             color: AppColors.textColor,
+            fontSize: 21, // Sesuaikan dengan CalculatorPage
           ),
         ),
         actions: [
@@ -479,9 +481,9 @@ class _ChargerStationPageState extends State<ChargerStationPage> {
                                   controller.wilayah.isEmpty
                                       ? "Stasiun Pengisian"
                                       : "Stasiun di ${controller.wilayah}",
-                                  style: const TextStyle(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w600,
                                     color: AppColors.textColor,
                                   ),
                                 ),

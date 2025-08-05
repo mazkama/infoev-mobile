@@ -5,6 +5,7 @@ import 'package:infoev/core/halper.dart';
 import 'dart:convert';
 import 'package:infoev/core/local_db.dart';
 import 'package:infoev/app/services/app_token_service.dart';
+import 'package:infoev/app/services/AppException.dart';
 
 class FavoriteVehicleController extends GetxController {
   var favoriteVehicles = <FavoriteVehicle>[].obs;
@@ -120,6 +121,13 @@ class FavoriteVehicleController extends GetxController {
         favoriteVehicles.clear();
         filteredVehicles.clear();
         errorMessage.value = 'Token tidak tersedia. Silakan login kembali.';
+        ErrorHandlerService.handleError(
+          AppException(
+            message: 'Token tidak tersedia. Silakan login kembali.',
+            type: ErrorType.authentication,
+          ),
+          showToUser: true,
+        );
         return;
       }
 
@@ -152,9 +160,21 @@ class FavoriteVehicleController extends GetxController {
       } else {
         errorMessage.value =
             'Gagal mengambil data. Status code: ${response.statusCode}';
+        ErrorHandlerService.handleError(
+          AppException(
+            message: 'Gagal mengambil data favorit. Silakan coba lagi.',
+            type: ErrorType.server,
+            statusCode: response.statusCode,
+          ),
+          showToUser: true,
+        );
       }
     } catch (e) {
-      errorMessage.value = 'Terjadi kesalahan: $e';
+      errorMessage.value = 'Terjadi kesalahan saat mengambil data favorit.';
+      ErrorHandlerService.handleError(
+        e,
+        showToUser: true,
+      );
     } finally {
       if (reset) {
         isLoading.value = false;
@@ -170,6 +190,13 @@ class FavoriteVehicleController extends GetxController {
 
     if (token == null || token.isEmpty) {
       errorMessage.value = 'Token tidak tersedia. Silakan login kembali.';
+      ErrorHandlerService.handleError(
+        AppException(
+          message: 'Token tidak tersedia. Silakan login kembali.',
+          type: ErrorType.authentication,
+        ),
+        showToUser: true,
+      );
       return;
     }
 
@@ -194,9 +221,21 @@ class FavoriteVehicleController extends GetxController {
       } else {
         errorMessage.value =
             'Gagal menambah favorit. Status code: ${response.statusCode}';
+        ErrorHandlerService.handleError(
+          AppException(
+            message: 'Gagal menambah favorit. Silakan coba lagi.',
+            type: ErrorType.server,
+            statusCode: response.statusCode,
+          ),
+          showToUser: true,
+        );
       }
     } catch (e) {
-      errorMessage.value = 'Terjadi kesalahan: $e';
+      errorMessage.value = 'Terjadi kesalahan saat menambah favorit.';
+      ErrorHandlerService.handleError(
+        e,
+        showToUser: true,
+      );
     }
   }
 
@@ -206,6 +245,13 @@ class FavoriteVehicleController extends GetxController {
 
     if (token == null || token.isEmpty) {
       errorMessage.value = 'Token tidak tersedia. Silakan login kembali.';
+      ErrorHandlerService.handleError(
+        AppException(
+          message: 'Token tidak tersedia. Silakan login kembali.',
+          type: ErrorType.authentication,
+        ),
+        showToUser: true,
+      );
       return;
     }
 
@@ -228,9 +274,21 @@ class FavoriteVehicleController extends GetxController {
       } else {
         errorMessage.value =
             'Gagal menghapus favorit. Status code: ${response.statusCode}';
+        ErrorHandlerService.handleError(
+          AppException(
+            message: 'Gagal menghapus favorit. Silakan coba lagi.',
+            type: ErrorType.server,
+            statusCode: response.statusCode,
+          ),
+          showToUser: true,
+        );
       }
     } catch (e) {
-      errorMessage.value = 'Terjadi kesalahan: $e';
+      errorMessage.value = 'Terjadi kesalahan saat menghapus favorit.';
+      ErrorHandlerService.handleError(
+        e,
+        showToUser: true,
+      );
     }
   }
 }

@@ -36,13 +36,13 @@ class AppTokenService {
 
   /// Get device id or create new one and save
   Future<String> getDeviceId() async {
-    // String? deviceId = await _storage.read(key: _deviceIdKey);
-    // if (deviceId == null) {
-    //   deviceId = _uuid.v4();
-    //   await _storage.write(key: _deviceIdKey, value: deviceId);
-    // }
-    // return deviceId;
-    return '09989b8b-1f7a-494c-a0ee-6586d7d70c8e';
+    String? deviceId = await _storage.read(key: _deviceIdKey);
+    if (deviceId == null) {
+      deviceId = _uuid.v4();
+      await _storage.write(key: _deviceIdKey, value: deviceId);
+    }
+    return deviceId;
+    // return '09989b8b-1f7a-494c-a0ee-6586d7d70c8e';
   }
 
   /// Get app key if available

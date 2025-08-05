@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:infoev/app/modules/login/model/UserModel.dart';
 import 'package:infoev/core/halper.dart';
+import 'package:infoev/app/services/AppException.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../routes/app_pages.dart';
 
@@ -46,40 +47,42 @@ class RegisterController extends GetxController {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('user', jsonEncode(user.toJson()));
 
-        Get.snackbar(
-          "Success",
-          "Hi ${user.name}!",
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
+        ErrorHandlerService.showSuccess("Hi ${user.name}!");
         Get.offAllNamed(Routes.NAVBAR);
       } else {
         String message = data['message'] ?? 'Register failed';
 
+        // Jika ada error validasi dari backend
         if (data['errors'] != null && data['errors'] is Map<String, dynamic>) {
           message = (data['errors'] as Map<String, dynamic>).entries
               .map((e) => '${e.key}: ${e.value[0]}')
               .join('\n');
+          ErrorHandlerService.handleError(
+            AppException(
+              message: message,
+              type: ErrorType.validation,
+              statusCode: response.statusCode,
+            ),
+            showToUser: true,
+          );
+        } else {
+          ErrorHandlerService.handleError(
+            AppException(
+              message: message,
+              type: ErrorType.server,
+              statusCode: response.statusCode,
+            ),
+            showToUser: true,
+          );
         }
-
-        _showSnackbar(message, isError: true);
       }
     } catch (e) {
-      _showSnackbar('Terjadi kesalahan. Coba lagi.', isError: true);
+      ErrorHandlerService.handleError(
+        e,
+        showToUser: true,
+      );
     }
 
     isLoading.value = false;
-  }
-
-  void _showSnackbar(String message, {bool isError = false}) {
-    Get.snackbar(
-      isError ? 'Error' : 'Sukses',
-      message,
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: isError ? Colors.red : Colors.green,
-      colorText: Colors.white,
-      margin: const EdgeInsets.all(12),
-      duration: const Duration(seconds: 3),
-    );
   }
 }

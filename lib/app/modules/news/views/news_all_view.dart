@@ -10,6 +10,8 @@ import 'package:infoev/app/modules/news/views/news_detail_view.dart';
 import 'package:infoev/app/styles/app_colors.dart';
 import 'package:infoev/app/modules/news/views/widgets/EmptyStateWidget.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:infoev/core/ad_helper.dart';
 
 class ArticalPage extends StatefulWidget {
   const ArticalPage({super.key});
@@ -24,6 +26,11 @@ class _ArticalPageState extends State<ArticalPage> {
   final TextEditingController searchController = TextEditingController();
   Timer? _debounce;
   bool _showSearch = false;
+
+  // Tambahkan untuk AdMob
+  final List<BannerAd?> _bannerAds = [];
+  final List<bool> _isBannerAdLoadedList = [];
+  final int adInterval = 6;
 
   @override
   void initState() {
@@ -68,8 +75,48 @@ class _ArticalPageState extends State<ArticalPage> {
     await newsController.refreshNews();
   }
 
+  void _createAndLoadBannerAd(int index) {
+    final bannerAd = BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId(isTest: false), // isTest: true untuk development
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            if (_isBannerAdLoadedList.length <= index) {
+              _isBannerAdLoadedList.add(true);
+            } else {
+              _isBannerAdLoadedList[index] = true;
+            }
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+          setState(() {
+            if (_isBannerAdLoadedList.length <= index) {
+              _isBannerAdLoadedList.add(false);
+            } else {
+              _isBannerAdLoadedList[index] = false;
+            }
+          });
+        },
+      ),
+    );
+
+    if (_bannerAds.length <= index) {
+      _bannerAds.add(bannerAd);
+    } else {
+      _bannerAds[index] = bannerAd;
+    }
+
+    bannerAd.load();
+  }
+
   @override
   void dispose() {
+    for (var ad in _bannerAds) {
+      ad?.dispose();
+    }
     scrollController.removeListener(_onScroll);
     scrollController.dispose();
     _debounce?.cancel();
@@ -386,34 +433,70 @@ class _ArticalPageState extends State<ArticalPage> {
                     delegate: SliverChildBuilderDelegate((context, index) {
                       if (index == newsList.length) {
                         // Loading more indicator
-                        return isLoadingMore
-                            ? const Padding(
-                              padding: EdgeInsets.all(8),
-                              child: Center(child: CircularProgressIndicator()),
-                            )
-                            : const SizedBox();
+                        return Obx(
+                          () => newsController.isLoadingMoreAll.value
+                              ? const Padding(
+                                  padding: EdgeInsets.all(8),
+                                  child: Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                )
+                              : const SizedBox(),
+                        );
                       }
 
-                      final news = newsList[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: NewsTitle(
-                          ontap: () {
-                            FocusScope.of(context).unfocus();
-                            FocusManager.instance.primaryFocus?.unfocus();
-                            Get.to(NewsDetailsPage(news: news));
-                          },
-                          imageUrl: news.thumbnailUrl,
-                          tag: "EV",
-                          time: DateFormat(
-                            "dd MMM yyyy",
-                            'id_ID',
-                          ).format(news.createdAt),
-                          title: news.title,
-                          author: "InfoEV.id",
+                      List<Widget> newsWithAds = [];
+                      int adCount = index ~/ adInterval;
+
+                      // Add news item
+                      newsWithAds.add(
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: NewsTitle(
+                            ontap: () {
+                              FocusScope.of(context).unfocus();
+                              FocusManager.instance.primaryFocus?.unfocus();
+                              Get.to(NewsDetailsPage(news: newsList[index]));
+                            },
+                            imageUrl: newsList[index].thumbnailUrl,
+                            tag: "EV",
+                            time: DateFormat(
+                              "dd MMM yyyy",
+                              'id_ID',
+                            ).format(newsList[index].createdAt),
+                            title: newsList[index].title,
+                            author: "InfoEV.id",
+                          ),
                         ),
                       );
-                    }, childCount: newsList.length + (hasMore ? 1 : 0)),
+
+                      // Tampilkan banner setiap kelipatan adInterval
+                      if ((index + 1) % adInterval == 0) {
+                        if (_bannerAds.length <= adCount) {
+                          _createAndLoadBannerAd(adCount);
+                        }
+
+                        if (_isBannerAdLoadedList.length > adCount &&
+                            _isBannerAdLoadedList[adCount] == true &&
+                            _bannerAds.length > adCount &&
+                            _bannerAds[adCount] != null) {
+                          newsWithAds.add(
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              child: Center(
+                                child: SizedBox(
+                                  width: _bannerAds[adCount]!.size.width.toDouble(),
+                                  height: _bannerAds[adCount]!.size.height.toDouble(),
+                                  child: AdWidget(ad: _bannerAds[adCount]!),
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                      }
+
+                      return Column(children: newsWithAds);
+                    }, childCount: newsList.length + 1),
                   ),
               ],
             );

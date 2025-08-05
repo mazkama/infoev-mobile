@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:infoev/app/modules/explore/model/MerekModel.dart';
+import 'package:infoev/app/services/AppException.dart';
 import 'package:infoev/core/halper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
@@ -476,9 +477,23 @@ class MerekController extends GetxController {
       } else {
         debugPrint('API Error: ${response.statusCode}');
         debugPrint('Response: ${response.body}');
+        // Tambahkan handler ramah
+        ErrorHandlerService.handleError(
+          AppException(
+            message: 'Gagal memuat data merek. Silakan coba lagi nanti.',
+            type: ErrorType.server,
+            statusCode: response.statusCode,
+          ),
+          showToUser: true,
+        );
       }
     } catch (e) {
       debugPrint('Error fetching data: $e');
+      // Tambahkan handler ramah
+      ErrorHandlerService.handleError(
+        e,
+        showToUser: true,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -503,6 +518,11 @@ class MerekController extends GetxController {
         } catch (e) {
           // Jika gagal mengambil banner, tetap tambahkan merek tanpa banner
           debugPrint('Error fetching banner for ${merek.name}: $e');
+          // Handler ramah jika perlu
+          ErrorHandlerService.handleError(
+            e,
+            showToUser: false, // Tidak perlu tampilkan ke user untuk kasus ini
+          );
           result.add(merek);
         }
       }
@@ -510,6 +530,10 @@ class MerekController extends GetxController {
       return result;
     } catch (e) {
       debugPrint('Error in _processMerekItems: $e');
+      ErrorHandlerService.handleError(
+        e,
+        showToUser: true,
+      );
       return [];
     }
   }

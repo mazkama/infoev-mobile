@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'dart:core';
 import 'package:infoev/app/modules/charger_station/model/ChargerStationModel.dart';
 import 'info_chip.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ChargerStationCard extends StatelessWidget {
   final ChargerStationModel station;
@@ -100,7 +101,7 @@ class ChargerStationCard extends StatelessWidget {
                       children: [
                         Text(
                           station.name,
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textColor,
@@ -109,7 +110,7 @@ class ChargerStationCard extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           station.vicinity,
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             fontSize: 14,
                             color: AppColors.textSecondary,
                           ),
@@ -118,20 +119,17 @@ class ChargerStationCard extends StatelessWidget {
                         Row(
                           children: [
                             InfoChip(
-                              label:
-                                  station.openNow == true
-                                      ? "Buka"
-                                      : (station.openNow == null
-                                          ? "Status Tidak Diketahui"
-                                          : "Tutup"),
-                              backgroundColor:
-                                  station.openNow == true
-                                      ? AppColors.successColor.withOpacity(0.2)
-                                      : AppColors.overlayColor,
-                              textColor:
-                                  station.openNow == true
-                                      ? AppColors.successColor
-                                      : AppColors.textOnPrimary,
+                              label: station.openNow == true
+                                  ? "Buka"
+                                  : (station.openNow == null
+                                      ? "Status Tidak Diketahui"
+                                      : "Tutup"),
+                              backgroundColor: station.openNow == true
+                                  ? AppColors.successColor.withOpacity(0.2)
+                                  : AppColors.overlayColor,
+                              textColor: station.openNow == true
+                                  ? AppColors.successColor
+                                  : AppColors.textOnPrimary,
                             ),
                             if (station.rating != null) ...[
                               const SizedBox(width: 8),
@@ -150,28 +148,33 @@ class ChargerStationCard extends StatelessWidget {
                           children: [
                             Text(
                               station.businessStatus,
-                              style: TextStyle(
+                              style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.w500,
                                 color: Colors.grey[300],
+                                fontSize: 12,
                               ),
                             ),
-                            // Maps button instead of distance text
                             ElevatedButton.icon(
                               onPressed: _launchMapsUrl,
-                              icon: Icon(Icons.directions, size: 16),
-                              label: Text('Detail Maps'),
+                              icon: const Icon(Icons.directions, size: 16),
+                              label: Text(
+                                'Detail Maps',
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                ),
+                              ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.buttonPrimary,
-                                // backgroundColor: Colors.purple[400],
                                 foregroundColor: AppColors.textOnPrimary,
-                                textStyle: TextStyle(
+                                textStyle: GoogleFonts.poppins(
                                   fontWeight: FontWeight.w500,
                                 ),
-                                padding: EdgeInsets.symmetric(
+                                padding: const EdgeInsets.symmetric(
                                   horizontal: 12,
                                   vertical: 4,
                                 ),
-                                minimumSize: Size(0, 30),
+                                minimumSize: const Size(0, 30),
                               ),
                             ),
                           ],

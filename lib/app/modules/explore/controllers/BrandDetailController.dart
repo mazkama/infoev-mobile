@@ -8,9 +8,9 @@ import 'package:infoev/app/modules/explore/model/VehicleTipeModel.dart';
 import 'package:infoev/core/halper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:infoev/app/services/app_token_service.dart';
+import 'package:infoev/app/services/AppException.dart';
 
-class BrandDetailController extends GetxController { 
-
+class BrandDetailController extends GetxController {
   // Data state
   var isLoading = true.obs;
   var hasError = false.obs;
@@ -103,7 +103,14 @@ class BrandDetailController extends GetxController {
 
       if (brandSlug == null) {
         hasError.value = true;
-        errorMessage.value = "Could not find brand";
+        errorMessage.value = "Data merek tidak ditemukan";
+        ErrorHandlerService.handleError(
+          AppException(
+            message: "Data merek tidak ditemukan",
+            type: ErrorType.server,
+          ),
+          showToUser: true,
+        );
         isLoading.value = false;
         return;
       }
@@ -147,7 +154,10 @@ class BrandDetailController extends GetxController {
           return;
         }
       } catch (e) {
-        debugPrint('Cache error: $e');
+        ErrorHandlerService.handleError(
+          e,
+          showToUser: true,
+        );
       }
 
       // If no cache or expired, fetch fresh data
@@ -156,8 +166,11 @@ class BrandDetailController extends GetxController {
       }
     } catch (e) {
       hasError.value = true;
-      errorMessage.value = "Error: ${e.toString()}";
-      debugPrint('Error in fetchBrandDetail: $e');
+      errorMessage.value = "Terjadi kesalahan saat memuat data merek.";
+      ErrorHandlerService.handleError(
+        e,
+        showToUser: true,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -180,24 +193,29 @@ class BrandDetailController extends GetxController {
         );
         if (response.statusCode == 200) {
           final data = jsonDecode(response.body);
-          debugPrint('Vehicle API response: $data');
           final vehiclesRaw = data['vehicles'] ?? [];
-          debugPrint('Raw vehicles: $vehiclesRaw');
-
-          // Filter dengan cast pada brand_id
           final vehicles = vehiclesRaw
               .where((v) {
                 final id = modelDetailBrand.cast<int>(v['brand_id'], 'brand_id');
                 return id != null && id == brandId;
               })
               .toList();
-          debugPrint('Filtered vehicles: $vehicles');
-
-          // Gabungkan hasil dari setiap endpoint
           allVehicles.addAll(VehicleModel.fromJsonList(vehicles));
+        } else {
+          ErrorHandlerService.handleError(
+            AppException(
+              message: 'Gagal memuat data kendaraan. Silakan coba lagi nanti.',
+              type: ErrorType.server,
+              statusCode: response.statusCode,
+            ),
+            showToUser: true,
+          );
         }
       } catch (e) {
-        debugPrint('Error fetching from endpoint: $e');
+        ErrorHandlerService.handleError(
+          e,
+          showToUser: true,
+        );
       }
     }
 
@@ -212,31 +230,34 @@ class BrandDetailController extends GetxController {
       );
       if (brandResponse.statusCode == 200) {
         final brandData = jsonDecode(brandResponse.body);
-
-        // Update brandDetail
         brandDetail.value = modelDetailBrand.BrandDetailModel(
           vehicles: allVehicles,
           nameBrand: brandData['name_brand'] ?? '',
           banner: brandData['banner'] ?? '',
           brandId: brandId,
         );
-
-        // Load vehicle years from API before applying filters
         await _loadVehicleYears(allVehicles);
-
-        // Save year cache to SharedPreferences
         await _saveYearCacheToPrefs(brandId);
-
-        // Save complete data to cache
         await _saveToCache(brandId, allVehicles, brandData);
         applyFilters();
       } else {
+        ErrorHandlerService.handleError(
+          AppException(
+            message: 'Gagal memuat detail merek. Silakan coba lagi nanti.',
+            type: ErrorType.server,
+            statusCode: brandResponse.statusCode,
+          ),
+          showToUser: true,
+        );
         throw Exception(
           "Error fetching brand details: ${brandResponse.statusCode}",
         );
       }
     } catch (e) {
-      debugPrint('Error fetching brand details: $e');
+      ErrorHandlerService.handleError(
+        e,
+        showToUser: true,
+      );
       throw e;
     }
   }
@@ -281,13 +302,11 @@ class BrandDetailController extends GetxController {
   // Memuat tipe kendaraan
   Future<void> fetchVehicleTypes() async {
     try {
-      // Cek cache terlebih dahulu
       final prefs = await SharedPreferences.getInstance();
       final cacheData = prefs.getString("vehicle_types_cache");
       final cacheTimestamp = prefs.getInt("vehicle_types_cache_timestamp") ?? 0;
       final currentTime = DateTime.now().millisecondsSinceEpoch;
 
-      // Jika data cache masih valid
       if (cacheData != null &&
           (currentTime - cacheTimestamp < cacheExpiration)) {
         final data = jsonDecode(cacheData);
@@ -299,11 +318,8 @@ class BrandDetailController extends GetxController {
         } else {
           vehicleTypes.value = [];
         }
-
-        // Data sudah dari cache, tidak perlu menyimpan ulang response.body
         await prefs.setInt("vehicle_types_cache_timestamp", currentTime);
       } else {
-        // Jika tidak ada cache atau cache tidak valid, fetch dari API dengan app_key
         final response = await _appTokenService.requestWithAutoRefresh(
           requestFn: (appKey) => http.get(
             Uri.parse("$prodUrl/tipe"),
@@ -315,21 +331,25 @@ class BrandDetailController extends GetxController {
         if (response.statusCode == 200) {
           final data = jsonDecode(response.body);
           vehicleTypes.value = VehicleTypeModel.fromJsonList(data['items']);
-
-          // Simpan ke cache
           await prefs.setString("vehicle_types_cache", response.body);
           await prefs.setInt("vehicle_types_cache_timestamp", currentTime);
         } else {
-          debugPrint(
-            "Error fetching vehicle types: API returned status ${response.statusCode}",
+          ErrorHandlerService.handleError(
+            AppException(
+              message: 'Gagal memuat tipe kendaraan. Silakan coba lagi nanti.',
+              type: ErrorType.server,
+              statusCode: response.statusCode,
+            ),
+            showToUser: true,
           );
-          // Gunakan data default jika ada error
           vehicleTypes.value = _getDefaultVehicleTypes();
         }
       }
     } catch (e) {
-      debugPrint("Error fetching vehicle types: ${e.toString()}");
-      // Gunakan data default jika ada error
+      ErrorHandlerService.handleError(
+        e,
+        showToUser: true,
+      );
       vehicleTypes.value = _getDefaultVehicleTypes();
     }
   }

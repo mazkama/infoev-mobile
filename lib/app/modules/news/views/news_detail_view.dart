@@ -8,6 +8,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:infoev/app/styles/app_colors.dart'; // Import palet warna
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:infoev/core/ad_helper.dart';
 
 class NewsDetailsPage extends StatefulWidget {
   final NewsModel news;
@@ -18,10 +20,28 @@ class NewsDetailsPage extends StatefulWidget {
 }
 
 class _NewsDetailsPageState extends State<NewsDetailsPage> {
+  BannerAd? _bannerAd;
+
   @override
   void initState() {
     super.initState();
     initializeDateFormatting('id_ID', null);
+
+    _bannerAd = BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId(isTest: false), // isTest: true untuk development
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (_) => setState(() {}),
+        onAdFailedToLoad: (ad, error) => ad.dispose(),
+      ),
+    )..load();
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
   }
 
   @override
@@ -153,6 +173,15 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
                           };
                         },
                       ),
+                      const SizedBox(height: 24),
+                      if (_bannerAd != null)
+                        Center(
+                          child: SizedBox(
+                            width: _bannerAd!.size.width.toDouble(),
+                            height: _bannerAd!.size.height.toDouble(),
+                            child: AdWidget(ad: _bannerAd!),
+                          ),
+                        ),
                     ],
                   ),
                 ),

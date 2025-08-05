@@ -12,38 +12,30 @@ class AuthService {
   // Fungsi logout dari Google
   static Future<void> logoutFromGoogle() async {
     try {
-      await _googleSignIn.signOut(); // Logout dari Google SignIn
-      print("Logged out from Google.");
+      await _googleSignIn.signOut();
+      print("Berhasil logout dari Google.");
     } catch (e) {
-      print("Error during Google sign-out: $e");
+      print("Terjadi kesalahan saat logout Google: $e");
     }
   }
 
   // Fungsi login menggunakan Google
   static Future<Map<String, dynamic>> loginWithGoogle() async {
     try {
-      // Step 1: Logout dari Google jika ada sesi sebelumnya
       await logoutFromGoogle();
-
-      // Step 2: Login melalui Google
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       if (googleUser == null) {
-        return {'success': false, 'message': 'User canceled Google sign-in.'};
+        return {'success': false, 'message': 'Proses login dengan Google dibatalkan.'};
       }
 
-      // Step 2: Ambil accessToken dari Google
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final String? accessToken = googleAuth.accessToken;
 
       if (accessToken == null) {
-        return {'success': false, 'message': 'Access token is null.'};
+        return {'success': false, 'message': 'Tidak dapat mengakses akun Google Anda. Silakan coba lagi.'};
       }
 
-      print("Google Access Token: $accessToken");
-
-      // Step 3: Kirim accessToken ke backend Laravel
       final response = await _sendTokenToBackend(accessToken);
 
       if (response != null) {
@@ -55,11 +47,15 @@ class AuthService {
       } else {
         return {
           'success': false,
-          'message': 'Failed to authenticate with Laravel backend.',
+          'message': 'Tidak dapat terhubung ke server. Silakan coba beberapa saat lagi.',
         };
       }
     } catch (e) {
-      return {'success': false, 'message': 'Error: $e'};
+      // Jangan tampilkan error sistem ke user
+      return {
+        'success': false,
+        'message': 'Terjadi gangguan saat login Google. Silakan coba beberapa saat lagi.',
+      };
     }
   }
 
@@ -86,11 +82,11 @@ class AuthService {
           'user': jsonResponse['data']['user'],
         };
       } else {
-        print('Backend response failed: ${response.statusCode}');
+        print('Gagal mendapatkan respon dari server: ${response.statusCode}');
         return null;
       }
     } catch (e) {
-      print("Error sending token to backend: $e");
+      print("Terjadi kesalahan saat mengirim token ke backend: $e");
       return null;
     }
   }
@@ -118,67 +114,71 @@ class AuthService {
           'user': json['data']['user'],
         };
       } else {
-        return {'success': false, 'message': json['message']};
+        return {
+          'success': false,
+          'message': json['message'] ?? 'Email atau password salah. Silakan cek kembali.',
+        };
       }
     } catch (e) {
-      return {'success': false, 'message': 'Error: $e'};
+      return {
+        'success': false,
+        'message': 'Tidak dapat terhubung ke server. Silakan coba beberapa saat lagi.',
+      };
     }
   }
 
   // Endpoint logout pada backend
-  static String logoutUrl =
-      "$prodUrl/auth/logout";
+  static String logoutUrl = "$prodUrl/auth/logout";
 
   // Fungsi logout untuk menghapus data dan mengarahkan ke halaman login
   static Future<void> logout(BuildContext context) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString(
-        'token',
-      ); // Mendapatkan token dari SharedPreferences
+      final token = prefs.getString('token');
 
       if (token == null) {
-        // Jika tidak ada token, langsung logout tanpa melakukan request ke backend
         _clearDataAndNavigateToLogin(context);
         return;
       }
 
-      // Kirim request logout ke backend dengan token
       final response = await http.post(
         Uri.parse(logoutUrl),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Menyertakan token dalam header
+          'Authorization': 'Bearer $token',
         },
       );
 
-      // Periksa apakah request logout berhasil
       if (response.statusCode == 200) {
-        // Jika berhasil, hapus data dan arahkan ke halaman login
         _clearDataAndNavigateToLogin(context);
       } else {
-        // Jika request logout gagal, tampilkan pesan error
-        print('Logout failed with status: ${response.statusCode}');
-        // Optional: Tampilkan pesan kesalahan kepada pengguna
+        // Tampilkan pesan ramah ke user
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Gagal logout. Silakan coba beberapa saat lagi.'),
+          ),
+        );
       }
     } catch (e) {
-      print("Error during logout: $e");
-      // Optional: Tampilkan pesan kesalahan kepada pengguna
+      // Tampilkan pesan ramah ke user
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Terjadi kesalahan saat logout. Silakan coba beberapa saat lagi.'),
+        ),
+      );
     }
   }
 
-  // Fungsi untuk menghapus data dan navigasi ke halaman login
   static Future<void> _clearDataAndNavigateToLogin(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
 
-    // Tunggu sebentar agar UI bisa menyesuaikan sebelum navigasi
     await Future.delayed(const Duration(milliseconds: 500));
 
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => LoginPage()),
-      (route) => false, // Menghapus semua halaman sebelumnya
+      (route) => false,
     );
   }
 }

@@ -6,6 +6,7 @@ import 'package:infoev/app/modules/news/model/NewsModel.dart';
 import 'package:infoev/core/halper.dart';
 import 'package:infoev/app/services/cache_service.dart';
 import 'package:infoev/app/services/app_token_service.dart';
+import 'package:infoev/app/services/AppException.dart';
 
 class HomeController extends GetxController {
   RxList<NewsModel> newNewsList = <NewsModel>[].obs; 
@@ -79,16 +80,29 @@ class HomeController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        
+
         // Proses semua data dari satu response
         await processNewsData(data);
         await processPopularVehicles(data);
         await processNewVehicles(data);
+        isError.value = false;
       } else {
         isError.value = true;
+        ErrorHandlerService.handleError(
+          AppException(
+            message: 'Gagal memuat data utama. Silakan coba lagi nanti.',
+            type: ErrorType.server,
+            statusCode: response.statusCode,
+          ),
+          showToUser: true,
+        );
       }
     } catch (e) {
       isError.value = true;
+      ErrorHandlerService.handleError(
+        e,
+        showToUser: true,
+      );
     }
   }
   

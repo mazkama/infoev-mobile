@@ -6,6 +6,7 @@ import 'package:infoev/app/modules/news/model/NewsModel.dart';
 import 'package:infoev/app/services/app_token_service.dart';
 import 'package:infoev/core/halper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:infoev/app/services/AppException.dart';
 
 class NewsController extends GetxController {
   // List & state for each type
@@ -93,6 +94,49 @@ class NewsController extends GetxController {
     isLoading.value = false;
   }
 
+  Future<void> searchNews(String query) async {
+    isLoading.value = true;
+    searchQuery.value = query;
+    currentFilter.value = 'all';
+    try {
+      final url = "$prodUrl/berita?q=$query";
+      print('[ENDPOINT] Search news: $url');
+      final response = await _appTokenService.requestWithAutoRefresh(
+        requestFn: (appKey) => http.get(
+          Uri.parse(url),
+          headers: {'x-app-key': appKey},
+        ),
+        platform: "android",
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final List<dynamic> newsData = data['posts']['data'];
+        allNewsList.assignAll(
+          newsData.map((json) => NewsModel.fromJson(json)).toList(),
+        );
+      } else {
+        isError.value = true;
+        ErrorHandlerService.handleError(
+          AppException(
+            message: 'Gagal mencari berita. Silakan coba lagi nanti.',
+            type: ErrorType.server,
+            statusCode: response.statusCode,
+          ),
+          showToUser: true,
+        );
+      }
+    } catch (e) {
+      isError.value = true;
+      ErrorHandlerService.handleError(
+        e,
+        showToUser: true,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   Future<void> refreshNews() async {
     isLoading.value = true;
     isError.value = false;
@@ -110,6 +154,10 @@ class NewsController extends GetxController {
       await loadAllData();
     } catch (e) {
       isError.value = true;
+      ErrorHandlerService.handleError(
+        e,
+        showToUser: true,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -150,9 +198,21 @@ class NewsController extends GetxController {
         }
       } else {
         isError.value = true;
+        ErrorHandlerService.handleError(
+          AppException(
+            message: 'Gagal memuat berita. Silakan coba lagi nanti.',
+            type: ErrorType.server,
+            statusCode: response.statusCode,
+          ),
+          showToUser: true,
+        );
       }
     } catch (e) {
       isError.value = true;
+      ErrorHandlerService.handleError(
+        e,
+        showToUser: true,
+      );
     } finally {
       isLoadingMoreAll.value = false;
     }
@@ -193,9 +253,21 @@ class NewsController extends GetxController {
         }
       } else {
         isError.value = true;
+        ErrorHandlerService.handleError(
+          AppException(
+            message: 'Gagal memuat berita untukmu. Silakan coba lagi nanti.',
+            type: ErrorType.server,
+            statusCode: response.statusCode,
+          ),
+          showToUser: true,
+        );
       }
     } catch (e) {
       isError.value = true;
+      ErrorHandlerService.handleError(
+        e,
+        showToUser: true,
+      );
     } finally {
       isLoadingMoreForYou.value = false;
     }
@@ -237,42 +309,23 @@ class NewsController extends GetxController {
         }
       } else {
         isError.value = true;
+        ErrorHandlerService.handleError(
+          AppException(
+            message: 'Gagal memuat tips & trik. Silakan coba lagi nanti.',
+            type: ErrorType.server,
+            statusCode: response.statusCode,
+          ),
+          showToUser: true,
+        );
       }
     } catch (e) {
       isError.value = true;
+      ErrorHandlerService.handleError(
+        e,
+        showToUser: true,
+      );
     } finally {
       isLoadingMoreTips.value = false;
-    }
-  }
-
-  Future<void> searchNews(String query) async {
-    isLoading.value = true;
-    searchQuery.value = query;
-    currentFilter.value = 'all';
-    try {
-      final url = "$prodUrl/berita?q=$query";
-      print('[ENDPOINT] Search news: $url');
-      final response = await _appTokenService.requestWithAutoRefresh(
-        requestFn: (appKey) => http.get(
-          Uri.parse(url),
-          headers: {'x-app-key': appKey},
-        ),
-        platform: "android",
-      );
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final List<dynamic> newsData = data['posts']['data'];
-        allNewsList.assignAll(
-          newsData.map((json) => NewsModel.fromJson(json)).toList(),
-        );
-      } else {
-        isError.value = true;
-      }
-    } catch (e) {
-      isError.value = true;
-    } finally {
-      isLoading.value = false;
     }
   }
 
@@ -302,6 +355,10 @@ class NewsController extends GetxController {
       }
     } catch (e) {
       isError.value = true;
+      ErrorHandlerService.handleError(
+        e,
+        showToUser: true,
+      );
     } finally {
       isLoading.value = false;
     }
