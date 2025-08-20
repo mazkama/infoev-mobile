@@ -18,9 +18,9 @@ void main() async {
 
   // Inisialisasi AdMob
   await MobileAds.instance.initialize();
-  MobileAds.instance.updateRequestConfiguration(
-    RequestConfiguration(testDeviceIds: ['824C2245EB3E0B52167C2FC577C61A29']),
-  );
+  // MobileAds.instance.updateRequestConfiguration(
+  //   RequestConfiguration(testDeviceIds: ['824C2245EB3E0B52167C2FC577C61A29']),
+  // );
 
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);

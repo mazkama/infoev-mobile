@@ -29,8 +29,8 @@ android {
         // Pastikan ini sesuai dengan kebutuhan aplikasi Anda
         minSdk = 23
         targetSdk = 35
-        versionCode = 8
-        versionName = "1.0.8"
+        versionCode = 10
+        versionName = "1.0.10"
     }
 
     signingConfigs {
