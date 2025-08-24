@@ -31,11 +31,18 @@ class _JelajahPageState extends State<JelajahPage> {
 
     // Load initial data
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // TODO: Remove debug prints later
+      debugPrint('DEBUG: JelajahPage - Starting data load');
+      
       // Ensure type counts are loaded first
       await controller.loadTypeData();
+      debugPrint('DEBUG: JelajahPage - Type data loaded');
 
       if (controller.merekList.isEmpty && !controller.isLoading.value) {
+        debugPrint('DEBUG: JelajahPage - merekList is empty, refreshing data');
         await controller.refreshData();
+      } else {
+        debugPrint('DEBUG: JelajahPage - merekList has ${controller.merekList.length} items');
       }
 
       // Ensure focus is not active when returning from other pages
@@ -350,6 +357,12 @@ class _JelajahPageState extends State<JelajahPage> {
             ),
           ),
           child: Obx(() {
+            // TODO: Remove debug prints later
+            debugPrint('DEBUG: JelajahPage - Building filter chips');
+            debugPrint('DEBUG: JelajahPage - totalBrandsCount: ${controller.totalBrandsCount.value}');
+            debugPrint('DEBUG: JelajahPage - merekList length: ${controller.merekList.length}');
+            debugPrint('DEBUG: JelajahPage - brandCounts: ${controller.filterOptions['brandCounts']}');
+            
             // Fixed order for vehicle types with their respective names
             final List<Map<String, dynamic>> fixedTypeOrder = [
               {'id': 0, 'name': 'Semua', 'count': controller.merekList.length},
@@ -362,12 +375,17 @@ class _JelajahPageState extends State<JelajahPage> {
             // Update counts from brandCounts if available
             final brandCounts = controller.filterOptions['brandCounts'];
             if (brandCounts != null) {
+              debugPrint('DEBUG: JelajahPage - Updating counts from brandCounts');
               for (var type in fixedTypeOrder) {
                 if (type['id'] != 0) {
                   type['count'] = brandCounts[type['id']] ?? 0;
                 }
               }
+            } else {
+              debugPrint('DEBUG: JelajahPage - brandCounts is null');
             }
+
+            debugPrint('DEBUG: JelajahPage - Final type order: $fixedTypeOrder');
 
             return ListView(
               scrollDirection: Axis.horizontal,
@@ -377,10 +395,28 @@ class _JelajahPageState extends State<JelajahPage> {
                     final type = entry.value;
                     final id = type['id'] as int;
                     final name = type['name'] as String;
-                    final count =
-                        id == 0
-                            ? controller.merekList.length
-                            : type['count'] as int;
+                    final count = id == 0
+                        ? () {
+                            // For "Semua", show total count based on minProductCount filter
+                            final minProductFilter = controller.filterOptions['minProductCount'] ?? 0;
+                            if (minProductFilter > 0) {
+                              return controller.merekList.where((merek) => 
+                                merek.vehiclesCount >= minProductFilter).length;
+                            } else {
+                              return controller.merekList.length;
+                            }
+                          }()
+                        : () {
+                            // For specific types, get filtered count from controller
+                            final minProductFilter = controller.filterOptions['minProductCount'] ?? 0;
+                            
+                            if (minProductFilter > 0) {
+                              // Get filtered count for this type considering minProductCount
+                              return controller.getFilteredTypeCount(id, minProductFilter);
+                            } else {
+                              return type['count'] as int;
+                            }
+                          }();
                     final isSelected =
                         id == 0
                             ? controller.filterOptions['typeId'] == null ||
@@ -398,7 +434,12 @@ class _JelajahPageState extends State<JelajahPage> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (id == 0) {
-                            controller.resetFilters();
+                            // Preserve existing filter settings and only reset typeId to null/0
+                            final currentMinProductCount = controller.filterOptions['minProductCount'] ?? 0;
+                            controller.filterBrands({
+                              'minProductCount': currentMinProductCount,
+                              'typeId': 0,
+                            });
                           } else {
                             // Preserve existing filter settings and only change typeId
                             final currentMinProductCount = controller.filterOptions['minProductCount'] ?? 0;
@@ -425,7 +466,17 @@ class _JelajahPageState extends State<JelajahPage> {
                           ),
                         ),
                         child: Text(
-                          id == 0 ? name : '$name ($count)',
+                          id == 0 
+                            ? () {
+                                final minProductFilter = controller.filterOptions['minProductCount'] ?? 0;
+                                if (minProductFilter > 0) {
+                                  final totalCount = controller.getTotalFilteredCount();
+                                  return '$name ($totalCount)';
+                                } else {
+                                  return name;
+                                }
+                              }()
+                            : '$name ($count)',
                           style: AppText.filterChipStyle(
                             isSelected: isSelected,
                             color: AppColors.ChipTextColor(
@@ -753,23 +804,57 @@ class _JelajahPageState extends State<JelajahPage> {
       backgroundColor: AppColors.backgroundColor,
       onRefresh: () => controller.refreshData(),
       child: Obx(() {
+        // TODO: Remove debug prints later
+        debugPrint('DEBUG: JelajahPage - Building main content');
+        debugPrint('DEBUG: JelajahPage - isLoading: ${controller.isLoading.value}');
+        debugPrint('DEBUG: JelajahPage - merekList length: ${controller.merekList.length}');
+        debugPrint('DEBUG: JelajahPage - filteredMerekList length: ${controller.filteredMerekList.length}');
+        
         if (controller.isLoading.value && controller.merekList.isEmpty) {
+          debugPrint('DEBUG: JelajahPage - Showing shimmer loading');
           return _buildShimmer(screenWidth);
         }
 
         if (!controller.isLoading.value && controller.merekList.isEmpty) {
+          debugPrint('DEBUG: JelajahPage - Showing error state');
           return _buildErrorState(controller);
         }
 
-        final displayList =
-            controller.filteredMerekList.isEmpty
-                ? controller.merekList
-                : controller.filteredMerekList;
+        // Check if any filters are active
+        final hasActiveFilters = (controller.filterOptions['minProductCount'] != null && 
+                                 controller.filterOptions['minProductCount'] > 0) ||
+                                (controller.filterOptions['typeId'] != null && 
+                                 controller.filterOptions['typeId'] > 0) ||
+                                controller.searchQuery.value.isNotEmpty;
 
-        if (displayList.isEmpty) {
-          return _buildEmptyFilterResults(controller);
+        // Check if minProductCount filter is active and results in empty data
+        final isMinProductCountActive = controller.filterOptions['minProductCount'] != null && 
+                                       controller.filterOptions['minProductCount'] > 0;
+        
+        // If minProductCount is active and no brands meet the criteria, show empty state
+        if (isMinProductCountActive && controller.getTotalFilteredCount() == 0) {
+          debugPrint('DEBUG: JelajahPage - No brands meet minProductCount criteria, showing empty state');
+          return _buildMinProductCountEmptyResults(controller);
         }
 
+        final displayList = hasActiveFilters 
+            ? controller.filteredMerekList
+            : (controller.filteredMerekList.isEmpty 
+                ? controller.merekList 
+                : controller.filteredMerekList);
+
+        debugPrint('DEBUG: JelajahPage - displayList length: ${displayList.length}');
+
+        if (displayList.isEmpty) {
+          // Check which type of empty state to show
+          if (isMinProductCountActive) {
+            return _buildMinProductCountEmptyResults(controller);
+          } else {
+            return _buildEmptyFilterResults(controller);
+          }
+        }
+
+        debugPrint('DEBUG: JelajahPage - Building brand grid with ${displayList.length} items');
         return _buildBrandGrid(controller, screenWidth, displayList);
       }),
     );
@@ -796,17 +881,46 @@ class _JelajahPageState extends State<JelajahPage> {
     final spacing = isTablet ? 16.0 : 12.0;
     final aspectRatio = isLargeScreen ? 1.3 : isTablet ? 1.25 : 1.2;
     
-    return GridView.builder(
-      padding: EdgeInsets.all(spacing),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        childAspectRatio: aspectRatio,
-        crossAxisSpacing: spacing,
-        mainAxisSpacing: spacing,
-      ),
-      itemCount: displayList.length,
-      itemBuilder: (context, index) {
-        final merek = displayList[index];
+    return NotificationListener<ScrollNotification>(
+      onNotification: (ScrollNotification scrollInfo) {
+        if (scrollInfo is ScrollEndNotification && 
+            scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+          // User has reached the end of the list
+          if (controller.hasMoreData.value && !controller.isLoading.value) {
+            controller.loadMoreData();
+          }
+        }
+        return false;
+      },
+      child: GridView.builder(
+        padding: EdgeInsets.all(spacing),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: crossAxisCount,
+          childAspectRatio: aspectRatio,
+          crossAxisSpacing: spacing,
+          mainAxisSpacing: spacing,
+        ),
+        itemCount: displayList.length + (controller.hasMoreData.value ? 1 : 0),
+        itemBuilder: (context, index) {
+          // TODO: Remove debug prints later
+          if (index < displayList.length) {
+            debugPrint('DEBUG: Building grid item $index: ${displayList[index].name}');
+          }
+          
+          // Show loading indicator at the end
+          if (index == displayList.length) {
+            debugPrint('DEBUG: Showing loading indicator at end of grid');
+            return Container(
+              padding: const EdgeInsets.all(16),
+              child: const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.secondaryColor),
+                ),
+              ),
+            );
+          }
+          
+          final merek = displayList[index];
         return InkWell(
           onTap: () {
             debugPrint("Merek ID: ${merek.id}, Banner: ${merek.banner}");
@@ -852,6 +966,7 @@ class _JelajahPageState extends State<JelajahPage> {
           ),
         );
       },
+      ),
     );
   }
 
@@ -1063,6 +1178,37 @@ class _JelajahPageState extends State<JelajahPage> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildMinProductCountEmptyResults(MerekController controller) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.search_off,
+            size: 64,
+            color: AppColors.primaryColor,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Tidak Ditemukan',
+            textAlign: TextAlign.center,
+            style: AppText.titleEmptyFilterResults.copyWith(
+              color: AppColors.textTertiary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Silakan nonaktifkan atau sesuaikan\nfilter sesuai kebutuhan Anda',
+            textAlign: TextAlign.center,
+            style: AppText.descriptionEmptyFilterResults.copyWith(
+              color: AppColors.textTertiary,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1363,13 +1509,16 @@ class _JelajahPageState extends State<JelajahPage> {
                     ),
                   ),
                   onPressed: () {
-                    // Reset hanya nilai pada dialog, bukan nilai filter sebenarnya
+                    // Reset semua nilai pada dialog dan reset filter sebenarnya
                     setState(() {
                       minProductCount = 0;
                       sortBy = 'name';
                       sortOrder = 'asc';
                       selectedTypeId = 0;
                     });
+                    // Reset filter sebenarnya di controller
+                    controller.resetFilters();
+                    controller.sortBrands('name', 'asc');
                   },
                 ),
                 ElevatedButton(

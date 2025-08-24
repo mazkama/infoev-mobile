@@ -31,12 +31,12 @@ class ConfigService {
       debugPrint('Initializing Config Service (manual mode, no Firebase)...');
 
       // Custom/manual assignment
-      _devUrl = 'https://infoev.id/api';
-      _baseUrl = 'https://infoev.id';
-      _prodUrl = 'https://infoev.id/api';
-      // _devUrl = 'https://infoev.mazkama.web.id/api';
-      // _baseUrl = 'https://infoev.mazkama.web.id';
-      // _prodUrl = 'https://infoev.mazkama.web.id/api';
+      // _devUrl = 'https://infoev.id/api';
+      // _baseUrl = 'https://infoev.id';
+      // _prodUrl = 'https://infoev.id/api';
+      _devUrl = 'https://infoev.mazkama.web.id/api';
+      _baseUrl = 'https://infoev.mazkama.web.id';
+      _prodUrl = 'https://infoev.mazkama.web.id/api';
       _isInMaintenanceMode = false;
 
       // Validasi nilai yang dibutuhkan
